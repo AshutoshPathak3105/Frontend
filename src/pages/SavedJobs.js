@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookmarkX, Briefcase, MapPin, IndianRupee, Clock } from 'lucide-react';
+import { BookmarkX, Briefcase } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getSavedJobs, toggleSaveJob } from '../services/api';
 import JobCard from '../components/jobs/JobCard';

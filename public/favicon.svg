@@ -1,0 +1,24 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rounded square -->
+  <rect width="100" height="100" rx="22" fill="#0f172a"/>
+
+  <!-- Magnifying glass circle -->
+  <circle cx="42" cy="42" r="22" stroke="#0ea5e9" stroke-width="7"/>
+  <!-- Magnifying glass handle -->
+  <path d="M25 62 L 16 76" stroke="#0ea5e9" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Briefcase inside lens -->
+  <rect x="31" y="33" width="22" height="16" rx="2.5" fill="#f97316"/>
+  <path d="M37 33 V 29.5 Q 37 27, 40 27 H 44 Q 47 27, 47 29.5 V 33" stroke="#f97316" stroke-width="2.5" fill="none"/>
+  <rect x="39" y="39" width="6" height="4" rx="1" fill="white" opacity="0.35"/>
+
+  <!-- Stylized "J" (orange) -->
+  <path d="M66 22 V 56 Q 66 70, 54 70" stroke="#f97316" stroke-width="9" stroke-linecap="round" fill="none"/>
+
+  <!-- Stylized "S" (blue) -->
+  <path d="M74 22 Q 94 22, 94 34 Q 94 42, 84 42 Q 74 42, 74 52 Q 74 65, 94 65" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round" fill="none"/>
+
+  <!-- Waves at bottom -->
+  <path d="M18 82 Q 50 74, 82 82" stroke="#0ea5e9" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M24 90 Q 56 82, 88 90" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+</svg>

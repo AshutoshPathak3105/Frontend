@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Quote, Users, Trophy, Target, Edit2 } from 'lucide-react';
+import { Star, Quote, Users, Trophy, Target } from 'lucide-react';
 import { getStories } from '../services/api';
-import { useAuth } from '../context/AuthContext';
-
 const TESTIMONIALS = [];
 
 const SuccessStories = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
 

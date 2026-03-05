@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, Sparkles, RotateCcw, Zap } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, Minimize2, Maximize2, RotateCcw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './AIChatbot.css';
 
@@ -93,6 +93,7 @@ const AIChatbot = () => {
         if (user?.name && messages.length === 1 && messages[0].isInitial) {
             setMessages([getInitialMessage(user.name)]);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.name]);
 
     useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);

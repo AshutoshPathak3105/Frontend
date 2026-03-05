@@ -354,12 +354,12 @@ const Footer = () => {
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
                         {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item, i, arr) => (
                             <React.Fragment key={item}>
-                                <a href="#" style={{ color: isDark ? '#475569' : 'var(--text-muted)', fontSize: 10, textDecoration: 'none', transition: 'color 0.2s' }}
+                                <button type="button" style={{ color: isDark ? '#475569' : 'var(--text-muted)', fontSize: 10, textDecoration: 'none', transition: 'color 0.2s', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                     onMouseEnter={e => e.currentTarget.style.color = 'var(--primary-light)'}
                                     onMouseLeave={e => e.currentTarget.style.color = isDark ? '#475569' : 'var(--text-muted)'}
                                 >
                                     {item}
-                                </a>
+                                </button>
                                 {i < arr.length - 1 && (
                                     <span style={{ color: isDark ? '#2d3748' : 'var(--border)', userSelect: 'none' }}>·</span>
                                 )}
