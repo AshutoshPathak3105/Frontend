@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
     User, MapPin, Briefcase, GraduationCap, Calendar,
-    MessageCircle, Mail, ThumbsUp, Tag,
+    MessageCircle, ThumbsUp, Tag,
     MoreHorizontal, Users, UserCheck, X, Clock, Camera
 } from 'lucide-react';
 import {
@@ -200,17 +200,6 @@ const PostCard = ({ post, currentUser, onLike }) => {
         </div>
     );
 };
-
-// ── Section Header ─────────────────────────────────────────────────────────────
-const SectionHeader = ({ title, subtitle }) => (
-    <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 4, height: 22, background: 'var(--gradient-primary)', borderRadius: 4 }} />
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{title}</h2>
-        </div>
-        {subtitle && <p style={{ margin: '4px 0 0 14px', fontSize: 13, color: 'var(--text-muted)' }}>{subtitle}</p>}
-    </div>
-);
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 const PublicProfile = () => {

@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { getAllCompanies } from '../services/api';
 
 const Companies = () => {
-    const [companies, setCompanies] = useState([]);
+    const [, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [industry, setIndustry] = useState('');

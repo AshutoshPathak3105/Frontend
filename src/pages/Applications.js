@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MapPin, Clock, Eye, X, Calendar, User, Download, Briefcase, GraduationCap, Code, ExternalLink, Video, Phone, Users } from 'lucide-react';
+import { MapPin, Clock, Eye, X, Calendar, User, Download, Briefcase, GraduationCap, Code, ExternalLink, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getMyApplications, getCompanyApplications, updateApplicationStatus, withdrawApplication, scheduleInterviewAPI, cancelInterviewAPI, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -32,10 +32,10 @@ const Applications = () => {
 
     const isEmployer = user?.role === 'employer' || user?.role === 'admin';
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const status = searchParams.get('status');
         if (status) setFilterStatus(status);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         fetchApplications();
     }, [isEmployer, searchParams]);
 

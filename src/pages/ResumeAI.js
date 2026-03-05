@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
     Sparkles, Shield, CheckCircle, AlertTriangle, XCircle,
-    Briefcase, GraduationCap, Code, MapPin, Clock,
-    IndianRupee, ChevronRight, Upload, User, Star,
+    Briefcase, Code, MapPin, Clock,
+    IndianRupee, Upload, Star,
     ArrowRight, Loader, FileText, RefreshCw, ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { verifyAndAnalyzeResume, getProfile, getUploadUrl } from '../services/api';
-import { useAuth } from '../context/AuthContext';
-
 // ─── Score bar color ─────────────────────────────────────────────────────────
 const scoreColor = (n) => {
     if (n >= 80) return '#10b981';
@@ -36,8 +34,6 @@ const LEVEL_COLORS = {
 };
 
 const ResumeAI = () => {
-    const { user } = useAuth();
-    const navigate = useNavigate();
     const [profile, setProfile]   = useState(null);
     const [loading, setLoading]   = useState(false);
     const [results, setResults]   = useState(null);

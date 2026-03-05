@@ -128,7 +128,6 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
     const [commentText, setCommentText] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
-    const [connecting, setConnecting] = useState(false);
     const menuRef = useRef(null);
 
     const liked = post.likes?.includes(currentUser?._id);

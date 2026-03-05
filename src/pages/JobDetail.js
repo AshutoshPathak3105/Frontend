@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-    MapPin, Briefcase, Users, Globe, Calendar,
+    MapPin, Briefcase, Users, Calendar,
     BookmarkPlus, BookmarkCheck, CheckCircle, Send
 } from 'lucide-react';
 import toast from 'react-hot-toast';
