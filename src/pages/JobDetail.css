@@ -1,0 +1,17 @@
+.job-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .job-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .job-detail-sidebar {
+        position: static !important;
+        top: auto !important;
+    }
+}

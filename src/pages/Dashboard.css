@@ -1,0 +1,42 @@
+/* Recent Activity card */
+.dash-recent-card {
+  padding: 28px;
+}
+
+/* Card header row */
+.dash-recent-header {
+  margin-bottom: 24px;
+}
+
+/* Each job / application item row */
+.dash-recent-item {
+  padding: 16px;
+  gap: 16px;
+}
+
+/* Stats card */
+.dash-stat-card {
+  padding: 24px;
+}
+
+/* Two-column main grids */
+.seeker-main-grid,
+.employer-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .seeker-main-grid,
+  .employer-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .dash-recent-card { padding: 14px; }
+  .dash-recent-header { margin-bottom: 14px; }
+  .dash-recent-item { padding: 10px 12px; gap: 10px; }
+  .dash-stat-card { padding: 16px; }
+}

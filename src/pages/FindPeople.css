@@ -1,0 +1,117 @@
+/* =========================================
+   FIND PEOPLE PAGE — Supplemental styles
+   (card grid styles come from Network.css)
+========================================= */
+
+/* Pending / Undo cancel button */
+.fp-cancel-btn {
+    color: var(--text-secondary) !important;
+    border-color: var(--border) !important;
+}
+.fp-cancel-btn:hover:not(:disabled) {
+    color: var(--danger, #ef4444) !important;
+    border-color: var(--danger, #ef4444) !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* Clickable card */
+.fp-card-clickable { cursor: pointer; }
+
+.fp-card-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+}
+
+.fp-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--text-primary);
+    transition: color 0.15s;
+}
+.fp-card-link:hover .fp-card-name { color: var(--primary); }
+
+/* Cover color override for Find People */
+.fp-cover {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+}
+
+/* ── Avatar circle ── */
+.conn-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--bg-card);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    background: var(--gradient-button);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.conn-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+.conn-avatar-initials {
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+/* Small meta lines inside card body */
+.fp-location,
+.fp-mutual {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 2px 0;
+    justify-content: center;
+}
+
+/* Pagination */
+.fp-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 36px;
+}
+
+.fp-page-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.fp-page-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.06);
+}
+.fp-page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.fp-page-info {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}

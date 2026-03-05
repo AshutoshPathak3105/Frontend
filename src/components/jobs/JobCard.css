@@ -1,0 +1,34 @@
+.job-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    min-width: 0;
+    box-sizing: border-box;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    height: 100%;
+    isolation: isolate;
+}
+
+.job-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-card);
+    opacity: 0;
+    transition: var(--transition);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.job-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-glow);
+}
+
+.job-card:hover::before {
+    opacity: 1;
+}
