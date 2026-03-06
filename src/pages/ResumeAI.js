@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
     Sparkles, Shield, CheckCircle, AlertTriangle, XCircle,
     Briefcase, Code, MapPin, Clock,
-    IndianRupee, Upload, Star,
+    IndianRupee, Upload, Star, User,
     ArrowRight, Loader, FileText, RefreshCw, ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';

@@ -281,7 +281,6 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
                                 <button
                         className={`post-action-btn connect-btn ${isConnected ? 'connected' : ''}`}
                         onClick={() => onConnect(post.author?._id, isConnected)}
-                        disabled={connecting}
                         title={isConnected ? 'Unfriend' : 'Send friend request'}
                     >
                         {isConnected ? <UserCheck size={16} /> : <Users size={16} />}

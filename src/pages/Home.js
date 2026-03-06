@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, MapPin, TrendingUp, Users, Briefcase, Building2, ArrowRight, Star, Zap, ChevronRight, CheckCircle } from 'lucide-react';
+import { Search, MapPin, ArrowRight, Star, Zap, ChevronRight, CheckCircle } from 'lucide-react';
 import { getFeaturedJobs, getJobStats, getCategories, getStories } from '../services/api';
 import JobCard from '../components/jobs/JobCard';
 import LogoImage from '../components/common/Logo';
@@ -23,7 +23,7 @@ const Home = () => {
     const [searchLocation, setSearchLocation] = useState('');
     const [featuredJobs, setFeaturedJobs] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [stats, setStats] = useState(null);
+    const [, setStats] = useState(null);
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
 

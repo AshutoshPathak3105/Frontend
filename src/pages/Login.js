@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import LogoImage from '../components/common/Logo';
 import MathCaptcha from '../components/common/MathCaptcha';
-import { Mail, Lock, LogIn, Chrome, Info, Zap, Eye, EyeOff, ArrowRight, Phone } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { login } from '../services/api';
 import { useAuth } from '../context/AuthContext';

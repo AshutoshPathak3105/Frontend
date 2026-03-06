@@ -32,12 +32,11 @@ const Applications = () => {
 
     const isEmployer = user?.role === 'employer' || user?.role === 'admin';
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const status = searchParams.get('status');
         if (status) setFilterStatus(status);
         fetchApplications();
-    }, [isEmployer, searchParams]);
+    }, [isEmployer, searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchApplications = async () => {
         setLoading(true);

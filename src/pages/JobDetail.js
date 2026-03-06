@@ -21,7 +21,8 @@ const JobDetail = () => {
     const [coverLetter, setCoverLetter] = useState('');
 
     useEffect(() => {
-        fetchJob(); // eslint-disable-line react-hooks/exhaustive-deps
+        fetchJob();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const fetchJob = async () => {

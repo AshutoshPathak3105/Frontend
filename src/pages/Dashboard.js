@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Briefcase, FileText, Clock, CheckCircle, Calendar,
+    Briefcase, FileText, CheckCircle, Calendar,
     Plus, ArrowRight, Eye, Users, Zap,
     BookmarkCheck, Building2, TrendingUp, UserCheck,
     Target, Layout, Bell, BarChart2, Send

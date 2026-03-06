@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Edit2, Trash2, Eye, Users, MapPin, Clock, ToggleLeft, ToggleRight, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Trash2, Eye, Users, MapPin, Clock, ToggleLeft, ToggleRight, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getMyJobs, deleteJob, updateJob } from '../services/api';
 
 const MyJobs = () => {
-    const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState(null);

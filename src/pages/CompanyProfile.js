@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, MapPin, Globe, Users, Phone, Mail, Save, Plus, Camera } from 'lucide-react';
+import { Building2, Globe, Phone, Mail, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getMyCompany, createCompany, updateCompany } from '../services/api';
 
@@ -7,7 +7,7 @@ const INDUSTRIES = ['Technology', 'Finance', 'Healthcare', 'Education', 'Retail'
 const COMPANY_SIZES = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
 
 const CompanyProfile = () => {
-    const [company, setCompany] = useState(null);
+    const [, setCompany] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [isNew, setIsNew] = useState(false);

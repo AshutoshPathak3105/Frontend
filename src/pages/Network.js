@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     Users, UserPlus, UserCheck, MessageCircle,
-    MoreHorizontal, Search, Trash2, Check, X,
+    MoreHorizontal, Search, Check, X,
     Briefcase, MapPin, Globe, Loader2
 } from 'lucide-react';
 import {
     getConnectionRequests, respondToConnectionRequest,
-    getConnections, getProfile, toggleFollow, removeConnection, getMe,
+    getConnections, toggleFollow, removeConnection, getMe,
     browsePeople, sendConnectionRequest
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';

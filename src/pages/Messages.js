@@ -15,9 +15,9 @@ import {
 } from '../services/api';
 import {
     Send, Search, MessageCircleMore, Trash2,
-    X, UserPlus, ChevronLeft, MoreVertical, User, Pin,
+    X, UserPlus, MoreVertical, User, Pin,
     CheckCheck, Clock, Loader, Plus, Camera,
-    FileText, Film, Image, Video, Copy, Pencil
+    FileText, Image, Video, Copy, Pencil
 } from 'lucide-react';
 import './Messages.css';
 

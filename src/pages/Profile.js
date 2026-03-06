@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Globe, Briefcase, GraduationCap, Plus, Trash2, Save, Upload, Tag, Camera, Users, UserCheck, UserPlus, FileText, ExternalLink, CheckCircle, Sparkles, Zap, Building2, IndianRupee, ChevronRight, Trophy } from 'lucide-react';
+import { User, MapPin, Briefcase, GraduationCap, Plus, Trash2, Save, Upload, Tag, Camera, Users, UserCheck, UserPlus, FileText, ExternalLink, CheckCircle, Sparkles, Zap, Building2, IndianRupee, ChevronRight, Trophy } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getProfile, updateProfile, uploadAvatar, addExperience, deleteExperience, addEducation, deleteEducation, updatePassword, uploadResume, deleteResume, recommendJobsFromResume, getUploadUrl, addAchievement, deleteAchievement, deleteAccount } from '../services/api';
 import { useAuth } from '../context/AuthContext';

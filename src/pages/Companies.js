@@ -4,12 +4,13 @@ import { getAllCompanies } from '../services/api';
 
 const Companies = () => {
     const [, setCompanies] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [industry, setIndustry] = useState('');
 
     useEffect(() => {
         fetchCompanies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, industry]);
 
     const fetchCompanies = async () => {

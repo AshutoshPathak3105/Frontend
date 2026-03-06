@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, MapPin, IndianRupee, Clock, Plus, X, Send, Tag } from 'lucide-react';
+import { Briefcase, IndianRupee, Plus, X, Send, Tag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { createJob } from '../services/api';
 

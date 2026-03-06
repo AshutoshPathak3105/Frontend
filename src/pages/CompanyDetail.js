@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { MapPin, Users, Globe, Calendar, Building2, Briefcase, ExternalLink } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { MapPin, Users, Globe, Calendar, Building2, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getCompany, getJobs } from '../services/api';
 import JobCard from '../components/jobs/JobCard';
@@ -34,6 +34,7 @@ const CompanyDetail = () => {
             }
         };
         fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleCategoryFilter = (category) => {
