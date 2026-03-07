@@ -16,7 +16,11 @@ const getFallbackMessage = (userInput) => {
 const getAIResponse = async (message, conversationHistory) => {
     try {
         const token = localStorage.getItem('token');
-        const apiBase = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const hostname = window.location.hostname;
+        const apiBase = process.env.REACT_APP_API_URL ||
+            ((hostname === 'localhost' || hostname === '127.0.0.1')
+                ? '/api'
+                : 'http://localhost:8000/api');
         const response = await fetch(`${apiBase}/ai/chat`, {
             method: 'POST',
             headers: {

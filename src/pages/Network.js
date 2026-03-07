@@ -282,165 +282,165 @@ const Network = () => {
                         </div>
                     ) : (
                         activeTab === 'requests' ? (
-                        <div className="requests-grid">
-                            {requests.length === 0 ? (
-                                <div className="empty-state">
-                                    <div className="empty-icon-wrap">
-                                        <UserPlus size={48} />
-                                    </div>
-                                    <h3>No pending requests</h3>
-                                    <p>When people want to connect with you, their requests will appear here.</p>
-                                    <Link to="/people" className="btn btn-primary">Find People to Connect</Link>
-                                </div>
-                            ) : (() => {
-                                const filteredReqs = networkSearch
-                                    ? requests.filter(r =>
-                                        r.sender?.name?.toLowerCase().includes(networkSearch.toLowerCase()) ||
-                                        r.sender?.role?.toLowerCase().includes(networkSearch.toLowerCase()) ||
-                                        r.sender?.headline?.toLowerCase().includes(networkSearch.toLowerCase())
-                                      )
-                                    : requests;
-                                if (filteredReqs.length === 0) return (
+                            <div className="requests-grid">
+                                {requests.length === 0 ? (
                                     <div className="empty-state">
-                                        <div className="empty-icon-wrap"><Search size={36} /></div>
-                                        <h3>No results found</h3>
-                                        <p>No requests match &ldquo;{networkSearch}&rdquo;.</p>
+                                        <div className="empty-icon-wrap">
+                                            <UserPlus size={48} />
+                                        </div>
+                                        <h3>No pending requests</h3>
+                                        <p>When people want to connect with you, their requests will appear here.</p>
+                                        <Link to="/people" className="btn btn-primary">Find People to Connect</Link>
                                     </div>
-                                );
-                                return filteredReqs.map(req => (
-                                    <div key={req._id} className="request-card">
-                                        {/* Cover */}
-                                        <div className="request-cover">
-                                            <div className="connection-cover-pattern" />
+                                ) : (() => {
+                                    const filteredReqs = networkSearch
+                                        ? requests.filter(r =>
+                                            r.sender?.name?.toLowerCase().includes(networkSearch.toLowerCase()) ||
+                                            r.sender?.role?.toLowerCase().includes(networkSearch.toLowerCase()) ||
+                                            r.sender?.headline?.toLowerCase().includes(networkSearch.toLowerCase())
+                                        )
+                                        : requests;
+                                    if (filteredReqs.length === 0) return (
+                                        <div className="empty-state">
+                                            <div className="empty-icon-wrap"><Search size={36} /></div>
+                                            <h3>No results found</h3>
+                                            <p>No requests match &ldquo;{networkSearch}&rdquo;.</p>
                                         </div>
-                                        {/* Avatar centred over cover */}
-                                        <div className="conn-avatar-wrap">
-                                            <Avatar u={req.sender} size={68} />
-                                        </div>
-                                        {/* Info */}
-                                        <div className="conn-body">
-                                            <Link to={`/users/profile/${req.sender?._id}`} className="conn-name-link">
-                                                <h3>{req.sender?.name}</h3>
-                                            </Link>
-                                            <p className="conn-headline">{req.sender?.headline || req.sender?.role}</p>
-                                            <div className="request-meta">
-                                                <Briefcase size={12} />
-                                                <span>{req.sender?.role}</span>
+                                    );
+                                    return filteredReqs.map(req => (
+                                        <div key={req._id} className="request-card">
+                                            {/* Cover */}
+                                            <div className="request-cover">
+                                                <div className="connection-cover-pattern" />
+                                            </div>
+                                            {/* Avatar centred over cover */}
+                                            <div className="conn-avatar-wrap">
+                                                <Avatar u={req.sender} size={68} />
+                                            </div>
+                                            {/* Info */}
+                                            <div className="conn-body">
+                                                <Link to={`/users/profile/${req.sender?._id}`} className="conn-name-link">
+                                                    <h3>{req.sender?.name}</h3>
+                                                </Link>
+                                                <p className="conn-headline">{req.sender?.headline || req.sender?.role}</p>
+                                                <div className="request-meta">
+                                                    <Briefcase size={12} />
+                                                    <span>{req.sender?.role}</span>
+                                                </div>
+                                            </div>
+                                            {/* Actions */}
+                                            <div className="request-footer">
+                                                <button
+                                                    className="btn btn-primary req-action-btn"
+                                                    onClick={() => handleRespond(req._id, 'accepted')}
+                                                >
+                                                    <Check size={15} /> Accept
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline req-action-btn ignore-btn"
+                                                    onClick={() => handleRespond(req._id, 'rejected')}
+                                                >
+                                                    <X size={15} /> Ignore
+                                                </button>
                                             </div>
                                         </div>
-                                        {/* Actions */}
-                                        <div className="request-footer">
-                                            <button
-                                                className="btn btn-primary req-action-btn"
-                                                onClick={() => handleRespond(req._id, 'accepted')}
-                                            >
-                                                <Check size={15} /> Accept
-                                            </button>
-                                            <button
-                                                className="btn btn-outline req-action-btn ignore-btn"
-                                                onClick={() => handleRespond(req._id, 'rejected')}
-                                            >
-                                                <X size={15} /> Ignore
-                                            </button>
-                                        </div>
-                                    </div>
-                                ));
-                            })()}
-                        </div>
-                    ) : (
-                        <div>
+                                    ));
+                                })()}
+                            </div>
+                        ) : (
+                            <div>
 
-                            {connections.length === 0 ? (
-                                <div className="empty-state">
-                                    <div className="empty-icon-wrap"><Users size={48} /></div>
-                                    <h3>No connections yet</h3>
-                                    <p>Start building your professional network by connecting with colleagues and recruiters.</p>
-                                    <Link to="/jobs" className="btn btn-primary">Discover People</Link>
-                                </div>
-                            ) : (() => {
-                                const filtered = connections.filter(c =>
-                                    !networkSearch ||
-                                    c.name?.toLowerCase().includes(networkSearch.toLowerCase()) ||
-                                    c.role?.toLowerCase().includes(networkSearch.toLowerCase()) ||
-                                    c.headline?.toLowerCase().includes(networkSearch.toLowerCase())
-                                );
-                                if (filtered.length === 0) return (
+                                {connections.length === 0 ? (
                                     <div className="empty-state">
-                                        <div className="empty-icon-wrap"><Search size={36} /></div>
-                                        <h3>No results found</h3>
-                                        <p>No connections match &ldquo;{networkSearch}&rdquo;.</p>
+                                        <div className="empty-icon-wrap"><Users size={48} /></div>
+                                        <h3>No connections yet</h3>
+                                        <p>Start building your professional network by connecting with colleagues and recruiters.</p>
+                                        <Link to="/jobs" className="btn btn-primary">Discover People</Link>
                                     </div>
-                                );
-                                return (
-                                    <div className="connections-grid">
-                                        {filtered.map(conn => (
-                                            <div key={conn._id} className="connection-card">
-                                                {/* Cover */}
-                                                <div className="connection-cover">
-                                                    <div className="connection-cover-pattern" />
-                                                </div>
+                                ) : (() => {
+                                    const filtered = connections.filter(c =>
+                                        !networkSearch ||
+                                        c.name?.toLowerCase().includes(networkSearch.toLowerCase()) ||
+                                        c.role?.toLowerCase().includes(networkSearch.toLowerCase()) ||
+                                        c.headline?.toLowerCase().includes(networkSearch.toLowerCase())
+                                    );
+                                    if (filtered.length === 0) return (
+                                        <div className="empty-state">
+                                            <div className="empty-icon-wrap"><Search size={36} /></div>
+                                            <h3>No results found</h3>
+                                            <p>No connections match &ldquo;{networkSearch}&rdquo;.</p>
+                                        </div>
+                                    );
+                                    return (
+                                        <div className="connections-grid">
+                                            {filtered.map(conn => (
+                                                <div key={conn._id} className="connection-card">
+                                                    {/* Cover */}
+                                                    <div className="connection-cover">
+                                                        <div className="connection-cover-pattern" />
+                                                    </div>
 
-                                                {/* Avatar centred over the cover */}
-                                                <div className="conn-avatar-wrap">
-                                                    <Avatar u={conn} size={68} />
-                                                </div>
+                                                    {/* Avatar centred over the cover */}
+                                                    <div className="conn-avatar-wrap">
+                                                        <Avatar u={conn} size={68} />
+                                                    </div>
 
-                                                {/* Info */}
-                                                <div className="conn-body">
-                                                    <Link to={`/users/profile/${conn._id}`} className="conn-name-link">
-                                                        <h3>{conn.name}</h3>
-                                                    </Link>
-                                                    <p className="conn-headline">{conn.headline || conn.role}</p>
-                                                    <span className="badge badge-primary-light">Connected</span>
-                                                </div>
+                                                    {/* Info */}
+                                                    <div className="conn-body">
+                                                        <Link to={`/users/profile/${conn._id}`} className="conn-name-link">
+                                                            <h3>{conn.name}</h3>
+                                                        </Link>
+                                                        <p className="conn-headline">{conn.headline || conn.role}</p>
+                                                        <span className="badge badge-primary-light">Connected</span>
+                                                    </div>
 
-                                                {/* Footer */}
-                                                <div className="connection-footer">
-                                                    <button
-                                                        className="btn btn-primary btn-full"
-                                                        onClick={() => navigate('/messages')}
-                                                    >
-                                                        <MessageCircle size={16} /> Message
-                                                    </button>
-                                                    <div className="menu-container" style={{ position: 'relative' }}>
+                                                    {/* Footer */}
+                                                    <div className="connection-footer">
                                                         <button
-                                                            className="btn btn-outline icon-only"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setOpenMenuId(openMenuId === conn._id ? null : conn._id);
-                                                            }}
+                                                            className="btn btn-primary btn-full"
+                                                            onClick={() => navigate('/messages')}
                                                         >
-                                                            <MoreHorizontal size={16} />
+                                                            <MessageCircle size={16} /> Message
                                                         </button>
-                                                        {openMenuId === conn._id && (
-                                                            <div className="network-dropdown-menu">
-                                                                <button onClick={() => handleToggleFollow(conn._id)}>
-                                                                    {user?.following?.includes(conn._id) ? (
-                                                                        <><UserCheck size={14} /> Unfollow</>
-                                                                    ) : (
-                                                                        <><UserPlus size={14} /> Follow User</>
-                                                                    )}
-                                                                </button>
-                                                                <button className="danger" onClick={() => handleRemoveConnection(conn._id)}>
-                                                                    <X size={14} /> Unfriend
-                                                                </button>
-                                                                <button onClick={() => toast.success('Profile shared!')}>
-                                                                    <Globe size={14} /> Share Profile
-                                                                </button>
-                                                                <button className="danger" onClick={() => toast.error('User Reported')}>
-                                                                    🚩 Report
-                                                                </button>
-                                                            </div>
-                                                        )}
+                                                        <div className="menu-container" style={{ position: 'relative' }}>
+                                                            <button
+                                                                className="btn btn-outline icon-only"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setOpenMenuId(openMenuId === conn._id ? null : conn._id);
+                                                                }}
+                                                            >
+                                                                <MoreHorizontal size={16} />
+                                                            </button>
+                                                            {openMenuId === conn._id && (
+                                                                <div className="network-dropdown-menu">
+                                                                    <button onClick={() => handleToggleFollow(conn._id)}>
+                                                                        {user?.following?.includes(conn._id) ? (
+                                                                            <><UserCheck size={14} /> Unfollow</>
+                                                                        ) : (
+                                                                            <><UserPlus size={14} /> Follow User</>
+                                                                        )}
+                                                                    </button>
+                                                                    <button className="danger" onClick={() => handleRemoveConnection(conn._id)}>
+                                                                        <X size={14} /> Unfriend
+                                                                    </button>
+                                                                    <button onClick={() => toast.success('Profile shared!')}>
+                                                                        <Globe size={14} /> Share Profile
+                                                                    </button>
+                                                                    <button className="danger" onClick={() => toast.error('User Reported')}>
+                                                                        🚩 Report
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                );
-                            })()}
-                        </div>
-                    ) : null
+                                            ))}
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        ) : null
                     )}
                 </main>
             </div>

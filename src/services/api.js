@@ -2,15 +2,18 @@ import axios from 'axios';
 
 const getBaseURL = () => {
     if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
-    // When accessed from another device on the LAN (e.g. phone, another PC),
-    // window.location.hostname will be the server's IP (e.g. 192.168.1.x).
-    // In that case, hit the backend directly on port 5000.
-    // When on localhost, use a relative path so the CRA proxy handles it.
+    // Localhost: use CRA proxy (proxy target defined in package.json)
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return '/api';
     }
-    return `http://${hostname}:5000/api`;
+    // Production without REACT_APP_API_URL set — log a clear warning.
+    // Set REACT_APP_API_URL in your Vercel environment variables to fix this.
+    console.error(
+        '[api] REACT_APP_API_URL is not set. ' +
+        'Add it in Vercel: Settings → Environment Variables → REACT_APP_API_URL=https://<your-render-backend>.onrender.com/api'
+    );
+    return 'http://localhost:8000/api';
 };
 
 // Converts a stored upload path like "/uploads/resumes/file.pdf"
@@ -22,9 +25,9 @@ export const getUploadUrl = (filePath) => {
     // Already an absolute URL (e.g. Cloudinary / clearbit) — leave as-is
     if (filePath.startsWith('http://') || filePath.startsWith('https://')) return filePath;
     const hostname = window.location.hostname;
-    const backendBase = (hostname === 'localhost' || hostname === '127.0.0.1')
-        ? 'http://localhost:5000'
-        : `http://${hostname}:5000`;
+    const backendBase = process.env.REACT_APP_API_URL
+        ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '')
+        : 'http://localhost:8000';
     return `${backendBase}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
 };
 

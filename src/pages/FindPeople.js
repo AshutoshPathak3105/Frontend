@@ -9,7 +9,9 @@ import toast from 'react-hot-toast';
 import './Network.css';
 import './FindPeople.css';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const _hostname = window.location.hostname;
+const API_BASE = process.env.REACT_APP_API_URL ||
+    ((_hostname === 'localhost' || _hostname === '127.0.0.1') ? 'http://localhost:8000' : `http://${_hostname}:8000`);
 
 const getInitials = (name = '') =>
     name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);

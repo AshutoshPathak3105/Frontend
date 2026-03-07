@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 
-const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 const generateCode = (len = 6) => {
     let code = '';
@@ -66,7 +66,7 @@ const MathCaptcha = ({ onVerify }) => {
 
     useEffect(() => {
         if (input.length === 0) { onVerify(false); return; }
-        const ok = input === code;
+        const ok = input.toUpperCase() === code.toUpperCase();
         setVerified(ok);
         onVerify(ok);
     }, [input, code, onVerify]);

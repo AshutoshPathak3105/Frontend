@@ -23,7 +23,7 @@ import './Messages.css';
 
 // GIPHY public API key — replace with your own from https://developers.giphy.com
 const GIPHY_KEY = 'dc6zaTOxFJmzC';
-const BACKEND_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const BACKEND_URL = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const getInitials = (name) =>

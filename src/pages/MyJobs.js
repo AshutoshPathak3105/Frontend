@@ -154,10 +154,22 @@ const MyJobs = () => {
                                 {(job.applicationsCount || 0) > 0 && (
                                     <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
                                         <Link
-                                            to={`/applications?job=${job._id}`}
-                                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--primary-light)', fontWeight: 600 }}
+                                            to={`/jobs/${job._id}/applications`}
+                                            style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: 8,
+                                                padding: '8px 16px', borderRadius: 'var(--radius-full)',
+                                                fontSize: 13, fontWeight: 600,
+                                                background: 'rgba(99,102,241,0.1)',
+                                                color: 'var(--primary-light)',
+                                                border: '1px solid rgba(99,102,241,0.2)',
+                                                textDecoration: 'none', transition: 'var(--transition)',
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.18)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; }}
                                         >
-                                            <Users size={13} /> View {job.applicationsCount} application{job.applicationsCount !== 1 ? 's' : ''} <ArrowRight size={12} />
+                                            <Users size={13} />
+                                            View {job.applicationsCount} Application{job.applicationsCount !== 1 ? 's' : ''}
+                                            <ArrowRight size={12} />
                                         </Link>
                                     </div>
                                 )}

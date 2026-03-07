@@ -38,6 +38,7 @@ import Messages from './pages/Messages';
 import Network from './pages/Network';
 import FindPeople from './pages/FindPeople';
 import ResumeAI from './pages/ResumeAI';
+import JobApplicationsPage from './pages/JobApplicationsPage';
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
   if (loading) return (
@@ -63,7 +64,7 @@ const AppContent = () => {
   const noFooterPaths = ['/messages'];
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
   // Profile menu pages where chatbot should be hidden
-  const noChatbotPaths = ['/dashboard', '/profile', '/applications', '/saved-jobs', '/network', '/my-jobs', '/company-profile', '/admin', '/messages', '/people', '/users/profile'];
+  const noChatbotPaths = ['/dashboard', '/profile', '/applications', '/saved-jobs', '/network', '/my-jobs', '/company-profile', '/admin', '/messages', '/people', '/users/profile', '/jobs'];
   const shouldHideChatbot = noChatbotPaths.some(path => location.pathname.startsWith(path));
 
   return (
@@ -87,7 +88,8 @@ const AppContent = () => {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/saved-jobs" element={<ProtectedRoute roles={['jobseeker']}><SavedJobs /></ProtectedRoute>} />
-          <Route path="/applications" element={<ProtectedRoute roles={['jobseeker']}><Applications /></ProtectedRoute>} />
+          <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
+          <Route path="/jobs/:jobId/applications" element={<ProtectedRoute roles={['employer', 'admin']}><JobApplicationsPage /></ProtectedRoute>} />
           <Route path="/post-job" element={<ProtectedRoute roles={['employer', 'admin']}><PostJob /></ProtectedRoute>} />
           <Route path="/my-jobs" element={<ProtectedRoute roles={['employer', 'admin']}><MyJobs /></ProtectedRoute>} />
           <Route path="/company-profile" element={<ProtectedRoute roles={['employer', 'admin']}><CompanyProfile /></ProtectedRoute>} />

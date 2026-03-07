@@ -32,7 +32,13 @@ const Login = () => {
             toast.success(`Welcome back, ${res.data.user.name}!`);
             navigate('/dashboard');
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Login failed. Please try again.');
+            const status = err.response?.status;
+            const msg = err.response?.data?.message;
+            if (status === 429) {
+                toast.error('Too many login attempts. Please wait 15 minutes and try again.');
+            } else {
+                toast.error(msg || 'Login failed. Please try again.');
+            }
             setCaptchaKey(prev => prev + 1);
             setCaptchaVerified(false);
         } finally {
