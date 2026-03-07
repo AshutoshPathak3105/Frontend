@@ -1,0 +1,48 @@
+type User @table {
+  displayName: String!
+  email: String!
+  createdAt: Timestamp!
+  photoUrl: String
+  lastLogin: Timestamp
+}
+
+type JobApplication @table {
+  user: User!
+  jobTitle: String!
+  companyName: String!
+  applicationDate: Date!
+  status: String!
+  jobLink: String
+  notes: String
+  salaryExpectation: Int
+}
+
+type Document @table {
+  user: User!
+  name: String!
+  type: String!
+  content: String!
+  createdAt: Timestamp!
+  lastModifiedAt: Timestamp
+}
+
+type AIRequest @table {
+  user: User!
+  jobApplication: JobApplication
+  requestType: String!
+  jobDescription: String!
+  aiResponse: String!
+  requestedAt: Timestamp!
+  feedback: String
+  documentGeneratedId: Document
+}
+
+type Reminder @table {
+  user: User!
+  jobApplication: JobApplication
+  title: String!
+  dueDate: Timestamp!
+  status: String!
+  createdAt: Timestamp!
+  notes: String
+}

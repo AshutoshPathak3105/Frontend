@@ -1,0 +1,40 @@
+query ListJobApplications @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  jobApplications(where: { userId: { eq_expr: "auth.uid" } }) {
+    id
+    jobTitle
+    companyName
+    applicationDate
+    status
+    jobLink
+  }
+}
+
+mutation CreateDocument($name: String!, $type: String!, $content: String!) @auth(level: USER) {
+  document_insert(data: {
+    userId_expr: "auth.uid",
+    name: $name,
+    type: $type,
+    content: $content,
+    createdAt_expr: "request.time"
+  })
+}
+
+query GetUserReminders @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  reminders(where: { userId: { eq_expr: "auth.uid" } }) {
+    id
+    title
+    dueDate
+    status
+    jobApplication {
+      jobTitle
+      companyName
+    }
+  }
+}
+
+mutation UpdateJobApplicationStatus($id: UUID!, $status: String!) @auth(level: USER) {
+  jobApplication_update(
+    key: { id: $id },
+    data: { status: $status }
+  )
+}

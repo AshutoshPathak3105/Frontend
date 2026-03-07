@@ -1,0 +1,121 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This is a seed data mutation for development purposes only.") {
+  user_insertMany(data: [
+    {
+      id: "b2d8e7c0-6b7d-4e1b-8c9a-0d7f2a1b3c4e",
+      displayName: "Alice Smith",
+      email: "alice.smith@example.com",
+      createdAt: "2023-01-15T10:00:00Z"
+    },
+    {
+      id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      displayName: "Bob Johnson",
+      email: "bob.johnson@example.com",
+      createdAt: "2023-02-20T11:30:00Z"
+    },
+    {
+      id: "c0d1e2f3-4a5b-6c7d-8e9f-0123456789ab",
+      displayName: "Charlie Brown",
+      email: "charlie.brown@example.com",
+      createdAt: "2023-03-05T09:15:00Z"
+    }
+  ])
+  jobApplication_insertMany(data: [
+    {
+      id: "10a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6",
+      userId_expr: "b2d8e7c0-6b7d-4e1b-8c9a-0d7f2a1b3c4e",
+      jobTitle: "Software Engineer",
+      companyName: "Tech Solutions Inc.",
+      applicationDate: "2023-04-01",
+      status: "Applied",
+      jobLink: "https://example.com/job1",
+      notes: "Exciting opportunity in AI development.",
+      salaryExpectation: 120000
+    },
+    {
+      id: "20b3c4d5-e6f7-a8b9-c0d1-e2f3a4b5c6d7",
+      userId_expr: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      jobTitle: "Product Manager",
+      companyName: "Innovate Co.",
+      applicationDate: "2023-04-10",
+      status: "Interview Scheduled",
+      jobLink: "https://example.com/job2",
+      notes: "Initial screening call went well.",
+      salaryExpectation: 135000
+    },
+    {
+      id: "30c4d5e6-f7a8-b9c0-d1e2-f3a4b5c6d7e8",
+      userId_expr: "b2d8e7c0-6b7d-4e1b-8c9a-0d7f2a1b3c4e",
+      jobTitle: "Data Scientist",
+      companyName: "Data Insights Corp.",
+      applicationDate: "2023-04-05",
+      status: "Rejected",
+      jobLink: "https://example.com/job3",
+      notes: "Too much travel required.",
+      salaryExpectation: 110000
+    }
+  ])
+  document_insertMany(data: [
+    {
+      id: "40d5e6f7-a8b9-c0d1-e2f3-a4b5c6d7e8f9",
+      userId_expr: "b2d8e7c0-6b7d-4e1b-8c9a-0d7f2a1b3c4e",
+      name: "Alice's Resume",
+      type: "Resume",
+      content: "Alice Smith resume content...",
+      createdAt: "2023-01-20T14:00:00Z"
+    },
+    {
+      id: "50e6f7a8-b9c0-d1e2-f3a4-b5c6d7e8f9a0",
+      userId_expr: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      name: "Bob's Cover Letter",
+      type: "Cover Letter",
+      content: "Bob Johnson cover letter content...",
+      createdAt: "2023-02-25T16:00:00Z"
+    }
+  ])
+  reminder_insertMany(data: [
+    {
+      id: "60f7a8b9-c0d1-e2f3-a4b5-c6d7e8f9a0b1",
+      userId_expr: "b2d8e7c0-6b7d-4e1b-8c9a-0d7f2a1b3c4e",
+      jobApplicationId_expr: "10a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6",
+      title: "Follow up on Tech Solutions application",
+      dueDate: "2023-04-08T09:00:00Z",
+      status: "Pending",
+      createdAt: "2023-04-02T10:00:00Z",
+      notes: "Send a polite follow-up email."
+    },
+    {
+      id: "70a8b9c0-d1e2-f3a4-b5c6-d7e8f9a0b1c2",
+      userId_expr: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      jobApplicationId_expr: "20b3c4d5-e6f7-a8b9-c0d1-e2f3a4b5c6d7",
+      title: "Prepare for Innovate Co. interview",
+      dueDate: "2023-04-12T14:00:00Z",
+      status: "In Progress",
+      createdAt: "2023-04-10T17:00:00Z",
+      notes: "Research company values and common interview questions."
+    }
+  ])
+  aIRequest_insertMany(data: [
+    {
+      id: "80b9c0d1-e2f3-a4b5-c6d7-e8f9a0b1c2d3",
+      userId_expr: "b2d8e7c0-6b7d-4e1b-8c9a-0d7f2a1b3c4e",
+      jobApplicationId_expr: "10a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6",
+      requestType: "Resume Review",
+      jobDescription: "Software Engineer at Tech Solutions Inc.",
+      aiResponse: "AI suggested improvements for keywords and formatting.",
+      requestedAt: "2023-04-01T15:00:00Z",
+      feedback: "Very helpful suggestions, applied most of them.",
+      documentGeneratedId_expr: "40d5e6f7-a8b9-c0d1-e2f3-a4b5c6d7e8f9"
+    },
+    {
+      id: "90c0d1e2-f3a4-b5c6-d7e8-f9a0b1c2d3e4",
+      userId_expr: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      jobApplicationId_expr: "20b3c4d5-e6f7-a8b9-c0d1-e2f3a4b5c6d7",
+      requestType: "Cover Letter Generation",
+      jobDescription: "Product Manager at Innovate Co.",
+      aiResponse: "AI generated a draft cover letter based on job description.",
+      requestedAt: "2023-04-10T12:00:00Z",
+      feedback: "Good starting point, needed some personalization.",
+      documentGeneratedId_expr: "50e6f7a8-b9c0-d1e2-f3a4-b5c6d7e8f9a0"
+    }
+  ])
+}
