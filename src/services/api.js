@@ -24,7 +24,6 @@ export const getUploadUrl = (filePath) => {
     if (!filePath) return '';
     // Already an absolute URL (e.g. Cloudinary / clearbit) — leave as-is
     if (filePath.startsWith('http://') || filePath.startsWith('https://')) return filePath;
-    const hostname = window.location.hostname;
     const backendBase = process.env.REACT_APP_API_URL
         ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '')
         : 'http://localhost:8000';
