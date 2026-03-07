@@ -176,9 +176,21 @@ const Navbar = () => {
 
     const handleSearchSelect = (path) => {
         setSearchOpen(false);
+        setMobileSearchOpen(false);
         setSearchQuery('');
         setSearchResults(null);
         navigate(path);
+    };
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter' && searchQuery.trim().length >= 2) {
+            handleSearchSelect(`/jobs?search=${encodeURIComponent(searchQuery.trim())}`);
+        }
+        if (e.key === 'Escape') {
+            setSearchOpen(false);
+            setSearchQuery('');
+            setSearchResults(null);
+        }
     };
 
     const handleLogout = () => {
@@ -228,6 +240,7 @@ const Navbar = () => {
                                 value={searchQuery}
                                 onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }}
                                 onFocus={() => setSearchOpen(true)}
+                                onKeyDown={handleSearchKeyDown}
                                 autoComplete="off"
                             />
                             {searchQuery && (
@@ -250,7 +263,7 @@ const Navbar = () => {
                                             <div className="search-section">
                                                 <div className="search-section-label"><Briefcase size={12} /> Jobs</div>
                                                 {searchResults.jobs.map(job => (
-                                                    <button key={job._id} className="search-result-item" onClick={() => handleSearchSelect(`/jobs/${job._id}`)}>
+                                                    <button type="button" key={job._id} className="search-result-item" onMouseDown={e => e.preventDefault()} onClick={() => handleSearchSelect(`/jobs/${job._id}`)}>
                                                         <div className="search-result-main">{job.title}</div>
                                                         <div className="search-result-sub">{job.company?.name} &bull; {job.location}</div>
                                                     </button>
@@ -262,7 +275,7 @@ const Navbar = () => {
                                             <div className="search-section">
                                                 <div className="search-section-label"><Building2 size={12} /> Companies</div>
                                                 {searchResults.companies.map(c => (
-                                                    <button key={c._id} className="search-result-item" onClick={() => handleSearchSelect(`/companies/${c._id}`)}>
+                                                    <button type="button" key={c._id} className="search-result-item" onMouseDown={e => e.preventDefault()} onClick={() => handleSearchSelect(`/companies/${c._id}`)}>
                                                         <div className="search-result-main">{c.name}</div>
                                                         <div className="search-result-sub">{c.industry} &bull; {c.location}</div>
                                                     </button>
@@ -270,8 +283,8 @@ const Navbar = () => {
                                             </div>
                                         )}
                                         {/* Users */}
-                                        {searchResults.users.map(u => (
-                                            <button key={u._id} className="search-result-item" onClick={() => handleSearchSelect(`/users/profile/${u._id}`)}>
+                                        {searchResults.users?.length > 0 && searchResults.users.map(u => (
+                                            <button type="button" key={u._id} className="search-result-item" onMouseDown={e => e.preventDefault()} onClick={() => handleSearchSelect(`/users/profile/${u._id}`)}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                     <div className="avatar" style={{ width: 32, height: 32, fontSize: 13, flexShrink: 0 }}>
                                                         {u.avatar
@@ -291,7 +304,7 @@ const Navbar = () => {
                                         )}
                                         {/* View all */}
                                         {(searchResults.jobs?.length > 0 || searchResults.companies?.length > 0) && (
-                                            <button className="search-view-all" onClick={() => handleSearchSelect(`/jobs?search=${encodeURIComponent(searchQuery)}`)}>
+                                            <button type="button" className="search-view-all" onMouseDown={e => e.preventDefault()} onClick={() => handleSearchSelect(`/jobs?search=${encodeURIComponent(searchQuery)}`)}>
                                                 View all results for &ldquo;{searchQuery}&rdquo;
                                             </button>
                                         )}
@@ -546,6 +559,7 @@ const Navbar = () => {
                             value={searchQuery}
                             onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }}
                             onFocus={() => setSearchOpen(true)}
+                            onKeyDown={handleSearchKeyDown}
                             autoComplete="off"
                             autoFocus
                         />
@@ -564,7 +578,7 @@ const Navbar = () => {
                                         <div className="search-section">
                                             <div className="search-section-label"><Briefcase size={12} /> Jobs</div>
                                             {searchResults.jobs.map(job => (
-                                                <button key={job._id} className="search-result-item" onClick={() => { handleSearchSelect(`/jobs/${job._id}`); setMobileSearchOpen(false); }}>
+                                                <button type="button" key={job._id} className="search-result-item" onMouseDown={e => e.preventDefault()} onClick={() => { handleSearchSelect(`/jobs/${job._id}`); }}>
                                                     <div className="search-result-main">{job.title}</div>
                                                     <div className="search-result-sub">{job.company?.name} &bull; {job.location}</div>
                                                 </button>
@@ -575,7 +589,7 @@ const Navbar = () => {
                                         <div className="search-section">
                                             <div className="search-section-label"><Building2 size={12} /> Companies</div>
                                             {searchResults.companies.map(c => (
-                                                <button key={c._id} className="search-result-item" onClick={() => { handleSearchSelect(`/companies/${c._id}`); setMobileSearchOpen(false); }}>
+                                                <button type="button" key={c._id} className="search-result-item" onMouseDown={e => e.preventDefault()} onClick={() => { handleSearchSelect(`/companies/${c._id}`); }}>
                                                     <div className="search-result-main">{c.name}</div>
                                                     <div className="search-result-sub">{c.industry} &bull; {c.location}</div>
                                                 </button>
@@ -586,7 +600,7 @@ const Navbar = () => {
                                         <div className="search-section">
                                             <div className="search-section-label"><Users size={12} /> People</div>
                                             {searchResults.users.map(u => (
-                                                <button key={u._id} className="search-result-item" onClick={() => { handleSearchSelect(`/users/profile/${u._id}`); setMobileSearchOpen(false); }}>
+                                                <button type="button" key={u._id} className="search-result-item" onMouseDown={e => e.preventDefault()} onClick={() => { handleSearchSelect(`/users/profile/${u._id}`); }}>
                                                     <div className="search-result-main">{u.name}</div>
                                                     <div className="search-result-sub">{u.headline || u.role}</div>
                                                 </button>
@@ -597,7 +611,7 @@ const Navbar = () => {
                                         <div className="search-no-results">No results for &ldquo;{searchQuery}&rdquo;</div>
                                     )}
                                     {(searchResults.jobs?.length > 0 || searchResults.companies?.length > 0) && (
-                                        <button className="search-view-all" onClick={() => { handleSearchSelect(`/jobs?search=${encodeURIComponent(searchQuery)}`); setMobileSearchOpen(false); }}>
+                                        <button type="button" className="search-view-all" onMouseDown={e => e.preventDefault()} onClick={() => { handleSearchSelect(`/jobs?search=${encodeURIComponent(searchQuery)}`); }}>
                                             View all results for &ldquo;{searchQuery}&rdquo;
                                         </button>
                                     )}
