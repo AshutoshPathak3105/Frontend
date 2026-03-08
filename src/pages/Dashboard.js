@@ -112,12 +112,8 @@ const JobSeekerDashboard = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(160px, 100%), 1fr))', gap: 14, marginBottom: 28 }}>
                     {[
                         { label: 'Total Applied', value: stats?.totalApplications || 0, color: '#6366f1', icon: <FileText size={18} />, to: '/applications' },
-                        { label: 'Under Review', value: stats?.reviewing || 0, color: '#60a5fa', icon: <Eye size={18} />, to: '/applications?status=reviewing' },
-                        { label: 'Shortlisted', value: stats?.shortlisted || 0, color: '#10b981', icon: <CheckCircle size={18} />, to: '/applications?status=shortlisted' },
                         { label: 'Interviews', value: stats?.interviews || 0, color: '#a78bfa', icon: <Calendar size={18} />, to: '/applications?status=interview' },
-                        { label: 'Offers', value: stats?.offered || 0, color: '#34d399', icon: <TrendingUp size={18} />, to: '/applications?status=offered' },
                         { label: 'Saved Jobs', value: stats?.savedJobs || 0, color: '#f59e0b', icon: <BookmarkCheck size={18} />, to: '/saved-jobs' },
-                        { label: 'Connections', value: stats?.connections || 0, color: '#f472b6', icon: <Users size={18} />, to: '/network' },
                         { label: 'Profile Score', value: `${completion}%`, color: completion >= 80 ? '#10b981' : completion >= 50 ? '#f59e0b' : '#f87171', icon: <Zap size={18} />, to: '/profile' },
                     ].map((s, i) => (
                         <Link key={i} to={s.to} style={{ textDecoration: 'none' }}>
