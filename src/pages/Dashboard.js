@@ -6,19 +6,19 @@ import {
     BookmarkCheck, Building2, TrendingUp, UserCheck,
     Target, Layout, Bell, BarChart2, Send
 } from 'lucide-react';
-import { getDashboardStats, getEmployerDashboardStats, getMyApplications, getMyJobs } from '../services/api';
+import { getDashboardStats, getEmployerDashboardStats, getMyApplications, getMyJobs, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import SocialFeed from '../components/social/SocialFeed';
 import './Dashboard.css';
 
 const STATUS_CONFIG = {
-    pending:     { label: 'Applied',     color: '#fbbf24', bg: 'rgba(245,158,11,0.1)' },
-    reviewing:   { label: 'Reviewing',   color: '#60a5fa', bg: 'rgba(59,130,246,0.1)' },
+    pending: { label: 'Applied', color: '#fbbf24', bg: 'rgba(245,158,11,0.1)' },
+    reviewing: { label: 'Reviewing', color: '#60a5fa', bg: 'rgba(59,130,246,0.1)' },
     shortlisted: { label: 'Shortlisted', color: '#34d399', bg: 'rgba(16,185,129,0.1)' },
-    interview:   { label: 'Interview',   color: '#a78bfa', bg: 'rgba(139,92,246,0.1)' },
-    offered:     { label: 'Offered',     color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-    rejected:    { label: 'Rejected',    color: '#f87171', bg: 'rgba(239,68,68,0.1)' },
-    withdrawn:   { label: 'Withdrawn',   color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
+    interview: { label: 'Interview', color: '#a78bfa', bg: 'rgba(139,92,246,0.1)' },
+    offered: { label: 'Offered', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+    rejected: { label: 'Rejected', color: '#f87171', bg: 'rgba(239,68,68,0.1)' },
+    withdrawn: { label: 'Withdrawn', color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
 };
 
 const getGreeting = () => {
@@ -58,11 +58,11 @@ const JobSeekerDashboard = () => {
     );
 
     const pipeline = [
-        { key: 'pending',     label: 'Applied',     color: '#fbbf24', emoji: '📤' },
-        { key: 'reviewing',   label: 'Reviewing',   color: '#60a5fa', emoji: '👁️' },
+        { key: 'pending', label: 'Applied', color: '#fbbf24', emoji: '📤' },
+        { key: 'reviewing', label: 'Reviewing', color: '#60a5fa', emoji: '👁️' },
         { key: 'shortlisted', label: 'Shortlisted', color: '#34d399', emoji: '✅' },
-        { key: 'interviews',  label: 'Interviews',  color: '#a78bfa', emoji: '📅' },
-        { key: 'offered',     label: 'Offered',     color: '#10b981', emoji: '🎉' },
+        { key: 'interviews', label: 'Interviews', color: '#a78bfa', emoji: '📅' },
+        { key: 'offered', label: 'Offered', color: '#10b981', emoji: '🎉' },
     ];
 
     const completion = stats?.profileCompletion || 0;
@@ -111,14 +111,14 @@ const JobSeekerDashboard = () => {
                 {/* Stats row */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(160px, 100%), 1fr))', gap: 14, marginBottom: 28 }}>
                     {[
-                        { label: 'Total Applied',  value: stats?.totalApplications || 0, color: '#6366f1', icon: <FileText size={18} />,     to: '/applications' },
-                        { label: 'Under Review',   value: stats?.reviewing || 0,         color: '#60a5fa', icon: <Eye size={18} />,           to: '/applications?status=reviewing' },
-                        { label: 'Shortlisted',    value: stats?.shortlisted || 0,       color: '#10b981', icon: <CheckCircle size={18} />,   to: '/applications?status=shortlisted' },
-                        { label: 'Interviews',     value: stats?.interviews || 0,         color: '#a78bfa', icon: <Calendar size={18} />,      to: '/applications?status=interview' },
-                        { label: 'Offers',         value: stats?.offered || 0,            color: '#34d399', icon: <TrendingUp size={18} />,    to: '/applications?status=offered' },
-                        { label: 'Saved Jobs',     value: stats?.savedJobs || 0,          color: '#f59e0b', icon: <BookmarkCheck size={18} />, to: '/saved-jobs' },
-                        { label: 'Connections',    value: stats?.connections || 0,        color: '#f472b6', icon: <Users size={18} />,         to: '/network' },
-                        { label: 'Profile Score',  value: `${completion}%`,               color: completion >= 80 ? '#10b981' : completion >= 50 ? '#f59e0b' : '#f87171', icon: <Zap size={18} />, to: '/profile' },
+                        { label: 'Total Applied', value: stats?.totalApplications || 0, color: '#6366f1', icon: <FileText size={18} />, to: '/applications' },
+                        { label: 'Under Review', value: stats?.reviewing || 0, color: '#60a5fa', icon: <Eye size={18} />, to: '/applications?status=reviewing' },
+                        { label: 'Shortlisted', value: stats?.shortlisted || 0, color: '#10b981', icon: <CheckCircle size={18} />, to: '/applications?status=shortlisted' },
+                        { label: 'Interviews', value: stats?.interviews || 0, color: '#a78bfa', icon: <Calendar size={18} />, to: '/applications?status=interview' },
+                        { label: 'Offers', value: stats?.offered || 0, color: '#34d399', icon: <TrendingUp size={18} />, to: '/applications?status=offered' },
+                        { label: 'Saved Jobs', value: stats?.savedJobs || 0, color: '#f59e0b', icon: <BookmarkCheck size={18} />, to: '/saved-jobs' },
+                        { label: 'Connections', value: stats?.connections || 0, color: '#f472b6', icon: <Users size={18} />, to: '/network' },
+                        { label: 'Profile Score', value: `${completion}%`, color: completion >= 80 ? '#10b981' : completion >= 50 ? '#f59e0b' : '#f87171', icon: <Zap size={18} />, to: '/profile' },
                     ].map((s, i) => (
                         <Link key={i} to={s.to} style={{ textDecoration: 'none' }}>
                             <div className="dash-stat-card" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', height: '100%', transition: 'var(--transition)' }}
@@ -171,7 +171,7 @@ const JobSeekerDashboard = () => {
                                             onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
                                         >
                                             <div style={{ width: 40, height: 40, background: 'var(--gradient-primary)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, overflow: 'hidden' }}>
-                                                {app.job?.company?.logo ? <img src={app.job.company.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} /> : '🏢'}
+                                                {app.job?.company?.logo ? <img src={getUploadUrl(app.job.company.logo)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} /> : '🏢'}
                                             </div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{app.job?.title || 'Unknown Role'}</div>
@@ -203,11 +203,11 @@ const JobSeekerDashboard = () => {
                             <h3 style={{ fontSize: 12, fontWeight: 700, marginBottom: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Quick Actions</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {[
-                                    { to: '/jobs',         icon: <Briefcase size={15} />,     label: 'Browse Jobs',     color: '#6366f1' },
-                                    { to: '/saved-jobs',   icon: <BookmarkCheck size={15} />, label: 'Saved Jobs',      color: '#f59e0b' },
-                                    { to: '/applications', icon: <FileText size={15} />,      label: 'My Applications', color: '#10b981' },
-                                    { to: '/profile',      icon: <UserCheck size={15} />,     label: 'Update Profile',  color: '#60a5fa' },
-                                    { to: '/network',      icon: <Users size={15} />,         label: 'My Network',      color: '#f472b6' },
+                                    { to: '/jobs', icon: <Briefcase size={15} />, label: 'Browse Jobs', color: '#6366f1' },
+                                    { to: '/saved-jobs', icon: <BookmarkCheck size={15} />, label: 'Saved Jobs', color: '#f59e0b' },
+                                    { to: '/applications', icon: <FileText size={15} />, label: 'My Applications', color: '#10b981' },
+                                    { to: '/profile', icon: <UserCheck size={15} />, label: 'Update Profile', color: '#60a5fa' },
+                                    { to: '/network', icon: <Users size={15} />, label: 'My Network', color: '#f472b6' },
                                 ].map((a, i) => (
                                     <Link key={i} to={a.to} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', border: '1px solid var(--border)', textDecoration: 'none', transition: 'var(--transition)' }}
                                         onMouseEnter={e => { e.currentTarget.style.borderColor = a.color; e.currentTarget.style.background = `${a.color}10`; }}
@@ -322,12 +322,12 @@ const EmployerDashboard = () => {
                 {/* Stats row */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(160px, 100%), 1fr))', gap: 14, marginBottom: 28 }}>
                     {[
-                        { label: 'Active Jobs',      value: stats?.activeJobs || 0,            color: '#10b981', icon: <Briefcase size={18} />,   to: '/my-jobs' },
-                        { label: 'Total Applicants', value: stats?.totalApplications || 0,      color: '#6366f1', icon: <Users size={18} />,        to: '/applications' },
-                        { label: 'Shortlisted',      value: stats?.shortlisted || 0,            color: '#34d399', icon: <CheckCircle size={18} />,  to: '/applications?status=shortlisted' },
-                        { label: 'Interviews',       value: stats?.interviews || 0,              color: '#a78bfa', icon: <Calendar size={18} />,     to: '/applications?status=interview' },
-                        { label: 'Hired',            value: stats?.hired || 0,                   color: '#fbbf24', icon: <UserCheck size={18} />,    to: '/applications?status=offered' },
-                        { label: 'New Today',        value: stats?.newApplicationsToday || 0,    color: '#f472b6', icon: <Bell size={18} />,         to: '/applications' },
+                        { label: 'Active Jobs', value: stats?.activeJobs || 0, color: '#10b981', icon: <Briefcase size={18} />, to: '/my-jobs' },
+                        { label: 'Total Applicants', value: stats?.totalApplications || 0, color: '#6366f1', icon: <Users size={18} />, to: '/applications' },
+                        { label: 'Shortlisted', value: stats?.shortlisted || 0, color: '#34d399', icon: <CheckCircle size={18} />, to: '/applications?status=shortlisted' },
+                        { label: 'Interviews', value: stats?.interviews || 0, color: '#a78bfa', icon: <Calendar size={18} />, to: '/applications?status=interview' },
+                        { label: 'Hired', value: stats?.hired || 0, color: '#fbbf24', icon: <UserCheck size={18} />, to: '/applications?status=offered' },
+                        { label: 'New Today', value: stats?.newApplicationsToday || 0, color: '#f472b6', icon: <Bell size={18} />, to: '/applications' },
                     ].map((s, i) => (
                         <Link key={i} to={s.to} style={{ textDecoration: 'none' }}>
                             <div className="dash-stat-card" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', height: '100%', transition: 'var(--transition)' }}
@@ -396,11 +396,11 @@ const EmployerDashboard = () => {
                             <h3 style={{ fontSize: 12, fontWeight: 700, marginBottom: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Quick Actions</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {[
-                                    { to: '/post-job',        icon: <Plus size={15} />,       label: 'Post a New Job',     color: '#10b981' },
-                                    { to: '/my-jobs',         icon: <Layout size={15} />,     label: 'Manage Postings',    color: '#6366f1' },
-                                    { to: '/applications',    icon: <FileText size={15} />,   label: 'View Applications',  color: '#a78bfa' },
-                                    { to: '/company-profile', icon: <Building2 size={15} />,  label: 'Company Profile',    color: '#f59e0b' },
-                                    { to: '/profile',         icon: <UserCheck size={15} />,  label: 'Edit My Profile',    color: '#60a5fa' },
+                                    { to: '/post-job', icon: <Plus size={15} />, label: 'Post a New Job', color: '#10b981' },
+                                    { to: '/my-jobs', icon: <Layout size={15} />, label: 'Manage Postings', color: '#6366f1' },
+                                    { to: '/applications', icon: <FileText size={15} />, label: 'View Applications', color: '#a78bfa' },
+                                    { to: '/company-profile', icon: <Building2 size={15} />, label: 'Company Profile', color: '#f59e0b' },
+                                    { to: '/profile', icon: <UserCheck size={15} />, label: 'Edit My Profile', color: '#60a5fa' },
                                 ].map((a, i) => (
                                     <Link key={i} to={a.to} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', border: '1px solid var(--border)', textDecoration: 'none', transition: 'var(--transition)' }}
                                         onMouseEnter={e => { e.currentTarget.style.borderColor = a.color; e.currentTarget.style.background = `${a.color}10`; }}
@@ -419,9 +419,9 @@ const EmployerDashboard = () => {
                             <h3 style={{ fontSize: 12, fontWeight: 700, marginBottom: 16, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Hiring Funnel</h3>
                             {[
                                 { label: 'Applications In', value: stats?.totalApplications || 0, color: '#6366f1' },
-                                { label: 'Shortlisted',     value: stats?.shortlisted || 0,        color: '#10b981' },
-                                { label: 'Interviews',      value: stats?.interviews || 0,          color: '#a78bfa' },
-                                { label: 'Offers Made',     value: stats?.hired || 0,               color: '#fbbf24' },
+                                { label: 'Shortlisted', value: stats?.shortlisted || 0, color: '#10b981' },
+                                { label: 'Interviews', value: stats?.interviews || 0, color: '#a78bfa' },
+                                { label: 'Offers Made', value: stats?.hired || 0, color: '#fbbf24' },
                             ].map((item, i) => {
                                 const pct = i === 0 ? 100 : Math.min(100, Math.round((item.value / totalApps) * 100));
                                 return (
@@ -442,9 +442,9 @@ const EmployerDashboard = () => {
                         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 20 }}>
                             <h3 style={{ fontSize: 12, fontWeight: 700, marginBottom: 16, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Job Performance</h3>
                             {[
-                                { icon: <Briefcase size={15} />, label: 'Total Jobs Posted', value: stats?.totalJobs || 0,       color: '#10b981' },
-                                { icon: <Eye size={15} />,       label: 'Total Job Views',   value: stats?.totalJobViews || 0,   color: '#6366f1' },
-                                { icon: <BarChart2 size={15} />, label: 'Avg. Applicants',   value: stats?.activeJobs ? Math.round((stats?.totalApplications || 0) / stats.activeJobs) : 0, color: '#f59e0b' },
+                                { icon: <Briefcase size={15} />, label: 'Total Jobs Posted', value: stats?.totalJobs || 0, color: '#10b981' },
+                                { icon: <Eye size={15} />, label: 'Total Job Views', value: stats?.totalJobViews || 0, color: '#6366f1' },
+                                { icon: <BarChart2 size={15} />, label: 'Avg. Applicants', value: stats?.activeJobs ? Math.round((stats?.totalApplications || 0) / stats.activeJobs) : 0, color: '#f59e0b' },
                             ].map((m, i) => (
                                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: i < 2 ? 12 : 0 }}>
                                     <div style={{ width: 32, height: 32, background: `${m.color}18`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: m.color, flexShrink: 0 }}>{m.icon}</div>

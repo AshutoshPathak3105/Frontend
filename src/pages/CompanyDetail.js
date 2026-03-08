@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Users, Globe, Calendar, Building2, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getCompany, getJobs } from '../services/api';
+import { getCompany, getJobs, getUploadUrl } from '../services/api';
 import JobCard from '../components/jobs/JobCard';
 import '../components/jobs/JobCard.css';
 
@@ -34,7 +34,7 @@ const CompanyDetail = () => {
             }
         };
         fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleCategoryFilter = (category) => {
@@ -69,7 +69,7 @@ const CompanyDetail = () => {
                             borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: 36, flexShrink: 0, overflow: 'hidden', border: '2px solid var(--border)'
                         }}>
-                            {company.logo ? <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏢'}
+                            {company.logo ? <img src={getUploadUrl(company.logo)} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏢'}
                         </div>
                         <div style={{ flex: 1 }}>
                             <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -183,7 +183,7 @@ const CompanyDetail = () => {
                         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 28 }}>
                             <div style={{ textAlign: 'center', marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
                                 <div style={{ width: 64, height: 64, borderRadius: 14, overflow: 'hidden', background: '#fff', border: '1px solid var(--border)', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    {company.logo ? <img src={company.logo} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <Building2 size={32} color="var(--primary)" />}
+                                    {company.logo ? <img src={getUploadUrl(company.logo)} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <Building2 size={32} color="var(--primary)" />}
                                 </div>
                                 <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{company.name}</h3>
                                 {company.verified && <span style={{ fontSize: 11, color: 'var(--success)', fontWeight: 600 }}>Verified Institution</span>}

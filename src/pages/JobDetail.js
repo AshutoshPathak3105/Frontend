@@ -5,7 +5,7 @@ import {
     BookmarkPlus, BookmarkCheck, CheckCircle, Send
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getJob, applyJob, toggleSaveJob } from '../services/api';
+import { getJob, applyJob, toggleSaveJob, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './JobDetail.css';
 
@@ -22,7 +22,7 @@ const JobDetail = () => {
 
     useEffect(() => {
         fetchJob();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const fetchJob = async () => {
@@ -145,7 +145,7 @@ const JobDetail = () => {
                                     borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: 28, flexShrink: 0
                                 }}>
-                                    {job.company?.logo ? <img src={job.company.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }} /> : '🏢'}
+                                    {job.company?.logo ? <img src={getUploadUrl(job.company.logo)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }} /> : '🏢'}
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
@@ -207,44 +207,44 @@ const JobDetail = () => {
                     <div className="job-detail-sidebar" style={{ position: 'sticky', top: 100 }}>
                         {/* Apply Card — hidden for employers */}
                         {user?.role !== 'employer' && (
-                        <div style={{
-                            background: 'var(--bg-card)', border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 3vw, 28px)', marginBottom: 20
-                        }}>
-                            {job.salary?.min || job.salary?.max ? (
-                                <div style={{ marginBottom: 20 }}>
-                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Salary Range</div>
-                                    <div style={{ fontSize: 22, fontWeight: 800, color: '#ffffff' }}>
-                                        {formatSalary(job.salary?.min, job.salary?.max)}
+                            <div style={{
+                                background: 'var(--bg-card)', border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 3vw, 28px)', marginBottom: 20
+                            }}>
+                                {job.salary?.min || job.salary?.max ? (
+                                    <div style={{ marginBottom: 20 }}>
+                                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Salary Range</div>
+                                        <div style={{ fontSize: 22, fontWeight: 800, color: '#ffffff' }}>
+                                            {formatSalary(job.salary?.min, job.salary?.max)}
+                                        </div>
+                                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>per year</div>
                                     </div>
-                                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>per year</div>
-                                </div>
-                            ) : null}
+                                ) : null}
 
-                            {hasApplied ? (
-                                <div style={{
-                                    background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
-                                    borderRadius: 'var(--radius-md)', padding: '14px 20px', textAlign: 'center',
-                                    color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-                                }}>
-                                    <CheckCircle size={18} /> Already Applied
-                                </div>
-                            ) : isExpired ? (
-                                <div style={{
-                                    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                                    borderRadius: 'var(--radius-md)', padding: '14px 20px', textAlign: 'center',
-                                    color: 'var(--danger)', fontWeight: 600
-                                }}>Application Closed</div>
-                            ) : (
-                                <button onClick={() => setShowApplyModal(true)} className="btn btn-primary btn-full" style={{ padding: '14px', fontSize: 15 }}>
-                                    <Send size={16} /> Apply Now
+                                {hasApplied ? (
+                                    <div style={{
+                                        background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
+                                        borderRadius: 'var(--radius-md)', padding: '14px 20px', textAlign: 'center',
+                                        color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                                    }}>
+                                        <CheckCircle size={18} /> Already Applied
+                                    </div>
+                                ) : isExpired ? (
+                                    <div style={{
+                                        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                                        borderRadius: 'var(--radius-md)', padding: '14px 20px', textAlign: 'center',
+                                        color: 'var(--danger)', fontWeight: 600
+                                    }}>Application Closed</div>
+                                ) : (
+                                    <button onClick={() => setShowApplyModal(true)} className="btn btn-primary btn-full" style={{ padding: '14px', fontSize: 15 }}>
+                                        <Send size={16} /> Apply Now
+                                    </button>
+                                )}
+
+                                <button onClick={handleSave} className="btn btn-secondary btn-full" style={{ marginTop: 12 }}>
+                                    {saved ? <><BookmarkCheck size={16} /> Saved</> : <><BookmarkPlus size={16} /> Save Job</>}
                                 </button>
-                            )}
-
-                            <button onClick={handleSave} className="btn btn-secondary btn-full" style={{ marginTop: 12 }}>
-                                {saved ? <><BookmarkCheck size={16} /> Saved</> : <><BookmarkPlus size={16} /> Save Job</>}
-                            </button>
-                        </div>
+                            </div>
                         )}
 
                         {/* Job Overview */}

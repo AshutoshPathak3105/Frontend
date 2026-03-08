@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Building2, Globe, Phone, Mail, Save } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Building2, Globe, Phone, Mail, Save, Upload, Link as LinkIcon, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getMyCompany, createCompany, updateCompany } from '../services/api';
+import { getMyCompany, createCompany, updateCompany, getUploadUrl } from '../services/api';
+import API from '../services/api';
 
 const INDUSTRIES = ['Technology', 'Finance', 'Healthcare', 'Education', 'Retail', 'Manufacturing', 'Media', 'Consulting', 'Real Estate', 'Other'];
 const COMPANY_SIZES = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
@@ -12,6 +13,13 @@ const CompanyProfile = () => {
     const [saving, setSaving] = useState(false);
     const [isNew, setIsNew] = useState(false);
 
+    // Logo state
+    const [logoFile, setLogoFile] = useState(null);        // selected File object
+    const [logoPreview, setLogoPreview] = useState('');    // local object URL for preview
+    const [isDragging, setIsDragging] = useState(false);
+    const [logoInputMode, setLogoInputMode] = useState('url'); // 'url' | 'file'
+    const fileInputRef = useRef(null);
+
     const [form, setForm] = useState({
         name: '', description: '', industry: '', size: '', location: '',
         website: '', phone: '', email: '', founded: '', logo: ''
@@ -20,6 +28,11 @@ const CompanyProfile = () => {
     useEffect(() => {
         fetchCompany();
     }, []);
+
+    // Clean up object URL on unmount
+    useEffect(() => {
+        return () => { if (logoPreview && logoPreview.startsWith('blob:')) URL.revokeObjectURL(logoPreview); };
+    }, [logoPreview]);
 
     const fetchCompany = async () => {
         try {
@@ -48,18 +61,77 @@ const CompanyProfile = () => {
 
     const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
+    // Handle file selection (from input or drop)
+    const handleFileSelect = (file) => {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { toast.error('Please select an image file (PNG, JPG, GIF, WebP, SVG)'); return; }
+        if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5 MB'); return; }
+        setLogoFile(file);
+        if (logoPreview && logoPreview.startsWith('blob:')) URL.revokeObjectURL(logoPreview);
+        setLogoPreview(URL.createObjectURL(file));
+        // Clear URL field so we're using file upload
+        setForm(prev => ({ ...prev, logo: '' }));
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleFileSelect(file);
+    };
+
+    const clearLogoFile = () => {
+        setLogoFile(null);
+        if (logoPreview && logoPreview.startsWith('blob:')) URL.revokeObjectURL(logoPreview);
+        setLogoPreview('');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    // Effective logo preview URL (blob > URL field > existing stored logo)
+    const effectiveLogoPreview = logoPreview || (form.logo ? getUploadUrl(form.logo) : '');
+
     const handleSave = async (e) => {
         e.preventDefault();
         if (!form.name) { toast.error('Company name is required'); return; }
         setSaving(true);
         try {
+            let savedLogo = form.logo;
+
+            // Upload logo file first if one was selected
+            if (logoFile) {
+                const fd = new FormData();
+                // Append all form fields + logo file for multipart
+                Object.keys(form).forEach(k => { if (k !== 'logo' && form[k] !== '') fd.append(k, form[k]); });
+                fd.append('logo', logoFile);
+
+                let res;
+                if (isNew) {
+                    res = await API.post('/companies', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                    setCompany(res.data.company);
+                    setIsNew(false);
+                    toast.success('Company profile created! 🎉');
+                } else {
+                    res = await API.put('/companies', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                    setCompany(res.data.company);
+                    toast.success('Company profile updated!');
+                }
+                // Refresh form with saved data
+                const c = res.data.company;
+                setForm(prev => ({ ...prev, logo: c.logo || '' }));
+                clearLogoFile();
+                setSaving(false);
+                return;
+            }
+
+            // No file — send JSON (logo might be a URL)
+            const payload = { ...form, logo: savedLogo };
             if (isNew) {
-                const res = await createCompany(form);
+                const res = await createCompany(payload);
                 setCompany(res.data.company);
                 setIsNew(false);
                 toast.success('Company profile created! 🎉');
             } else {
-                const res = await updateCompany(form);
+                const res = await updateCompany(payload);
                 setCompany(res.data.company);
                 toast.success('Company profile updated!');
             }
@@ -82,6 +154,36 @@ const CompanyProfile = () => {
             <style>{`
                 .cp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
                 @media (max-width: 640px) { .cp-grid-2 { grid-template-columns: 1fr; } }
+                .logo-drop-zone {
+                    border: 2px dashed var(--border);
+                    border-radius: var(--radius-lg);
+                    padding: 20px;
+                    cursor: pointer;
+                    transition: var(--transition);
+                    background: var(--bg-secondary);
+                    text-align: center;
+                }
+                .logo-drop-zone:hover, .logo-drop-zone.dragging {
+                    border-color: var(--primary);
+                    background: rgba(99,102,241,0.05);
+                }
+                .logo-mode-tab {
+                    padding: 6px 16px;
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-full);
+                    cursor: pointer;
+                    font-size: 13px;
+                    font-weight: 600;
+                    transition: var(--transition);
+                    background: transparent;
+                    color: var(--text-secondary);
+                    font-family: var(--font-family);
+                }
+                .logo-mode-tab.active {
+                    background: var(--gradient-primary);
+                    border-color: var(--primary);
+                    color: white;
+                }
             `}</style>
             <div className="container" style={{ padding: '40px 24px', maxWidth: 900 }}>
                 <div style={{ marginBottom: 32 }}>
@@ -112,19 +214,112 @@ const CompanyProfile = () => {
                         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)' }}>
                             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 24 }}>Company Identity</h2>
 
-                            {/* Logo Preview */}
-                            <div style={{ display: 'flex', gap: 20, alignItems: 'center', marginBottom: 24 }}>
-                                <div style={{
-                                    width: 80, height: 80, background: 'var(--gradient-primary)',
-                                    borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 32, overflow: 'hidden', border: '2px solid var(--border)', flexShrink: 0
-                                }}>
-                                    {form.logo ? <img src={form.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏢'}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <label className="form-label">Logo URL</label>
-                                    <input className="form-input" name="logo" value={form.logo} onChange={handleChange} placeholder="https://example.com/logo.png" />
-                                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>Enter a URL for your company logo</p>
+                            {/* Logo Section */}
+                            <div style={{ marginBottom: 24 }}>
+                                <label className="form-label" style={{ fontWeight: 700, fontSize: 14, marginBottom: 12, display: 'block' }}>
+                                    Company Logo
+                                </label>
+
+                                <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                    {/* Logo Preview */}
+                                    <div style={{
+                                        width: 88, height: 88, background: 'var(--gradient-primary)',
+                                        borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 32, overflow: 'hidden', border: '2px solid var(--border)', flexShrink: 0,
+                                        position: 'relative'
+                                    }}>
+                                        {effectiveLogoPreview
+                                            ? <img src={effectiveLogoPreview} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                onError={(e) => { e.target.style.display = 'none'; }}
+                                            />
+                                            : '🏢'
+                                        }
+                                        {/* Clear button */}
+                                        {(logoFile || form.logo) && (
+                                            <button type="button" onClick={() => { clearLogoFile(); setForm(prev => ({ ...prev, logo: '' })); }}
+                                                style={{
+                                                    position: 'absolute', top: -8, right: -8, width: 22, height: 22,
+                                                    background: 'var(--danger)', border: 'none', borderRadius: '50%',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    cursor: 'pointer', color: 'white'
+                                                }}
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {/* Input mode toggle + inputs */}
+                                    <div style={{ flex: 1, minWidth: 240 }}>
+                                        {/* Mode tabs */}
+                                        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                                            <button
+                                                type="button"
+                                                className={`logo-mode-tab ${logoInputMode === 'file' ? 'active' : ''}`}
+                                                onClick={() => setLogoInputMode('file')}
+                                            >
+                                                <Upload size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                                                Upload File
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`logo-mode-tab ${logoInputMode === 'url' ? 'active' : ''}`}
+                                                onClick={() => setLogoInputMode('url')}
+                                            >
+                                                <LinkIcon size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                                                Logo URL
+                                            </button>
+                                        </div>
+
+                                        {logoInputMode === 'file' ? (
+                                            <div
+                                                className={`logo-drop-zone ${isDragging ? 'dragging' : ''}`}
+                                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                                onDragLeave={() => setIsDragging(false)}
+                                                onDrop={handleDrop}
+                                                onClick={() => fileInputRef.current?.click()}
+                                            >
+                                                <input
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ display: 'none' }}
+                                                    onChange={(e) => handleFileSelect(e.target.files?.[0])}
+                                                />
+                                                {logoFile ? (
+                                                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                                                        <span style={{ color: 'var(--primary)', fontWeight: 600 }}>✓ {logoFile.name}</span>
+                                                        <span style={{ color: 'var(--text-muted)', marginLeft: 8 }}>
+                                                            ({(logoFile.size / 1024).toFixed(0)} KB)
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <Upload size={22} style={{ color: 'var(--primary)', marginBottom: 8 }} />
+                                                        <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                                                            <strong style={{ color: 'var(--primary)' }}>Click to upload</strong> or drag & drop
+                                                        </p>
+                                                        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                                                            PNG, JPG, GIF, WebP, SVG — max 5 MB
+                                                        </p>
+                                                    </>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <input
+                                                    className="form-input"
+                                                    name="logo"
+                                                    value={form.logo}
+                                                    onChange={(e) => { handleChange(e); clearLogoFile(); }}
+                                                    placeholder="https://example.com/logo.png"
+                                                />
+                                                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+                                                    Paste a direct image URL (PNG, JPG, SVG) — e.g. your Clearbit logo or CDN link
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

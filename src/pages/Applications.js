@@ -307,20 +307,20 @@ const Applications = () => {
                                     {Object.entries(STATUS_CONFIG).filter(([k]) => k === 'offered' || k === 'rejected').map(([status, config]) => {
                                         const isFinalized = ['offered', 'rejected'].includes(selectedApp.status);
                                         return (
-                                        <button key={status}
-                                            onClick={() => !isFinalized && handleStatusUpdate(selectedApp._id, status)}
-                                            disabled={isFinalized}
-                                            style={{
-                                                padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: 12, fontWeight: 600,
-                                                cursor: isFinalized ? 'not-allowed' : 'pointer', fontFamily: 'Inter',
-                                                opacity: isFinalized && selectedApp.status !== status ? 0.35 : 1,
-                                                background: selectedApp.status === status ? config.bg : 'transparent',
-                                                color: selectedApp.status === status ? config.color : 'var(--text-secondary)',
-                                                border: `1px solid ${selectedApp.status === status ? config.border : 'var(--border)'}`,
-                                                transition: 'var(--transition)'
-                                            }}>
-                                            {config.label}
-                                        </button>
+                                            <button key={status}
+                                                onClick={() => !isFinalized && handleStatusUpdate(selectedApp._id, status)}
+                                                disabled={isFinalized}
+                                                style={{
+                                                    padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: 12, fontWeight: 600,
+                                                    cursor: isFinalized ? 'not-allowed' : 'pointer', fontFamily: 'Inter',
+                                                    opacity: isFinalized && selectedApp.status !== status ? 0.35 : 1,
+                                                    background: selectedApp.status === status ? config.bg : 'transparent',
+                                                    color: selectedApp.status === status ? config.color : 'var(--text-secondary)',
+                                                    border: `1px solid ${selectedApp.status === status ? config.border : 'var(--border)'}`,
+                                                    transition: 'var(--transition)'
+                                                }}>
+                                                {config.label}
+                                            </button>
                                         );
                                     })}
                                 </div>
@@ -461,7 +461,7 @@ const Applications = () => {
                                         {isEmployer
                                             ? <User size={22} color="white" />
                                             : app.job?.company?.logo
-                                                ? <img src={app.job.company.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ? <img src={getUploadUrl(app.job.company.logo)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 : '🏢'}
                                     </div>
 
