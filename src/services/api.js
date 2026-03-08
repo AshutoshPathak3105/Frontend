@@ -189,7 +189,9 @@ export const deleteStory = (id) => API.delete(`/stories/${id}`);
 
 // ─── Social Feed Posts ────────────────────────────────────────────────────────
 export const getFeedPosts = (params) => API.get('/posts', { params });
-export const createFeedPost = (data) => API.post('/posts', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const createFeedPost = (data) => API.post('/posts', data);
+// Note: do NOT set Content-Type manually for FormData — axios sets it automatically
+// with the correct multipart boundary, which multer requires to parse the body.
 export const deleteFeedPost = (id) => API.delete(`/posts/${id}`);
 export const togglePostLike = (id) => API.put(`/posts/${id}/like`);
 export const addPostComment = (id, text) => API.post(`/posts/${id}/comment`, { text });

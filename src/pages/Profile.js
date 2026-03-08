@@ -328,6 +328,8 @@ const Profile = () => {
                     font-size: 28px; font-weight: 700; color: #fff;
                     flex-shrink: 0; overflow: hidden;
                     cursor: pointer; position: relative;
+                    text-decoration: none; box-sizing: border-box;
+                    -webkit-tap-highlight-color: transparent;
                 }
                 .profile-hero-avatar:hover { transform: scale(1.02); }
                 .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; margin-top: 12px; text-align: center; }
@@ -379,13 +381,14 @@ const Profile = () => {
                     <div className="profile-hero-banner" />
                     <div className="profile-hero-body">
                         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <div
+                            <label
+                                htmlFor="profile-avatar-upload"
                                 className="profile-hero-avatar"
-                                onClick={() => !avatarUploading && avatarInputRef.current?.click()}
-                                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+                                onClick={e => { if (avatarUploading) e.preventDefault(); }}
+                                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: avatarUploading ? 'default' : 'pointer' }}
                             >
                                 {avatarPreview
-                                    ? <img src={avatarPreview} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ? <img src={avatarPreview} alt="avatar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                     : getInitials(profileForm.name || user?.name)
                                 }
                                 {avatarUploading && (
@@ -393,24 +396,41 @@ const Profile = () => {
                                         <div className="spinner" style={{ width: 20, height: 20, borderTopColor: '#fff' }} />
                                     </div>
                                 )}
-                            </div>
-                            <button
-                                onClick={() => avatarInputRef.current?.click()}
-                                disabled={avatarUploading}
+                            </label>
+                            <label
+                                htmlFor="profile-avatar-upload"
+                                onClick={e => { if (avatarUploading) e.preventDefault(); }}
                                 style={{
                                     marginTop: 10,
-                                    background: 'var(--gradient-button)', border: 'none', borderRadius: 20,
-                                    padding: '6px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                                    background: 'var(--gradient-button)', borderRadius: 20,
+                                    padding: '6px 16px', fontSize: 12, fontWeight: 700,
+                                    cursor: avatarUploading ? 'not-allowed' : 'pointer',
                                     display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
                                     color: '#fff', transition: 'all 0.2s', zIndex: 10
                                 }}
                             >
                                 {avatarUploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
                                 <span>Edit</span>
-                            </button>
+                            </label>
                         </div>
                         <div className="profile-hero-info">
-                            <h1>{profileForm.name || user?.name || 'Your Name'}</h1>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+                                <h1 style={{ margin: 0 }}>{profileForm.name || user?.name || 'Your Name'}</h1>
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                                    padding: '3px 10px', borderRadius: 20,
+                                    fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+                                    ...(user?.role === 'employer'
+                                        ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
+                                        : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }
+                                    )
+                                }}>
+                                    {user?.role === 'employer'
+                                        ? <><Briefcase size={10} /> Employer</>
+                                        : <><User size={10} /> Job Seeker</>
+                                    }
+                                </span>
+                            </div>
                             <p>{profileForm.headline || 'Add a professional headline'}</p>
 
                             {/* New Stats Row */}
@@ -437,10 +457,12 @@ const Profile = () => {
                 {/* Hidden file input lives here */}
                 <input
                     ref={avatarInputRef}
+                    id="profile-avatar-upload"
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     style={{ display: 'none' }}
                     onChange={handleAvatarChange}
+                    disabled={avatarUploading}
                 />
                 <div className="profile-tabs-bar">
                     {TABS.map(tab => (
@@ -670,17 +692,17 @@ const Profile = () => {
                             </div>
 
                             {profile?.resume ? (
-                                <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
+                                <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, flexWrap: 'nowrap' }}>
                                     <div style={{ width: 40, height: 40, background: 'rgba(99,102,241,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                         <FileText size={20} style={{ color: 'var(--primary)' }} />
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                                         <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {profile.resumeName || 'resume.pdf'}
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                                            <CheckCircle size={13} style={{ color: '#10b981' }} />
-                                            <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600 }}>Uploaded</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'nowrap' }}>
+                                            <CheckCircle size={13} style={{ color: '#10b981', flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>Uploaded</span>
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', gap: 5, flexShrink: 0, flexWrap: 'nowrap' }}>

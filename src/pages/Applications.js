@@ -10,7 +10,7 @@ const STATUS_CONFIG = {
     reviewing: { label: 'Reviewing', color: '#60a5fa', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
     shortlisted: { label: 'Shortlisted', color: '#34d399', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' },
     interview: { label: 'Interview', color: '#a78bfa', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.3)' },
-    offered: { label: 'Offered', color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)' },
+    offered: { label: 'Accepted', color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)' },
     rejected: { label: 'Rejected', color: '#f87171', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' },
     withdrawn: { label: 'Withdrawn', color: '#64748b', bg: 'rgba(100,116,139,0.1)', border: 'rgba(100,116,139,0.3)' },
 };
@@ -134,7 +134,7 @@ const Applications = () => {
         <div style={{ paddingTop: 80, minHeight: '100vh', background: 'var(--bg-primary)' }}>
             {/* Detail Modal */}
             {selectedApp && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
                     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 'clamp(16px, 4vw, 36px)', maxWidth: 680, width: '100%', maxHeight: '92vh', overflowY: 'auto', boxShadow: 'var(--shadow-lg)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                             <div>
@@ -300,11 +300,20 @@ const Applications = () => {
                         {isEmployer && selectedApp.status !== 'withdrawn' && (
                             <div>
                                 <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Update Status</h4>
+                                {['offered', 'rejected'].includes(selectedApp.status) && (
+                                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>Status has been finalised and cannot be changed.</p>
+                                )}
                                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-                                    {Object.entries(STATUS_CONFIG).filter(([k]) => k !== 'withdrawn' && k !== 'interview').map(([status, config]) => (
-                                        <button key={status} onClick={() => handleStatusUpdate(selectedApp._id, status)}
+                                    {Object.entries(STATUS_CONFIG).filter(([k]) => k === 'offered' || k === 'rejected').map(([status, config]) => {
+                                        const isFinalized = ['offered', 'rejected'].includes(selectedApp.status);
+                                        return (
+                                        <button key={status}
+                                            onClick={() => !isFinalized && handleStatusUpdate(selectedApp._id, status)}
+                                            disabled={isFinalized}
                                             style={{
-                                                padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter',
+                                                padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: 12, fontWeight: 600,
+                                                cursor: isFinalized ? 'not-allowed' : 'pointer', fontFamily: 'Inter',
+                                                opacity: isFinalized && selectedApp.status !== status ? 0.35 : 1,
                                                 background: selectedApp.status === status ? config.bg : 'transparent',
                                                 color: selectedApp.status === status ? config.color : 'var(--text-secondary)',
                                                 border: `1px solid ${selectedApp.status === status ? config.border : 'var(--border)'}`,
@@ -312,7 +321,8 @@ const Applications = () => {
                                             }}>
                                             {config.label}
                                         </button>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 {/* ── Interview Scheduling Section ── */}
@@ -416,87 +426,147 @@ const Applications = () => {
                 </div>
 
                 {filtered.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                         {filtered.map(app => (
                             <div key={app._id} style={{
-                                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius-xl)', padding: 24, display: 'flex',
-                                gap: 16, alignItems: 'center', flexWrap: 'wrap', transition: 'var(--transition)'
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border)',
+                                borderLeft: `4px solid ${STATUS_CONFIG[app.status]?.color || 'var(--border)'}`,
+                                borderRadius: 'var(--radius-xl)',
+                                padding: '20px 22px',
+                                transition: 'var(--transition)',
                             }}
-                                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
-                                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                    e.currentTarget.style.borderTopColor = STATUS_CONFIG[app.status]?.color || 'var(--border-hover)';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.transform = '';
+                                    e.currentTarget.style.boxShadow = '';
+                                    e.currentTarget.style.borderTopColor = 'var(--border)';
+                                }}
                             >
-                                <div style={{
-                                    width: 52, height: 52, background: 'var(--gradient-primary)',
-                                    borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 20, flexShrink: 0, overflow: 'hidden'
-                                }}>
-                                    {isEmployer ? (
-                                        <User size={22} color="white" />
-                                    ) : (
-                                        app.job?.company?.logo ? <img src={app.job.company.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏢'
-                                    )}
-                                </div>
-
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {isEmployer ? app.applicant?.name : app.job?.title}
-                                    </div>
-                                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6 }}>
-                                        {isEmployer ? app.job?.title : app.job?.company?.name}
-                                    </div>
-                                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                                        {!isEmployer && app.job?.location && (
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}><MapPin size={11} />{app.job.location}</span>
-                                        )}
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}><Clock size={11} />{new Date(app.createdAt).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                                    <span style={{
-                                        padding: '5px 14px', borderRadius: 'var(--radius-full)', fontSize: 12, fontWeight: 600,
-                                        background: STATUS_CONFIG[app.status]?.bg, color: STATUS_CONFIG[app.status]?.color,
-                                        border: `1px solid ${STATUS_CONFIG[app.status]?.border}`
+                                {/* Top row: logo + info */}
+                                <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                                    {/* Logo */}
+                                    <div style={{
+                                        width: 54, height: 54,
+                                        background: app.job?.company?.logo ? 'var(--bg-secondary)' : 'var(--gradient-primary)',
+                                        borderRadius: 14,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 22, flexShrink: 0, overflow: 'hidden',
+                                        border: '1px solid var(--border)'
                                     }}>
+                                        {isEmployer
+                                            ? <User size={22} color="white" />
+                                            : app.job?.company?.logo
+                                                ? <img src={app.job.company.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                : '🏢'}
+                                    </div>
+
+                                    {/* Text info */}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <h3 style={{
+                                            fontWeight: 700, fontSize: 16, marginBottom: 3,
+                                            lineHeight: 1.35, color: 'var(--text-primary)',
+                                            display: '-webkit-box', WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical', overflow: 'hidden'
+                                        }}>
+                                            {isEmployer ? app.applicant?.name : app.job?.title}
+                                        </h3>
+                                        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 10, fontWeight: 500 }}>
+                                            {isEmployer ? app.job?.title : app.job?.company?.name}
+                                        </p>
+
+                                        {/* Meta chips */}
+                                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                                            {!isEmployer && app.job?.location && (
+                                                <span style={{
+                                                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                                                    fontSize: 12, color: 'var(--text-muted)',
+                                                    background: 'var(--bg-secondary)',
+                                                    padding: '3px 9px', borderRadius: 99,
+                                                    border: '1px solid var(--border)'
+                                                }}>
+                                                    <MapPin size={11} />{app.job.location}
+                                                </span>
+                                            )}
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: 4,
+                                                fontSize: 12, color: 'var(--text-muted)',
+                                                background: 'var(--bg-secondary)',
+                                                padding: '3px 9px', borderRadius: 99,
+                                                border: '1px solid var(--border)'
+                                            }}>
+                                                <Clock size={11} />
+                                                {new Date(app.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                            {app.status === 'interview' && app.interviewDate && (
+                                                <span style={{
+                                                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                                                    fontSize: 12, fontWeight: 600,
+                                                    background: 'rgba(139,92,246,0.12)', color: '#a78bfa',
+                                                    border: '1px solid rgba(139,92,246,0.3)',
+                                                    padding: '3px 9px', borderRadius: 99
+                                                }}>
+                                                    <Calendar size={11} />
+                                                    Interview: {new Date(app.interviewDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Bottom row: status badge + action buttons */}
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    marginTop: 16, paddingTop: 14,
+                                    borderTop: '1px solid var(--border)',
+                                    gap: 10, flexWrap: 'wrap'
+                                }}>
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                                        padding: '5px 14px', borderRadius: 99, fontSize: 12, fontWeight: 700,
+                                        background: STATUS_CONFIG[app.status]?.bg,
+                                        color: STATUS_CONFIG[app.status]?.color,
+                                        border: `1px solid ${STATUS_CONFIG[app.status]?.border}`,
+                                        letterSpacing: '0.02em'
+                                    }}>
+                                        <span style={{
+                                            width: 6, height: 6, borderRadius: '50%',
+                                            background: STATUS_CONFIG[app.status]?.color,
+                                            display: 'inline-block', flexShrink: 0
+                                        }} />
                                         {STATUS_CONFIG[app.status]?.label || app.status}
                                     </span>
-                                    {/* Show interview date chip */}
-                                    {app.status === 'interview' && app.interviewDate && (
-                                        <span style={{
-                                            padding: '5px 12px', borderRadius: 'var(--radius-full)', fontSize: 11, fontWeight: 600,
-                                            background: 'rgba(139,92,246,0.12)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)',
-                                            display: 'flex', alignItems: 'center', gap: 5
-                                        }}>
-                                            <Calendar size={11} />
-                                            {new Date(app.interviewDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                        </span>
-                                    )}
-                                    <button onClick={() => {
-                                        setSelectedApp(app);
-                                        if (app.status === 'interview' && app.interviewDate) {
-                                            // Pre-fill the form with existing interview data for rescheduling
-                                            const dt = new Date(app.interviewDate);
-                                            const pad = n => String(n).padStart(2, '0');
-                                            setInterviewDate(`${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`);
-                                            setInterviewType(app.interviewType || 'video');
-                                            setInterviewNotes(app.notes || '');
-                                            setMeetingLink(app.meetingLink || '');
-                                        } else {
-                                            setInterviewDate('');
-                                            setInterviewType('video');
-                                            setInterviewNotes('');
-                                            setMeetingLink('');
-                                        }
-                                    }} className="btn btn-secondary btn-sm">
-                                        <Eye size={13} /> Details
-                                    </button>
-                                    {!isEmployer && app.status === 'pending' && (
-                                        <button onClick={() => handleWithdraw(app._id)} className="btn btn-sm"
-                                            style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                                            <X size={13} /> Withdraw
+
+                                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <button onClick={() => {
+                                            setSelectedApp(app);
+                                            if (app.status === 'interview' && app.interviewDate) {
+                                                const dt = new Date(app.interviewDate);
+                                                const pad = n => String(n).padStart(2, '0');
+                                                setInterviewDate(`${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`);
+                                                setInterviewType(app.interviewType || 'video');
+                                                setInterviewNotes(app.notes || '');
+                                                setMeetingLink(app.meetingLink || '');
+                                            } else {
+                                                setInterviewDate('');
+                                                setInterviewType('video');
+                                                setInterviewNotes('');
+                                                setMeetingLink('');
+                                            }
+                                        }} className="btn btn-secondary btn-sm">
+                                            <Eye size={13} /> Details
                                         </button>
-                                    )}
+                                        {!isEmployer && app.status === 'pending' && (
+                                            <button onClick={() => handleWithdraw(app._id)} className="btn btn-sm"
+                                                style={{ background: 'rgba(239,68,68,0.08)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                                <X size={13} /> Withdraw
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}

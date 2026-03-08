@@ -112,6 +112,16 @@
     background: var(--bg-secondary);
 }
 
+.search-icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
 .search-icon-left {
     color: #3b82f6;
     flex-shrink: 0;
@@ -211,6 +221,8 @@
     flex-direction: column;
     gap: 2px;
     transition: background 0.15s;
+    text-decoration: none;
+    color: inherit;
 }
 
 .search-result-item:hover {
@@ -810,8 +822,7 @@
 }
 
 .mobile-menu-header .navbar-logo {
-    flex: 1;
-    min-width: 0;
+    flex-shrink: 0;
     overflow: visible;
     white-space: nowrap;
 }
@@ -823,17 +834,35 @@
     width: 36px;
     height: 36px;
     background: var(--bg-glass-light);
-    border: 1px solid var(--border);
+    border: 1px solid var(--primary);
     border-radius: var(--radius-md);
     cursor: pointer;
     color: var(--text-secondary);
     transition: var(--transition-fast);
+    flex-shrink: 0;
 }
 
 .mobile-close-btn:hover {
-    color: var(--danger);
-    border-color: var(--danger);
-    background: rgba(239, 68, 68, 0.1);
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="dark"] .mobile-close-btn {
+    border-color: #3b82f6;
+}
+
+[data-theme="dark"] .mobile-close-btn:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="light"] .mobile-close-btn {
+    border-color: #10b981;
+}
+
+[data-theme="light"] .mobile-close-btn:hover {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .mobile-menu-body {
@@ -1291,6 +1320,13 @@
         height: 28px !important;
     }
 
+    /* Shrink the navbar logo SVG on small screens */
+    .navbar-logo svg {
+        height: 24px !important;
+        width: auto !important;
+        max-width: 150px !important;
+    }
+
     .logo-text {
         font-size: 15px;
     }
@@ -1544,8 +1580,8 @@ body.mobile-menu-open .mobile-toggle {
 }
 
 .notif-list {
-    max-height: 600px;
-    min-height: 400px;
+    max-height: 480px;
+    min-height: 200px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -1716,7 +1752,17 @@ body.mobile-menu-open .mobile-toggle {
 
 @media (max-width: 480px) {
     .notif-dropdown {
-        width: calc(100vw - 24px);
-        right: -60px;
+        position: fixed;
+        top: 60px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+    }
+
+    .notif-list {
+        max-height: calc(100vh - 160px);
+        min-height: unset;
     }
 }

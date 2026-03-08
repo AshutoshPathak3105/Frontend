@@ -66,15 +66,15 @@ const MediaGrid = ({ media }) => {
                             position: 'relative', cursor: 'pointer',
                             gridColumn: count === 3 && i === 0 ? '1 / 2' : 'auto',
                             gridRow: count === 3 && i === 0 ? '1 / 3' : 'auto',
-                            maxHeight: isSingle ? 450 : 220,
+                            height: isSingle ? 300 : 220,
                             overflow: 'hidden',
                             background: m.type === 'video' ? '#000' : 'var(--bg-secondary)',
                             borderRadius: 'inherit'
                         }}
                     >
                         {m.type === 'video'
-                            ? <video src={m.url} style={{ width: '100%', height: isSingle ? 'auto' : '100%', objectFit: isSingle ? 'contain' : 'cover', display: 'block' }} />
-                            : <img src={m.url} alt="" style={{ width: '100%', height: isSingle ? 'auto' : '100%', objectFit: isSingle ? 'contain' : 'cover', display: 'block' }} />
+                            ? <video src={m.url} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            : <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         }
                         {i === 3 && count > 4 && (
                             <div style={{
@@ -195,29 +195,31 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
                     )}
                 </div>
 
-                {/* Right side: follow button + time below */}
+                {/* Right side: follow button (hidden on own posts) + time below */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
-                    <button
-                        onClick={handleFollowLocal}
-                        className={`follow-btn-small ${isFollowing ? 'following' : ''}`}
-                        style={{
-                            fontSize: 12,
-                            fontWeight: 700,
-                            color: isFollowing ? 'var(--text-muted)' : 'var(--primary)',
-                            background: isFollowing ? 'rgba(0,0,0,0.05)' : 'rgba(99, 102, 241, 0.08)',
-                            border: isFollowing ? '1px solid var(--border)' : '1px solid var(--primary)',
-                            borderRadius: 20,
-                            padding: '4px 12px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        {isFollowing ? <UserCheck size={12} /> : <UserPlus size={12} />}
-                        <span>{isFollowing ? 'Following' : 'Follow'}</span>
-                    </button>
+                    {!isOwner && (
+                        <button
+                            onClick={handleFollowLocal}
+                            className={`follow-btn-small ${isFollowing ? 'following' : ''}`}
+                            style={{
+                                fontSize: 12,
+                                fontWeight: 700,
+                                color: isFollowing ? 'var(--text-muted)' : 'var(--primary)',
+                                background: isFollowing ? 'rgba(0,0,0,0.05)' : 'rgba(99, 102, 241, 0.08)',
+                                border: isFollowing ? '1px solid var(--border)' : '1px solid var(--primary)',
+                                borderRadius: 20,
+                                padding: '4px 12px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {isFollowing ? <UserCheck size={12} /> : <UserPlus size={12} />}
+                            <span>{isFollowing ? 'Following' : 'Follow'}</span>
+                        </button>
+                    )}
                     <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}>
                         <Clock size={11} />{timeAgo(post.createdAt)}
                     </span>
@@ -265,7 +267,6 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
 
             {/* Action buttons */}
             <div className="post-actions">
-
                 <button className={`post-action-btn ${liked ? 'liked' : ''}`} onClick={() => onLike(post._id)}>
                     <ThumbsUp size={16} fill={liked ? 'currentColor' : 'none'} />
                     <span>Like</span>
@@ -278,7 +279,8 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
                     <Share2 size={16} />
                     <span>Share</span>
                 </button>
-                                <button
+                {!isOwner && (
+                    <button
                         className={`post-action-btn connect-btn ${isConnected ? 'connected' : ''}`}
                         onClick={() => onConnect(post.author?._id, isConnected)}
                         title={isConnected ? 'Unfriend' : 'Send friend request'}
@@ -286,6 +288,7 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
                         {isConnected ? <UserCheck size={16} /> : <Users size={16} />}
                         <span>{isConnected ? 'Friends' : 'Friend'}</span>
                     </button>
+                )}
             </div>
 
             {/* Comments Section */}

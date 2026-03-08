@@ -198,13 +198,31 @@ const Messages = () => {
         loadConversations();
     }, [loadConversations]);
 
-    // Auto-open conversation from navigation state (e.g., from PublicProfile)
+    // Auto-open conversation from navigation state (e.g., from PublicProfile → Message button)
     useEffect(() => {
-        if (!location.state?.convId || conversations.length === 0) return;
-        const target = conversations.find(c => c._id === location.state.convId);
+        const { convId, targetUserId, conversation } = location.state || {};
+        if (!convId) return;
+
+        // If the full conversation object was passed (from PublicProfile Message button),
+        // open it immediately — don't wait for the conversations list to load.
+        if (conversation) {
+            setConversations(prev => {
+                const exists = prev.some(c => c._id === convId);
+                return exists ? prev : [conversation, ...prev];
+            });
+            selectConversation(conversation);
+            navigate(location.pathname, { replace: true, state: {} });
+            return;
+        }
+
+        // Fallback: wait for conversations list then match by ID or userId
+        if (conversations.length === 0) return;
+        const target = conversations.find(c =>
+            c._id === convId ||
+            (targetUserId && c.others?.some(o => String(o._id || o) === String(targetUserId)))
+        );
         if (target) {
             selectConversation(target);
-            // Clear state so refresh doesn't re-trigger
             navigate(location.pathname, { replace: true, state: {} });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

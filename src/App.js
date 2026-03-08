@@ -64,7 +64,7 @@ const AppContent = () => {
   const noFooterPaths = ['/messages'];
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
   // Profile menu pages where chatbot should be hidden
-  const noChatbotPaths = ['/dashboard', '/profile', '/applications', '/saved-jobs', '/network', '/my-jobs', '/company-profile', '/admin', '/messages', '/people', '/users/profile', '/jobs'];
+  const noChatbotPaths = ['/profile', '/applications', '/saved-jobs', '/network', '/my-jobs', '/company-profile', '/admin', '/messages', '/people', '/users/profile', '/jobs'];
   const shouldHideChatbot = noChatbotPaths.some(path => location.pathname.startsWith(path));
 
   return (

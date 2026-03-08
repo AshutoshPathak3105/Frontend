@@ -216,12 +216,16 @@ const PublicProfile = () => {
     const [uploading, setUploading] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [followHover, setFollowHover] = useState(false);
     const fileInputRef = useRef(null);
     const moreMenuRef = useRef(null);
 
     // Show edit button if it's the current user's profile
     const isMe = currentUser && (!id || String(currentUser._id) === String(id) || String(currentUser.id) === String(id));
-    const isFriend = currentUser?.connections?.some(friendId => String(friendId) === String(id));
+    // Handle both populated objects and raw IDs in connections array
+    const isFriend = currentUser?.connections?.some(friendId =>
+        String(friendId?._id || friendId) === String(id)
+    );
 
     const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
@@ -257,9 +261,12 @@ const PublicProfile = () => {
                 const loadedProfile = profileRes.data.user || profileRes.data.profile;
                 setProfile(loadedProfile);
                 setPosts(postsRes.data.posts || []);
-                // Check if following
-                if (currentUser && loadedProfile?.followers?.includes(currentUser._id)) {
+                // Check if following — use String() to handle ObjectId vs string mismatch
+                const myId = String(currentUser?._id || currentUser?.id || '');
+                if (myId && loadedProfile?.followers?.some(f => String(f?._id || f) === myId)) {
                     setIsFollowing(true);
+                } else {
+                    setIsFollowing(false);
                 }
             } catch {
                 toast.error('Failed to load profile');
@@ -273,12 +280,22 @@ const PublicProfile = () => {
 
     const handleMessage = async () => {
         if (!currentUser) return navigate('/login');
+        if (!isFriend) {
+            toast.error('You can only message friends.');
+            return;
+        }
         setMsgLoading(true);
         try {
             const res = await getOrCreateConversation(id);
-            navigate('/messages', { state: { convId: res.data.conversation._id } });
-        } catch { navigate('/messages'); }
-        finally { setMsgLoading(false); }
+            const conv = res.data.conversation;
+            // Pass the full conversation object so Messages page can open it
+            // immediately without waiting for the conversations list to load
+            navigate('/messages', { state: { convId: conv._id, targetUserId: id, conversation: conv } });
+        } catch {
+            toast.error('Could not open conversation. Please try again.');
+        } finally {
+            setMsgLoading(false);
+        }
     };
 
     const handleFriend = async () => {
@@ -296,14 +313,29 @@ const PublicProfile = () => {
         if (!currentUser) return navigate('/login');
         try {
             const { data } = await toggleFollow(id);
-            setIsFollowing(data.isFollowing);
-            toast.success(data.isFollowing ? 'Followed successfully! 🔔' : 'Unfollowed successfully');
-
-            // Sync global user state
-            const me = await getMe();
-            if (updateUser) updateUser(me.data.user);
+            const nowFollowing = data.isFollowing;
+            setIsFollowing(nowFollowing);
+            // Update local follower count on the rendered profile
+            setProfile(prev => {
+                if (!prev) return prev;
+                const myId = String(currentUser._id || currentUser.id);
+                const followers = prev.followers || [];
+                const updated = nowFollowing
+                    ? [...followers, myId]
+                    : followers.filter(f => String(f) !== myId);
+                return { ...prev, followers: updated };
+            });
+            toast.success(nowFollowing ? 'Followed! 🔔' : 'Unfollowed');
         } catch (err) {
-            toast.error('Failed to update follow status');
+            toast.error(err.response?.data?.message || 'Failed to update follow status');
+            return;
+        }
+        // Sync global auth user separately — don't let this failure affect follow state
+        try {
+            const me = await getMe();
+            if (updateUser && me.data?.user) updateUser(me.data.user);
+        } catch {
+            // non-critical, ignore
         }
     };
 
@@ -356,13 +388,22 @@ const PublicProfile = () => {
                     <Avatar user={profile} size={108} />
                     {isMe && (
                         <div style={{ position: 'absolute', bottom: -32, left: '50%', transform: 'translateX(-50%)', zIndex: 100 }}>
-                            <input type="file" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" />
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
+                            <input
+                                type="file"
+                                id="public-profile-avatar-upload"
+                                ref={fileInputRef}
+                                onChange={handleAvatarChange}
+                                style={{ display: 'none' }}
+                                accept="image/*"
                                 disabled={uploading}
+                            />
+                            <label
+                                htmlFor="public-profile-avatar-upload"
+                                onClick={e => { if (uploading) e.preventDefault(); }}
                                 style={{
-                                    background: 'var(--gradient-button)', border: 'none', borderRadius: 20,
-                                    padding: '6px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                                    background: 'var(--gradient-button)', borderRadius: 20,
+                                    padding: '6px 16px', fontSize: 12, fontWeight: 700,
+                                    cursor: uploading ? 'not-allowed' : 'pointer',
                                     whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6,
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)', color: '#fff',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -371,14 +412,30 @@ const PublicProfile = () => {
                             >
                                 {uploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
                                 <span>Edit</span>
-                            </button>
+                            </label>
                         </div>
                     )}
                 </div>
                 {/* Info row */}
                 <div style={{ padding: '80px 28px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
                     <div style={{ flex: 1, minWidth: 260 }}>
-                        <h1 style={{ margin: '0 0 4px', fontSize: 26, fontWeight: 800 }}>{profile.name}</h1>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+                            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800 }}>{profile.name}</h1>
+                            <span style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 4,
+                                padding: '3px 10px', borderRadius: 20,
+                                fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+                                ...(profile.role === 'employer'
+                                    ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
+                                    : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }
+                                )
+                            }}>
+                                {profile.role === 'employer'
+                                    ? <><Briefcase size={10} /> Employer</>
+                                    : <><User size={10} /> Job Seeker</>
+                                }
+                            </span>
+                        </div>
                         <p style={{ margin: '0 0 12px', fontSize: 15, color: 'var(--text-secondary)', fontWeight: 500 }}>
                             {profile.headline || (currentExp ? `${currentExp.title} at ${currentExp.company}` : profile.role)}
                         </p>
@@ -398,10 +455,21 @@ const PublicProfile = () => {
                         <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center', position: 'relative' }}>
                             <button
                                 onClick={handleFollow}
-                                className={`btn ${isFollowing ? 'btn-secondary' : 'btn-outline'}`}
-                                style={{ height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}
+                                onMouseEnter={() => setFollowHover(true)}
+                                onMouseLeave={() => setFollowHover(false)}
+                                className={`btn ${isFollowing ? (followHover ? 'btn-danger-outline' : 'btn-secondary') : 'btn-outline'}`}
+                                style={{
+                                    height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+                                    ...(isFollowing && followHover ? {
+                                        background: 'rgba(239,68,68,0.08)',
+                                        borderColor: 'rgba(239,68,68,0.5)',
+                                        color: '#f87171',
+                                    } : {})
+                                }}
                             >
-                                {isFollowing ? 'Following' : 'Follow'}
+                                {isFollowing
+                                    ? (followHover ? 'Unfollow' : 'Following')
+                                    : 'Follow'}
                             </button>
 
                             {isFriend ? (
@@ -419,6 +487,7 @@ const PublicProfile = () => {
                                     disabled={friendSent}
                                     className="btn btn-primary"
                                     style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}
+                                    title="Connect first to enable messaging"
                                 >
                                     {friendSent ? <UserCheck size={16} /> : <Users size={16} />}
                                     {friendSent ? 'Request Sent' : 'Add Friend'}
@@ -652,12 +721,12 @@ const PublicProfile = () => {
                 {postsLoading ? (
                     <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /></div>
                 ) : posts.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>
+                    <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', marginTop: 0 }}>
                         <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
                         <p style={{ margin: 0, fontSize: 14 }}>No posts yet.</p>
                     </div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 0 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
                         {posts.map(post => (
                             <PostCard key={post._id} post={post} currentUser={currentUser} onLike={handleLike} />
                         ))}

@@ -205,7 +205,8 @@ const JobDetail = () => {
 
                     {/* Sidebar */}
                     <div className="job-detail-sidebar" style={{ position: 'sticky', top: 100 }}>
-                        {/* Apply Card */}
+                        {/* Apply Card — hidden for employers */}
+                        {user?.role !== 'employer' && (
                         <div style={{
                             background: 'var(--bg-card)', border: '1px solid var(--border)',
                             borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 3vw, 28px)', marginBottom: 20
@@ -244,6 +245,7 @@ const JobDetail = () => {
                                 {saved ? <><BookmarkCheck size={16} /> Saved</> : <><BookmarkPlus size={16} /> Save Job</>}
                             </button>
                         </div>
+                        )}
 
                         {/* Job Overview */}
                         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 3vw, 28px)' }}>

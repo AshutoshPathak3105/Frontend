@@ -1152,7 +1152,8 @@ body.mobile-menu-open {
    AVATAR — Gradient fill
 ============================================================ */
 .avatar {
-  border-radius: var(--radius-md);
+  border-radius: 50%;
+  overflow: hidden;
   object-fit: cover;
   background: var(--gradient-primary);
   display: flex;

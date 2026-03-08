@@ -2,7 +2,7 @@
 .social-feed {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
 }
 
 /* Post card */
@@ -10,7 +10,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
-    padding: 14px 16px;
+    padding: 14px 16px 28px;
 }
 
 .create-post-card {
@@ -46,6 +46,8 @@
 .post-actions {
     display: flex;
     gap: 4px;
+    margin-top: 10px;
+    padding-bottom: 2px;
 }
 
 .post-action-btn {
@@ -63,6 +65,7 @@
     cursor: pointer;
     flex: 1;
     justify-content: center;
+    white-space: nowrap;
 }
 
 .post-action-btn:hover {
@@ -194,17 +197,18 @@
 
 @media (max-width: 480px) {
     .post-action-btn {
-        padding: 8px 6px;
+        padding: 8px 4px;
         font-size: 11px;
-        gap: 4px;
+        gap: 3px;
+        white-space: nowrap;
     }
 
     .post-actions {
-        gap: 2px;
+        gap: 0;
     }
 
     .post-card {
-        padding: 12px;
+        padding: 12px 12px 28px;
     }
 
     .create-post-actions {
