@@ -11,6 +11,7 @@ import {
     viewPostAPI, sendConnectionRequest, toggleFollow, getMe, removeConnection, getUploadUrl
 } from '../../services/api';
 import './SocialFeed.css';
+import Avatar from '../common/Avatar';
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 const timeAgo = (date) => {
@@ -23,21 +24,6 @@ const timeAgo = (date) => {
     return `${Math.floor(h / 24)}d ago`;
 };
 
-const Avatar = ({ user, size = 40 }) => {
-    const initials = user?.name
-        ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-        : '?';
-
-    return user?.avatar
-        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-        : <div style={{
-            width: size, height: size, borderRadius: '50%', background: 'var(--gradient-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: size * 0.38, color: '#fff', fontWeight: 700, flexShrink: 0
-        }}>
-            {initials}
-        </div>
-};
 
 // ── Media Preview Grid ────────────────────────────────────────────────────────
 const MediaGrid = ({ media }) => {
@@ -73,8 +59,17 @@ const MediaGrid = ({ media }) => {
                         }}
                     >
                         {m.type === 'video'
-                            ? <video src={getUploadUrl(m.url)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            : <img src={getUploadUrl(m.url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ? <video
+                                src={getUploadUrl(m.url)}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                            : <img
+                                src={getUploadUrl(m.url)}
+                                alt="Post media content"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
                         }
                         {i === 3 && count > 4 && (
                             <div style={{

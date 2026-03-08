@@ -41,18 +41,7 @@ const formatTime = (dateStr) => {
     return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
-const Avatar = ({ user, size = 40 }) => (
-    <div
-        className="msg-avatar"
-        style={{ width: size, height: size, fontSize: size * 0.38 }}
-        title={user?.name}
-    >
-        {user?.avatar
-            ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-            : getInitials(user?.name)
-        }
-    </div>
-);
+import Avatar from '../components/common/Avatar';
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Messages = () => {

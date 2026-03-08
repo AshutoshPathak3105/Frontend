@@ -12,6 +12,7 @@ import {
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import Avatar from '../components/common/Avatar';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const timeAgo = (date) => {
@@ -33,23 +34,6 @@ const memberDuration = (date) => {
     return `${years}yr${years > 1 ? 's' : ''}${rem > 0 ? ` ${rem}mo` : ''}`;
 };
 
-// ── Avatar ────────────────────────────────────────────────────────────────────
-const Avatar = ({ user, size = 40 }) => {
-    const initials = user?.name
-        ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-        : '?';
-
-    return user?.avatar
-        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-        : <div style={{
-            width: size, height: size, borderRadius: '50%', background: 'var(--gradient-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: size * 0.35, color: '#fff', fontWeight: 800, flexShrink: 0,
-            letterSpacing: '-0.02em', border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-            {initials}
-        </div>
-};
 
 // ── Media Grid ────────────────────────────────────────────────────────────────
 const MediaGrid = ({ media }) => {

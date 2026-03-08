@@ -59,6 +59,13 @@ export const getUploadUrl = (filePath) => {
         return `${backendBaseFromEnv}${path.startsWith('/') ? '' : '/'}${path}`;
     }
 
+    // Fallback for production if REACT_APP_API_URL is missing
+    if (isProduction) {
+        console.warn('[getUploadUrl] WARNING: REACT_APP_API_URL is not set in production. Images might not load if the backend is on a separate domain.');
+        // If we are on Render, assuming the backend might be on the same domain or proxied
+        return `${protocol}//${hostname}${path.startsWith('/') ? '' : '/'}${path}`;
+    }
+
     // Fallback for local development
     const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
     const backendBase = (isIP || hostname === 'localhost') ? `${protocol}//${hostname}:8000` : `${protocol}//${hostname}`;

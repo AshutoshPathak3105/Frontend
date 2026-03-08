@@ -11,7 +11,32 @@ import {
 } from 'lucide-react';
 import './Navbar.css';
 import LogoImage from '../common/Logo';
+import Avatar from '../common/Avatar';
 import { globalSearch, getUnreadMessageCount, getNotifications, markAllNotificationsRead, markNotificationRead, deleteNotification, deleteAllNotifications, getUploadUrl } from '../../services/api';
+
+const getInitials = (name = '') =>
+    name?.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2) || 'U';
+
+const NotifAvatar = ({ avatar, name, title }) => {
+    const [imgError, setImgError] = useState(false);
+
+    if (avatar && !imgError) {
+        return (
+            <img
+                src={getUploadUrl(avatar)}
+                alt={name}
+                className="notif-pfp"
+                onError={() => setImgError(true)}
+            />
+        );
+    }
+
+    return (
+        <div className="notif-initials">
+            {getInitials(name || title)}
+        </div>
+    );
+};
 
 const Navbar = () => {
     const { user, logoutUser } = useAuth();
@@ -225,8 +250,6 @@ const Navbar = () => {
         { to: '/contact', label: 'Contact Us', icon: <Mail size={15} /> },
     ];
 
-    const getInitials = (name) =>
-        name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
 
     return (
         <>
@@ -325,9 +348,7 @@ const Navbar = () => {
                                                     <Link to={`/users/profile/${u._id}`} key={u._id} className="search-result-item" onClick={handleSearchReset}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                             <div className="avatar" style={{ width: 32, height: 32, fontSize: 13, flexShrink: 0 }}>
-                                                                {u.avatar
-                                                                    ? <img src={getUploadUrl(u.avatar)} alt={u.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                                                                    : getInitials(u.name)}
+                                                                <Avatar user={u} size={32} />
                                                             </div>
                                                             <div style={{ minWidth: 0 }}>
                                                                 <div className="search-result-main">{u.name}</div>
@@ -458,13 +479,11 @@ const Navbar = () => {
                                                     >
                                                         {/* 1. Left: Profile Picture or Placeholder */}
                                                         <div className="notif-avatar-box">
-                                                            {n.sender?.avatar ? (
-                                                                <img src={getUploadUrl(n.sender.avatar)} alt={n.sender.name} className="notif-pfp" />
-                                                            ) : (
-                                                                <div className="notif-initials">
-                                                                    {getInitials(n.sender?.name || n.title)}
-                                                                </div>
-                                                            )}
+                                                            <NotifAvatar
+                                                                avatar={n.sender?.avatar}
+                                                                name={n.sender?.name}
+                                                                title={n.title}
+                                                            />
                                                             {!n.isRead && <div className="notif-dot-v2" />}
                                                         </div>
 
@@ -507,15 +526,10 @@ const Navbar = () => {
                                         onClick={() => setDropdownOpen(!dropdownOpen)}
                                     >
                                         <div className="avatar" style={{ width: 32, height: 32, fontSize: 13 }}>
-                                            {user.avatar ? (
-                                                <img
-                                                    src={getUploadUrl(user.avatar)}
-                                                    alt={user.name}
-                                                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-                                                />
-                                            ) : (
-                                                getInitials(user.name)
-                                            )}
+                                            <Avatar
+                                                user={user}
+                                                size={32}
+                                            />
                                         </div>
                                         <span className="hide-mobile user-name-text" style={{ fontSize: 14 }}>
                                             {user.name?.split(' ')[0]}
@@ -527,9 +541,10 @@ const Navbar = () => {
                                         <div className="dropdown-menu">
                                             <div className="dropdown-header">
                                                 <div className="avatar" style={{ width: 40, height: 40, fontSize: 16 }}>
-                                                    {user.avatar
-                                                        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                                                        : getInitials(user.name)}
+                                                    <Avatar
+                                                        user={user}
+                                                        size={40}
+                                                    />
                                                 </div>
                                                 <div>
                                                     <div className="user-name-text" style={{ fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

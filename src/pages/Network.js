@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import './Network.css';
+import Avatar from '../components/common/Avatar';
 
 const Network = () => {
     const { user, updateUser } = useAuth();
@@ -128,16 +129,9 @@ const Network = () => {
         }
     };
 
-    const getInitials = (name) =>
-        name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
-
-    const Avatar = ({ u, size = 60 }) => (
+    const AvatarComponent = ({ u, size = 60 }) => (
         <div className="network-avatar" style={{ width: size, height: size, fontSize: size * 0.35 }}>
-            {u?.avatar ? (
-                <img src={getUploadUrl(u.avatar)} alt={u.name} />
-            ) : (
-                getInitials(u?.name)
-            )}
+            <Avatar user={u} size={size} />
         </div>
     );
 

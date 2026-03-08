@@ -1527,13 +1527,13 @@ body.mobile-menu-open .mobile-toggle {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     color: var(--primary-light);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 4px 6px;
     border-radius: var(--radius-sm);
     transition: var(--transition-fast);
     white-space: nowrap;
