@@ -2,18 +2,23 @@ import axios from 'axios';
 
 const getBaseURL = () => {
     if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
-    // Localhost: use CRA proxy (proxy target defined in package.json)
+
     const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    // Localhost: use CRA proxy (proxy target defined in package.json)
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
         return '/api';
     }
-    // Production without REACT_APP_API_URL set — log a clear warning.
-    // Set REACT_APP_API_URL in your Vercel environment variables to fix this.
-    console.error(
-        '[api] REACT_APP_API_URL is not set. ' +
-        'Add it in Vercel: Settings → Environment Variables → REACT_APP_API_URL=https://<your-render-backend>.onrender.com/api'
-    );
-    return 'http://localhost:8000/api';
+
+    // Check if hostname is an IP (local dev with mobile phone)
+    const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
+    if (isIP) {
+        return `http://${hostname}:8000/api`;
+    }
+
+    // Production build without REACT_APP_API_URL:
+    // Try /api assuming it might be behind a reverse proxy or same-domain hosting
+    console.warn('[api] REACT_APP_API_URL not set. Falling back to relative path /api');
+    return '/api';
 };
 
 // Converts a stored upload path like "/uploads/resumes/file.pdf"
@@ -22,12 +27,43 @@ const getBaseURL = () => {
 // so we must always point href/src at the real backend port.
 export const getUploadUrl = (filePath) => {
     if (!filePath) return '';
-    // Already an absolute URL (e.g. Cloudinary / clearbit) — leave as-is
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) return filePath;
-    const backendBase = process.env.REACT_APP_API_URL
+
+    let path = filePath;
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    const isProduction = !/localhost|127\.0\.0\.1|\[::1\]/.test(hostname) && !/^(?:[192|172|10]\..*|169\.254\..*)$/.test(hostname);
+
+    // Get live backend URL from env
+    const backendBaseFromEnv = process.env.REACT_APP_API_URL
         ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '')
-        : 'http://localhost:8000';
-    return `${backendBase}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+        : null;
+
+    // Hot-fix for database records containing "localhost" urls (common in local dev)
+    // when viewing from a different device (mobile IP) or production (Render)
+    if (path.startsWith('http://localhost') || path.startsWith('http://127.0.0.1')) {
+        if (isProduction && backendBaseFromEnv) {
+            // We are on Render/Vercel: replace localhost with the real backend site
+            path = path.replace(/^http:\/\/(localhost|127\.0\.0\.1)(:[\d]+)?/, backendBaseFromEnv);
+        } else if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+            // We are on Mobile IP: swap localhost with PC's IP (assume backend on port 8000)
+            path = path.replace(/localhost:[\d]+/, `${hostname}:8000`);
+            path = path.replace(/(localhost|127\.0\.0\.1)/, hostname);
+        }
+    }
+
+    // If it's already an absolute URL (Cloudinary, AWS S3, or fixed above)
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+
+    // Prepend backend base to relative paths (e.g. /uploads/...)
+    if (backendBaseFromEnv) {
+        return `${backendBaseFromEnv}${path.startsWith('/') ? '' : '/'}${path}`;
+    }
+
+    // Fallback for local development
+    const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
+    const backendBase = (isIP || hostname === 'localhost') ? `${protocol}//${hostname}:8000` : `${protocol}//${hostname}`;
+
+    return `${backendBase}${path.startsWith('/') ? '' : '/'}${path}`;
 };
 
 const API = axios.create({

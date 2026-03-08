@@ -8,7 +8,7 @@ import {
 import {
     getProfile, getOrCreateConversation, getFeedPosts,
     togglePostLike, sendConnectionRequest, uploadAvatar,
-    addPostComment, toggleFollow, getMe
+    addPostComment, toggleFollow, getMe, getUploadUrl
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -40,7 +40,7 @@ const Avatar = ({ user, size = 40 }) => {
         : '?';
 
     return user?.avatar
-        ? <img src={user.avatar} alt={user.name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
         : <div style={{
             width: size, height: size, borderRadius: '50%', background: 'var(--gradient-primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -78,15 +78,15 @@ const MediaGrid = ({ media }) => {
                         }}
                     >
                         {m.type === 'video'
-                            ? <video src={m.url} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            : <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+                            ? <video src={getUploadUrl(m.url)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            : <img src={getUploadUrl(m.url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
                     </div>
                 ))}
             </div>
             {lightbox !== null && (
                 <div onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <button onClick={() => setLightbox(null)} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
-                    <img src={media[lightbox].url} style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 12, objectFit: 'contain' }} alt="" onClick={e => e.stopPropagation()} />
+                    <img src={getUploadUrl(media[lightbox].url)} style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 12, objectFit: 'contain' }} alt="" onClick={e => e.stopPropagation()} />
                 </div>
             )}
         </>

@@ -46,7 +46,7 @@ const Profile = () => {
             const res = await getProfile();
             const p = res.data.user || res.data.profile;
             setProfile(p);
-            setAvatarPreview(p.avatar || null);
+            setAvatarPreview(p.avatar ? getUploadUrl(p.avatar) : null);
             setProfileForm({
                 name: p.name || '', email: p.email || '', headline: p.headline || '', bio: p.bio || '',
                 location: p.location || '', phone: p.phone || '', website: p.website || '',
@@ -86,11 +86,11 @@ const Profile = () => {
         try {
             const res = await uploadAvatar(file);
             updateUser(res.data.user);
-            setAvatarPreview(res.data.user.avatar);
+            setAvatarPreview(getUploadUrl(res.data.user.avatar));
             toast.success('Profile picture updated!');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Upload failed');
-            setAvatarPreview(profile?.avatar || null);
+            setAvatarPreview(profile?.avatar ? getUploadUrl(profile.avatar) : null);
         } finally {
             setAvatarUploading(false);
             e.target.value = '';

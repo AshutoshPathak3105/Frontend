@@ -3,22 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     Users, UserPlus, Search, X, MapPin, Loader2, ChevronLeft, ChevronRight
 } from 'lucide-react';
-import { browsePeople, sendConnectionRequest, cancelConnectionRequest } from '../services/api';
-import { useAuth } from '../context/AuthContext';
-import toast from 'react-hot-toast';
-import './Network.css';
-import './FindPeople.css';
-
-const _hostname = window.location.hostname;
-const API_BASE = process.env.REACT_APP_API_URL ||
-    ((_hostname === 'localhost' || _hostname === '127.0.0.1') ? 'http://localhost:8000' : `http://${_hostname}:8000`);
+import { browsePeople, sendConnectionRequest, cancelConnectionRequest, getUploadUrl } from '../services/api';
 
 const getInitials = (name = '') =>
     name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
 const avatar = (a, name) =>
     a
-        ? <img src={`${API_BASE}${a}`} alt={name} className="conn-avatar-img" />
+        ? <img src={getUploadUrl(a)} alt={name} className="conn-avatar-img" />
         : <div className="conn-avatar-initials">{getInitials(name)}</div>;
 
 const FindPeople = () => {
@@ -160,37 +152,37 @@ const FindPeople = () => {
                             {people.map(person => (
                                 <div key={person._id} className="connection-card fp-card-clickable">
                                     <Link to={`/users/profile/${person._id}`} className="fp-card-link">
-                                    <div className="connection-cover fp-cover">
-                                        <div className="connection-cover-pattern" />
-                                    </div>
-                                    <div className="conn-avatar-wrap">
-                                        <div className="conn-avatar">
-                                            {avatar(person.avatar, person.name)}
+                                        <div className="connection-cover fp-cover">
+                                            <div className="connection-cover-pattern" />
                                         </div>
-                                    </div>
-                                    <div className="conn-body">
-                                        <h3 className="fp-card-name">{person.name}</h3>
-                                        {person.headline && (
-                                            <p className="conn-headline">{person.headline}</p>
-                                        )}
-                                        {person.location && (
-                                            <p className="fp-location">
-                                                <MapPin size={11} /> {person.location}
-                                            </p>
-                                        )}
-                                        {person.mutualCount > 0 && (
-                                            <p className="fp-mutual">
-                                                <Users size={11} /> {person.mutualCount} mutual connection{person.mutualCount > 1 ? 's' : ''}
-                                            </p>
-                                        )}
-                                        {person.skills?.length > 0 && (
-                                            <div className="profile-badges" style={{ marginTop: 8 }}>
-                                                {person.skills.slice(0, 3).map(s => (
-                                                    <span key={s} className="badge badge-primary-light">{s}</span>
-                                                ))}
+                                        <div className="conn-avatar-wrap">
+                                            <div className="conn-avatar">
+                                                {avatar(person.avatar, person.name)}
                                             </div>
-                                        )}
-                                    </div>
+                                        </div>
+                                        <div className="conn-body">
+                                            <h3 className="fp-card-name">{person.name}</h3>
+                                            {person.headline && (
+                                                <p className="conn-headline">{person.headline}</p>
+                                            )}
+                                            {person.location && (
+                                                <p className="fp-location">
+                                                    <MapPin size={11} /> {person.location}
+                                                </p>
+                                            )}
+                                            {person.mutualCount > 0 && (
+                                                <p className="fp-mutual">
+                                                    <Users size={11} /> {person.mutualCount} mutual connection{person.mutualCount > 1 ? 's' : ''}
+                                                </p>
+                                            )}
+                                            {person.skills?.length > 0 && (
+                                                <div className="profile-badges" style={{ marginTop: 8 }}>
+                                                    {person.skills.slice(0, 3).map(s => (
+                                                        <span key={s} className="badge badge-primary-light">{s}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </Link>
                                     <div style={{ padding: '0 16px 16px' }}>
                                         {person.connectionStatus === 'pending' ? (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Clock, Bookmark, BookmarkCheck, Zap, Star, Users } from 'lucide-react';
-import { toggleSaveJob } from '../../services/api';
+import { toggleSaveJob, getUploadUrl } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import './JobCard.css';
@@ -104,7 +104,7 @@ const JobCard = ({ job, onSaveToggle, isSaved: initialSaved = false }) => {
                         border: '1px solid var(--border)'
                     }}>
                         {company?.logo ? (
-                            <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={getUploadUrl(company.logo)} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                             company?.name?.[0]?.toUpperCase() || 'C'
                         )}

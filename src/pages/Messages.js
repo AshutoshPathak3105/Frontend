@@ -11,7 +11,8 @@ import {
     deleteConversation,
     editMessage as editMessageAPI,
     deleteMessageAPI,
-    globalSearch
+    globalSearch,
+    getUploadUrl
 } from '../services/api';
 import {
     Send, Search, MessageCircleMore, Trash2,
@@ -23,7 +24,6 @@ import './Messages.css';
 
 // GIPHY public API key — replace with your own from https://developers.giphy.com
 const GIPHY_KEY = 'dc6zaTOxFJmzC';
-const BACKEND_URL = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const getInitials = (name) =>
@@ -48,7 +48,7 @@ const Avatar = ({ user, size = 40 }) => (
         title={user?.name}
     >
         {user?.avatar
-            ? <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+            ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
             : getInitials(user?.name)
         }
     </div>
@@ -750,9 +750,7 @@ const Messages = () => {
                                 const isMine = msg.sender?._id === currentUser?._id || msg.sender === currentUser?._id;
                                 const showAvatar = !isMine && (idx === 0 || messages[idx - 1]?.sender?._id !== msg.sender?._id);
                                 const type = msg.messageType || 'text';
-                                const fileUrl = msg.fileUrl
-                                    ? (msg.fileUrl.startsWith('http') ? msg.fileUrl : `${BACKEND_URL}${msg.fileUrl}`)
-                                    : null;
+                                const fileUrl = msg.fileUrl ? getUploadUrl(msg.fileUrl) : null;
                                 const isSelected = selectedMsg?._id === msg._id;
                                 const isEditing = editingMsgId === msg._id;
                                 return (

@@ -8,7 +8,7 @@ import {
 import {
     getConnectionRequests, respondToConnectionRequest,
     getConnections, toggleFollow, removeConnection, getMe,
-    browsePeople, sendConnectionRequest
+    browsePeople, sendConnectionRequest, getUploadUrl
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -134,7 +134,7 @@ const Network = () => {
     const Avatar = ({ u, size = 60 }) => (
         <div className="network-avatar" style={{ width: size, height: size, fontSize: size * 0.35 }}>
             {u?.avatar ? (
-                <img src={u.avatar} alt={u.name} />
+                <img src={getUploadUrl(u.avatar)} alt={u.name} />
             ) : (
                 getInitials(u?.name)
             )}
@@ -440,7 +440,7 @@ const Network = () => {
                                     );
                                 })()}
                             </div>
-                        ) : null
+                        )
                     )}
                 </main>
             </div>

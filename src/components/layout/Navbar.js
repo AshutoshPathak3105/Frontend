@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import './Navbar.css';
 import LogoImage from '../common/Logo';
-import { globalSearch, getUnreadMessageCount, getNotifications, markAllNotificationsRead, markNotificationRead, deleteNotification } from '../../services/api';
+import { globalSearch, getUnreadMessageCount, getNotifications, markAllNotificationsRead, markNotificationRead, deleteNotification, getUploadUrl } from '../../services/api';
 
 const Navbar = () => {
     const { user, logoutUser } = useAuth();
@@ -317,7 +317,7 @@ const Navbar = () => {
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                             <div className="avatar" style={{ width: 32, height: 32, fontSize: 13, flexShrink: 0 }}>
                                                                 {u.avatar
-                                                                    ? <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                                                    ? <img src={getUploadUrl(u.avatar)} alt={u.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                                                     : getInitials(u.name)}
                                                             </div>
                                                             <div style={{ minWidth: 0 }}>
@@ -445,7 +445,7 @@ const Navbar = () => {
                                                         {/* 1. Left: Profile Picture or Placeholder */}
                                                         <div className="notif-avatar-box">
                                                             {n.sender?.avatar ? (
-                                                                <img src={n.sender.avatar} alt={n.sender.name} className="notif-pfp" />
+                                                                <img src={getUploadUrl(n.sender.avatar)} alt={n.sender.name} className="notif-pfp" />
                                                             ) : (
                                                                 <div className="notif-initials">
                                                                     {getInitials(n.sender?.name || n.title)}
@@ -495,7 +495,7 @@ const Navbar = () => {
                                         <div className="avatar" style={{ width: 32, height: 32, fontSize: 13 }}>
                                             {user.avatar ? (
                                                 <img
-                                                    src={user.avatar}
+                                                    src={getUploadUrl(user.avatar)}
                                                     alt={user.name}
                                                     style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
                                                 />
@@ -514,7 +514,7 @@ const Navbar = () => {
                                             <div className="dropdown-header">
                                                 <div className="avatar" style={{ width: 40, height: 40, fontSize: 16 }}>
                                                     {user.avatar
-                                                        ? <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                                        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                                         : getInitials(user.name)}
                                                 </div>
                                                 <div>
@@ -701,7 +701,7 @@ const Navbar = () => {
                             <Link to="/profile" className="mobile-user-info" onClick={() => setMobileOpen(false)}>
                                 <div className="avatar" style={{ width: 42, height: 42, fontSize: 15, flexShrink: 0 }}>
                                     {user.avatar
-                                        ? <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                         : getInitials(user.name)}
                                 </div>
                                 <div style={{ overflow: 'hidden' }}>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, ArrowRight, Star, Zap, ChevronRight, CheckCircle } from 'lucide-react';
-import { getFeaturedJobs, getJobStats, getCategories, getStories } from '../services/api';
+import { getFeaturedJobs, getJobStats, getCategories, getStories, getUploadUrl } from '../services/api';
 import JobCard from '../components/jobs/JobCard';
 import LogoImage from '../components/common/Logo';
 import { useAuth } from '../context/AuthContext';
@@ -663,8 +663,11 @@ const Home = () => {
                                     "{t.story || t.text}"
                                 </p>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <div className="avatar" style={{ width: 44, height: 44, fontSize: 16, background: 'var(--gradient-primary)' }}>
-                                        {t.avatar || (t.name ? t.name.charAt(0) : '?')}
+                                    <div className="avatar" style={{ width: 44, height: 44, fontSize: 16, background: 'var(--gradient-primary)', overflow: 'hidden' }}>
+                                        {t.avatar && t.avatar.length > 2
+                                            ? <img src={getUploadUrl(t.avatar)} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            : (t.name ? t.name.charAt(0) : '?')
+                                        }
                                     </div>
                                     <div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>

@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import {
     getFeedPosts, createFeedPost, deleteFeedPost,
     togglePostLike, addPostComment, deletePostComment, sharePostAPI,
-    viewPostAPI, sendConnectionRequest, toggleFollow, getMe, removeConnection
+    viewPostAPI, sendConnectionRequest, toggleFollow, getMe, removeConnection, getUploadUrl
 } from '../../services/api';
 import './SocialFeed.css';
 
@@ -29,7 +29,7 @@ const Avatar = ({ user, size = 40 }) => {
         : '?';
 
     return user?.avatar
-        ? <img src={user.avatar} alt={user.name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+        ? <img src={getUploadUrl(user.avatar)} alt={user.name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
         : <div style={{
             width: size, height: size, borderRadius: '50%', background: 'var(--gradient-primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -73,8 +73,8 @@ const MediaGrid = ({ media }) => {
                         }}
                     >
                         {m.type === 'video'
-                            ? <video src={m.url} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            : <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ? <video src={getUploadUrl(m.url)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            : <img src={getUploadUrl(m.url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         }
                         {i === 3 && count > 4 && (
                             <div style={{
@@ -103,8 +103,8 @@ const MediaGrid = ({ media }) => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}><X size={20} /></button>
                     {media[lightbox].type === 'video'
-                        ? <video controls src={media[lightbox].url} style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 12 }} onClick={e => e.stopPropagation()} />
-                        : <img src={media[lightbox].url} alt="" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 12, objectFit: 'contain' }} onClick={e => e.stopPropagation()} />
+                        ? <video controls src={getUploadUrl(media[lightbox].url)} style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 12 }} onClick={e => e.stopPropagation()} />
+                        : <img src={getUploadUrl(media[lightbox].url)} alt="" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 12, objectFit: 'contain' }} onClick={e => e.stopPropagation()} />
                     }
                     {media.length > 1 && (
                         <div style={{ position: 'absolute', bottom: 20, display: 'flex', gap: 8 }}>
