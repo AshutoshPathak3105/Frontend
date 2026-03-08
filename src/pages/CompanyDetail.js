@@ -104,8 +104,8 @@ const CompanyDetail = () => {
                     padding: 7px 18px;
                     border-radius: 999px;
                     border: 1.5px solid var(--border);
-                    background: transparent;
-                    color: var(--text-secondary);
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
                     font-size: 13px;
                     font-weight: 600;
                     cursor: pointer;
@@ -113,15 +113,15 @@ const CompanyDetail = () => {
                     white-space: nowrap;
                     font-family: 'Inter', sans-serif;
                 }
-                .cd-cat-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+                .cd-cat-btn:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
                 .cd-cat-btn.active {
-                    background: var(--gradient-primary);
+                    background: var(--gradient-button);
                     border-color: transparent;
                     color: white;
-                    box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+                    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
                 }
                 [data-theme="light"] .cd-cat-btn.active {
-                    box-shadow: 0 4px 14px rgba(5,150,105,0.25);
+                    box-shadow: 0 4px 14px rgba(5,150,105,0.3);
                 }
                 .cd-info-row {
                     display: flex;
