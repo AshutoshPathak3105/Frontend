@@ -4,6 +4,10 @@ import {
     Users, UserPlus, Search, X, MapPin, Loader2, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { browsePeople, sendConnectionRequest, cancelConnectionRequest, getUploadUrl } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
+import './Network.css';
+import './FindPeople.css';
 
 const getInitials = (name = '') =>
     name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);

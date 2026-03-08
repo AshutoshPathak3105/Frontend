@@ -436,7 +436,7 @@ const Navbar = () => {
                                                     )}
                                                     {notifications.length > 0 && (
                                                         <button className="notif-delete-all" onClick={handleDeleteAll} title="Delete all notifications">
-                                                            <Trash2 size={14} /> Delete all
+                                                            <Trash2 size={16} />
                                                         </button>
                                                     )}
                                                     <button className="notif-close-btn" onClick={() => setNotifOpen(false)} title="Close">

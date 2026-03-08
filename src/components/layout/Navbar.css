@@ -1526,16 +1526,17 @@ body.mobile-menu-open .mobile-toggle {
 .notif-mark-all {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    font-weight: 600;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--primary-light);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 6px 8px;
     border-radius: var(--radius-sm);
     transition: var(--transition-fast);
+    white-space: nowrap;
 }
 
 .notif-mark-all:hover {
@@ -1545,16 +1546,18 @@ body.mobile-menu-open .mobile-toggle {
 .notif-delete-all {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #ef4444; /* red-500 */
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: #ef4444;
+    /* red-500 */
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 0;
     border-radius: var(--radius-sm);
     transition: var(--transition-fast);
+    flex-shrink: 0;
 }
 
 .notif-delete-all:hover {
@@ -1741,7 +1744,8 @@ body.mobile-menu-open .mobile-toggle {
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
-    opacity: 1; /* Changed from 0 to 1 as per user request */
+    opacity: 1;
+    /* Changed from 0 to 1 as per user request */
     transition: var(--transition-fast);
     flex-shrink: 0;
 }

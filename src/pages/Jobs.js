@@ -472,8 +472,8 @@ const Jobs = () => {
                                 <strong style={{ color: 'var(--primary)' }}>{totalJobs}</strong> jobs
                             </p>
                             {/* Inline sort */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Sort:</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap' }}>
+                                <span style={{ fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Sort:</span>
                                 <select className="form-select" value={filters.sort}
                                     onChange={e => handleFilterChange('sort', e.target.value)}
                                     style={{ padding: '6px 12px', fontSize: 13, minWidth: 150 }}>
