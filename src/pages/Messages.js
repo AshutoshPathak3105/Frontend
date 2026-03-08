@@ -21,6 +21,7 @@ import {
     FileText, Image, Video, Copy, Pencil
 } from 'lucide-react';
 import './Messages.css';
+import Avatar from '../components/common/Avatar';
 
 // GIPHY public API key — replace with your own from https://developers.giphy.com
 const GIPHY_KEY = 'dc6zaTOxFJmzC';
@@ -41,7 +42,6 @@ const formatTime = (dateStr) => {
     return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
-import Avatar from '../components/common/Avatar';
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Messages = () => {

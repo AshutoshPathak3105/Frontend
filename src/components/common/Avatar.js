@@ -4,7 +4,7 @@ import { getUploadUrl } from '../../services/api';
 const getInitials = (name = '') =>
     name?.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2) || '?';
 
-const Avatar = ({ user, size = 40, className = '' }) => {
+const Avatar = ({ user, size = 40, className = '', title = '', ...props }) => {
     const [imgError, setImgError] = useState(false);
 
     if (user?.avatar && !imgError) {
@@ -13,6 +13,7 @@ const Avatar = ({ user, size = 40, className = '' }) => {
                 src={getUploadUrl(user.avatar)}
                 alt={user.name}
                 className={className}
+                title={title || user.name}
                 style={{
                     width: size,
                     height: size,
@@ -21,6 +22,7 @@ const Avatar = ({ user, size = 40, className = '' }) => {
                     flexShrink: 0
                 }}
                 onError={() => setImgError(true)}
+                {...props}
             />
         );
     }
@@ -28,6 +30,7 @@ const Avatar = ({ user, size = 40, className = '' }) => {
     return (
         <div
             className={className}
+            title={title || user?.name}
             style={{
                 width: size,
                 height: size,
@@ -41,6 +44,7 @@ const Avatar = ({ user, size = 40, className = '' }) => {
                 fontWeight: 700,
                 flexShrink: 0
             }}
+            {...props}
         >
             {getInitials(user?.name)}
         </div>

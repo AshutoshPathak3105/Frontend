@@ -129,7 +129,7 @@ const Network = () => {
         }
     };
 
-    const AvatarComponent = ({ u, size = 60 }) => (
+    const LocalAvatar = ({ u, size = 60 }) => (
         <div className="network-avatar" style={{ width: size, height: size, fontSize: size * 0.35 }}>
             <Avatar user={u} size={size} />
         </div>
@@ -233,7 +233,7 @@ const Network = () => {
                                                     <div className="connection-cover-pattern" />
                                                 </div>
                                                 <div className="conn-avatar-wrap">
-                                                    <Avatar u={person} size={68} />
+                                                    <LocalAvatar u={person} size={68} />
                                                 </div>
                                                 <div className="conn-body">
                                                     <Link to={`/users/profile/${person._id}`} className="conn-name-link">
@@ -309,7 +309,7 @@ const Network = () => {
                                             </div>
                                             {/* Avatar centred over cover */}
                                             <div className="conn-avatar-wrap">
-                                                <Avatar u={req.sender} size={68} />
+                                                <LocalAvatar u={req.sender} size={68} />
                                             </div>
                                             {/* Info */}
                                             <div className="conn-body">
@@ -376,7 +376,7 @@ const Network = () => {
 
                                                     {/* Avatar centred over the cover */}
                                                     <div className="conn-avatar-wrap">
-                                                        <Avatar u={conn} size={68} />
+                                                        <LocalAvatar u={conn} size={68} />
                                                     </div>
 
                                                     {/* Info */}
