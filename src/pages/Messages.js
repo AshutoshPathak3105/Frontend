@@ -27,8 +27,6 @@ import Avatar from '../components/common/Avatar';
 const GIPHY_KEY = 'dc6zaTOxFJmzC';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const getInitials = (name) =>
-    name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 
 const formatTime = (dateStr) => {
     if (!dateStr) return '';
