@@ -128,8 +128,8 @@ const PostCard = ({ post, currentUser, onLike }) => {
         <div style={{ borderBottom: '1px solid var(--border)' }}>
             {/* Text content with padding */}
             {post.text && (
-                <div style={{ padding: '14px 20px 8px' }}>
-                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-wrap' }}>{post.text}</p>
+                <div style={{ padding: '14px 20px 8px', maxHeight: 70, overflowY: 'auto', background: 'rgba(99,102,241,0.03)', borderRadius: 8 }}>
+                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{post.text}</p>
                 </div>
             )}
 
