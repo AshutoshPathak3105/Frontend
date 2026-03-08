@@ -178,6 +178,7 @@ export const markNotificationRead = (id) => API.put(`/notifications/${id}/read`)
 export const markAllNotificationsRead = () => API.put('/notifications/mark-all-read');
 export const deleteNotification = (id) => API.delete(`/notifications/${id}`);
 export const clearReadNotifications = () => API.delete('/notifications/clear-read');
+export const deleteAllNotifications = () => API.delete('/notifications/delete-all');
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 export const getAdminStats = () => API.get('/admin/stats');

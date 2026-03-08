@@ -1542,6 +1542,25 @@ body.mobile-menu-open .mobile-toggle {
     background: rgba(59, 130, 246, 0.1);
 }
 
+.notif-delete-all {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ef4444; /* red-500 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.notif-delete-all:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
 .notif-close-btn {
     display: flex;
     align-items: center;
@@ -1722,14 +1741,12 @@ body.mobile-menu-open .mobile-toggle {
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
-    opacity: 0;
+    opacity: 1; /* Changed from 0 to 1 as per user request */
     transition: var(--transition-fast);
     flex-shrink: 0;
 }
 
-.notif-item:hover .notif-delete {
-    opacity: 1;
-}
+/* Removed hover triggered opacity */
 
 .notif-delete:hover {
     color: var(--danger);

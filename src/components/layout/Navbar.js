@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import './Navbar.css';
 import LogoImage from '../common/Logo';
-import { globalSearch, getUnreadMessageCount, getNotifications, markAllNotificationsRead, markNotificationRead, deleteNotification, getUploadUrl } from '../../services/api';
+import { globalSearch, getUnreadMessageCount, getNotifications, markAllNotificationsRead, markNotificationRead, deleteNotification, deleteAllNotifications, getUploadUrl } from '../../services/api';
 
 const Navbar = () => {
     const { user, logoutUser } = useAuth();
@@ -97,6 +97,15 @@ const Navbar = () => {
         try {
             await deleteNotification(id);
             setNotifications(prev => prev.filter(n => n._id !== id));
+        } catch { /* silent */ }
+    };
+
+    const handleDeleteAll = async () => {
+        if (!window.confirm('Are you sure you want to delete all notifications?')) return;
+        try {
+            await deleteAllNotifications();
+            setNotifications([]);
+            setUnreadNotifs(0);
         } catch { /* silent */ }
     };
 
@@ -423,6 +432,11 @@ const Navbar = () => {
                                                     {unreadNotifs > 0 && (
                                                         <button className="notif-mark-all" onClick={handleMarkAllRead} title="Mark all as read">
                                                             <CheckCheck size={14} /> Mark all read
+                                                        </button>
+                                                    )}
+                                                    {notifications.length > 0 && (
+                                                        <button className="notif-delete-all" onClick={handleDeleteAll} title="Delete all notifications">
+                                                            <Trash2 size={14} /> Delete all
                                                         </button>
                                                     )}
                                                     <button className="notif-close-btn" onClick={() => setNotifOpen(false)} title="Close">
