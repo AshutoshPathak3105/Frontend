@@ -69,7 +69,15 @@ const CompanyDetail = () => {
                             borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: 36, flexShrink: 0, overflow: 'hidden', border: '2px solid var(--border)'
                         }}>
-                            {company.logo ? <img src={getUploadUrl(company.logo)} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏢'}
+                            {company.logo ? (
+                                <img
+                                    src={getUploadUrl(company.logo)}
+                                    alt={company.name}
+                                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                            ) : null}
+                            <span style={{ display: company.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, width: '100%', height: '100%' }}>🏢</span>
                         </div>
                         <div style={{ flex: 1 }}>
                             <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -183,7 +191,15 @@ const CompanyDetail = () => {
                         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 28 }}>
                             <div style={{ textAlign: 'center', marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
                                 <div style={{ width: 64, height: 64, borderRadius: 14, overflow: 'hidden', background: '#fff', border: '1px solid var(--border)', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    {company.logo ? <img src={getUploadUrl(company.logo)} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <Building2 size={32} color="var(--primary)" />}
+                                    {company.logo ? (
+                                        <img
+                                            src={getUploadUrl(company.logo)}
+                                            alt=""
+                                            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                        />
+                                    ) : null}
+                                    <span style={{ display: company.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center' }}><Building2 size={32} color="var(--primary)" /></span>
                                 </div>
                                 <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{company.name}</h3>
                                 {company.verified && <span style={{ fontSize: 11, color: 'var(--success)', fontWeight: 600 }}>Verified Institution</span>}

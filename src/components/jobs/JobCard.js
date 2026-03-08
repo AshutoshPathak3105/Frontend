@@ -1,10 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Clock, Bookmark, BookmarkCheck, Zap, Star, Users } from 'lucide-react';
 import { toggleSaveJob, getUploadUrl } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import './JobCard.css';
+
+/* Handles broken images gracefully — shows letter avatar as fallback */
+const LogoBox = ({ logo, name, size = 52, radius = 12 }) => {
+    const [imgError, setImgError] = useState(false);
+    const logoUrl = getUploadUrl(logo);
+    const showImg = logoUrl && !imgError;
+    const initial = name?.[0]?.toUpperCase() || 'C';
+    return (
+        <div style={{
+            width: size, height: size, borderRadius: radius, overflow: 'hidden', flexShrink: 0,
+            background: 'var(--gradient-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: size * 0.38, fontWeight: 800, color: 'white',
+            border: '1px solid var(--border)', position: 'relative'
+        }}>
+            {showImg && (
+                <img
+                    src={logoUrl}
+                    alt={name}
+                    onError={() => setImgError(true)}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+                />
+            )}
+            {!showImg && initial}
+        </div>
+    );
+};
 
 const typeColors = {
     'full-time': 'badge-success',
@@ -96,19 +123,7 @@ const JobCard = ({ job, onSaveToggle, isSaved: initialSaved = false }) => {
 
                 {/* Company Info */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 16 }}>
-                    <div style={{
-                        width: 52, height: 52, borderRadius: 12, overflow: 'hidden',
-                        background: 'var(--gradient-primary)', flexShrink: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 20, fontWeight: 800, color: 'white',
-                        border: '1px solid var(--border)'
-                    }}>
-                        {company?.logo ? (
-                            <img src={getUploadUrl(company.logo)} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                            company?.name?.[0]?.toUpperCase() || 'C'
-                        )}
-                    </div>
+                    <LogoBox logo={company?.logo} name={company?.name} size={52} radius={12} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                             <span style={{

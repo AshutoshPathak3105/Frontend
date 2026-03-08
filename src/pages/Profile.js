@@ -868,9 +868,14 @@ const Profile = () => {
                                                         {/* Company logo */}
                                                         <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                             {job.company?.logo
-                                                                ? <img src={job.company.logo} alt={job.company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                                                : <Building2 size={20} style={{ color: 'var(--text-muted)' }} />
-                                                            }
+                                                                ? <img
+                                                                    src={getUploadUrl(job.company.logo)}
+                                                                    alt={job.company.name}
+                                                                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                                                />
+                                                                : null}
+                                                            <Building2 size={20} style={{ color: 'var(--text-muted)', display: job.company?.logo ? 'none' : 'flex' }} />
                                                         </div>
                                                         <div style={{ flex: 1, minWidth: 0 }}>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>

@@ -461,8 +461,14 @@ const Applications = () => {
                                         {isEmployer
                                             ? <User size={22} color="white" />
                                             : app.job?.company?.logo
-                                                ? <img src={getUploadUrl(app.job.company.logo)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                : '🏢'}
+                                                ? <img
+                                                    src={getUploadUrl(app.job.company.logo)}
+                                                    alt=""
+                                                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                                : null}
+                                        {!isEmployer && <span style={{ display: app.job?.company?.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🏢</span>}
                                     </div>
 
                                     {/* Text info */}

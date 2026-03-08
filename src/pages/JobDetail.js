@@ -145,7 +145,15 @@ const JobDetail = () => {
                                     borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: 28, flexShrink: 0
                                 }}>
-                                    {job.company?.logo ? <img src={getUploadUrl(job.company.logo)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }} /> : '🏢'}
+                                    {job.company?.logo ? (
+                                        <img
+                                            src={getUploadUrl(job.company.logo)}
+                                            alt=""
+                                            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                                        />
+                                    ) : null}
+                                    <span style={{ display: job.company?.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, width: '100%', height: '100%' }}>🏢</span>
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>

@@ -167,7 +167,15 @@ const JobSeekerDashboard = () => {
                                             onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
                                         >
                                             <div style={{ width: 40, height: 40, background: 'var(--gradient-primary)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, overflow: 'hidden' }}>
-                                                {app.job?.company?.logo ? <img src={getUploadUrl(app.job.company.logo)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} /> : '🏢'}
+                                                {app.job?.company?.logo ? (
+                                                    <img
+                                                        src={getUploadUrl(app.job.company.logo)}
+                                                        alt=""
+                                                        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }}
+                                                    />
+                                                ) : null}
+                                                <span style={{ display: app.job?.company?.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>🏢</span>
                                             </div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{app.job?.title || 'Unknown Role'}</div>
