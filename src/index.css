@@ -1481,9 +1481,7 @@ body.mobile-menu-open {
 /* ============================================================
    GLOBAL: disable hover lift/scale animations
 ============================================================ */
-*:hover {
-  transform: none !important;
-}
+
 
 /* ============================================================
    MOBILE RESPONSIVE — global component padding & layout fixes

@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import LogoImage from '../components/common/Logo';
 import MathCaptcha from '../components/common/MathCaptcha';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Search, Briefcase } from 'lucide-react';
@@ -10,15 +10,24 @@ import './Auth.css';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { loginUser } = useAuth();
+    const location = useLocation();
+    const { loginUser, user, loading } = useAuth();
     const [role, setRole] = useState('jobseeker');
     const [animDir, setAnimDir] = useState('');
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading2, setLoading2] = useState(false);
     const [captchaKey, setCaptchaKey] = useState(0);
     const [captchaVerified, setCaptchaVerified] = useState(false);
     const handleCaptcha = useCallback((v) => setCaptchaVerified(v), []);
+
+    // Redirect already-logged-in users away from login page
+    useEffect(() => {
+        if (!loading && user) {
+            const from = location.state?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
+        }
+    }, [user, loading, navigate, location.state]);
 
     const switchRole = (newRole) => {
         if (newRole === role) return;
@@ -34,12 +43,13 @@ const Login = () => {
             toast.error('Please complete the CAPTCHA verification.');
             return;
         }
-        setLoading(true);
+        setLoading2(true);
         try {
-            const res = await login(form);
+            const res = await login({ ...form, role });
             loginUser(res.data.user, res.data.token);
             toast.success(`Welcome back, ${res.data.user.name}!`);
-            navigate('/dashboard');
+            const from = location.state?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
         } catch (err) {
             const status = err.response?.status;
             const msg = err.response?.data?.message;
@@ -51,7 +61,7 @@ const Login = () => {
             setCaptchaKey(prev => prev + 1);
             setCaptchaVerified(false);
         } finally {
-            setLoading(false);
+            setLoading2(false);
         }
     };
 
@@ -157,9 +167,9 @@ const Login = () => {
                     <button
                         type="submit"
                         className={`auth-submit${isEmployer ? ' employer' : ''}`}
-                        disabled={loading || !captchaVerified}
+                        disabled={loading2 || !captchaVerified}
                     >
-                        {loading ? (
+                        {loading2 ? (
                             <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Signing in...</>
                         ) : (
                             <>Sign In <ArrowRight size={15} /></>

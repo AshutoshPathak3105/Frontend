@@ -416,7 +416,7 @@ const Jobs = () => {
             </div>
 
             {/* ── Jobs Grid ── */}
-            <div className="container" style={{ padding: '40px 24px' }}>
+            <div className="container jobs-grid-container">
 
                 {/* Active filter summary bar */}
                 {(filters.search || filters.location || activeFilterCount > 0) && !loading && (
@@ -474,7 +474,7 @@ const Jobs = () => {
                             {/* Inline sort */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap' }}>
                                 <span style={{ fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Sort:</span>
-                                <select className="form-select" value={filters.sort}
+                                <select className="form-select jobs-sort-select" value={filters.sort}
                                     onChange={e => handleFilterChange('sort', e.target.value)}
                                     style={{ padding: '6px 12px', fontSize: 13, minWidth: 150 }}>
                                     {SORT_OPTIONS.map(s => (

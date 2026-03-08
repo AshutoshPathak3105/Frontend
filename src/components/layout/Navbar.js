@@ -256,22 +256,20 @@ const Navbar = () => {
             <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
                 <div className="navbar-container">
 
-                    {/* ☰ Hamburger — LEFT on mobile (only when logged in) */}
-                    {user && (
-                        <button
-                            className="mobile-toggle"
-                            onClick={() => setMobileOpen(!mobileOpen)}
-                            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-                            aria-expanded={mobileOpen}
-                        >
-                            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-                        </button>
-                    )}
+                    {/* ☰ Hamburger — LEFT on mobile */}
+                    <button
+                        className="mobile-toggle"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                        aria-expanded={mobileOpen}
+                    >
+                        {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+                    </button>
 
                     {/* Logo */}
-                    <Link to="/" className="navbar-logo">
+                    <div className="navbar-logo">
                         <LogoImage height={34} withText={true} />
-                    </Link>
+                    </div>
 
                     {/* ── Global Search Bar (between logo and theme toggle) ── */}
                     <div className="navbar-search" ref={searchRef}>
@@ -710,9 +708,9 @@ const Navbar = () => {
                 <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
                     {/* Drawer Header */}
                     <div className="mobile-menu-header">
-                        <Link to="/" className="navbar-logo" onClick={() => setMobileOpen(false)}>
+                        <div className="navbar-logo">
                             <LogoImage height={32} withText={true} />
-                        </Link>
+                        </div>
                         <button
                             className="mobile-close-btn"
                             onClick={() => setMobileOpen(false)}
@@ -806,7 +804,7 @@ const Navbar = () => {
                             </div>
                         )}
 
-                        {/* ── Colour Mode & Messages ── */}
+                        {/* ── Settings, Colour Mode & Messages ── */}
                         <div className="mobile-grid-section">
                             <span className="mobile-section-label">Settings</span>
                             <div className="mobile-grid-2">
@@ -819,6 +817,10 @@ const Navbar = () => {
                                     <span>Messages</span>
                                 </Link>
                             </div>
+                            <Link to="/contact" className="mobile-home-link" style={{ marginTop: 12 }} onClick={() => setMobileOpen(false)}>
+                                <Mail size={18} />
+                                <span>Contact Us</span>
+                            </Link>
                         </div>
 
                     </div>

@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import LogoImage from '../components/common/Logo';
 import MathCaptcha from '../components/common/MathCaptcha';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Briefcase, Search, Globe, MapPin, Building2, AlignLeft } from 'lucide-react';
@@ -12,7 +12,8 @@ const INDUSTRIES = ['Technology', 'Finance', 'Healthcare', 'Education', 'Retail'
 
 const Register = () => {
     const navigate = useNavigate();
-    const { loginUser } = useAuth();
+    const location = useLocation();
+    const { loginUser, user, loading: authLoading } = useAuth();
     const [animDir, setAnimDir] = useState('');
     const [form, setForm] = useState({
         name: '', email: '', password: '', role: 'jobseeker',
@@ -23,6 +24,14 @@ const Register = () => {
     const [captchaKey, setCaptchaKey] = useState(0);
     const [captchaVerified, setCaptchaVerified] = useState(false);
     const handleCaptcha = useCallback((v) => setCaptchaVerified(v), []);
+
+    // Redirect already-logged-in users away from register page
+    useEffect(() => {
+        if (!authLoading && user) {
+            const from = location.state?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
+        }
+    }, [user, authLoading, navigate, location.state]);
 
     const isEmployer = form.role === 'employer';
 
@@ -59,7 +68,9 @@ const Register = () => {
             toast.success(isEmployer
                 ? 'Employer account created! Your company profile is ready. 🏢'
                 : 'Account created successfully! Welcome to Job Sarthi 🎉');
-            navigate('/dashboard');
+
+            const from = location.state?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
         } catch (err) {
             toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
             setCaptchaKey(prev => prev + 1);

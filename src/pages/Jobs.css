@@ -71,3 +71,43 @@
         border-radius: 0 0 12px 12px;
     }
 }
+
+/* ── Jobs Grid Container ───────────────────────────────── */
+.jobs-grid-container {
+    padding: 40px 24px 72px;
+}
+
+@media (max-width: 768px) {
+    .jobs-grid-container {
+        padding: 28px 16px 64px;
+    }
+}
+
+/* ── Sort Select — Mobile Beautiful Style ─────────────── */
+@media (max-width: 768px) {
+    .jobs-sort-select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary)) !important;
+        border: 1.2px solid rgba(99, 102, 241, 0.4) !important;
+        border-radius: 999px !important;
+        padding: 8px 36px 8px 16px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: var(--text-primary) !important;
+        min-width: 150px !important;
+        cursor: pointer;
+        /* Sort icon SVG */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 16 4 4 4-4'/%3E%3Cpath d='M7 20V4'/%3E%3Cpath d='M11 4h10'/%3E%3Cpath d='M11 8h7'/%3E%3Cpath d='M11 12h4'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 14px center !important;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.12), 0 1px 2px rgba(99, 102, 241, 0.05) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .jobs-sort-select:focus {
+        outline: none !important;
+        border-color: var(--primary-light) !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    }
+}

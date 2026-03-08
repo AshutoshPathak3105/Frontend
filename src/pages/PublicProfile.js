@@ -362,7 +362,7 @@ const PublicProfile = () => {
     const joinYear = profile.createdAt ? new Date(profile.createdAt).getFullYear() : '';
 
     return (
-        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '88px 20px 60px' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '88px 20px 72px' }}>
             {/* ─── HEADER CARD ──────────────────────────────────────────────── */}
             <div className="card" style={{ padding: 0, overflow: 'visible', marginBottom: 20, borderRadius: 16, position: 'relative' }}>
                 {/* Gradient banner */}

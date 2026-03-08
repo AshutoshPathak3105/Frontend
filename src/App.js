@@ -41,13 +41,15 @@ import ResumeAI from './pages/ResumeAI';
 import JobApplicationsPage from './pages/JobApplicationsPage';
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
+
   if (loading) return (
     <div className="loading-container" style={{ minHeight: '100vh' }}>
       <div className="spinner" />
       <p className="text-secondary">Loading...</p>
     </div>
   );
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
   if (roles && !roles.includes(user.role)) return <Navigate to="/dashboard" replace />;
   return children;
 };
@@ -73,15 +75,15 @@ const AppContent = () => {
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/jobs/:id" element={<JobDetail />} />
-          <Route path="/companies" element={<Companies />} />
-          <Route path="/companies/:id" element={<CompanyDetail />} />
+          <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+          <Route path="/jobs/:id" element={<ProtectedRoute><JobDetail /></ProtectedRoute>} />
+          <Route path="/companies" element={<ProtectedRoute><Companies /></ProtectedRoute>} />
+          <Route path="/companies/:id" element={<ProtectedRoute><CompanyDetail /></ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
           <Route path="/submit-story" element={<ProtectedRoute><SubmitStory /></ProtectedRoute>} />
           <Route path="/success-stories" element={<SuccessStories />} />
           <Route path="/users/profile/:id" element={<PublicProfile />} />

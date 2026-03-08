@@ -188,9 +188,9 @@ const Footer = () => {
                 <div className="footer-main-grid">
                     {/* Brand column */}
                     <div>
-                        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', marginBottom: 18 }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', marginBottom: 18, pointerEvents: 'none', cursor: 'default' }}>
                             <LogoImage height={32} withText={true} />
-                        </Link>
+                        </div>
                         <p style={{ color: isDark ? '#64748b' : 'var(--text-muted)', fontSize: 14, lineHeight: 1.8, maxWidth: 300, marginBottom: 28 }}>
                             The AI-powered job portal connecting talented professionals with their dream careers. Trusted by thousands of employers and job seekers.
                         </p>

@@ -244,7 +244,7 @@ const JobSeekerDashboard = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 32 }}><SocialFeed /></div>
+                <div style={{ marginTop: 48 }}><SocialFeed /></div>
             </div>
         </div>
     );
@@ -460,7 +460,7 @@ const EmployerDashboard = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 32 }}><SocialFeed /></div>
+                <div style={{ marginTop: 48 }}><SocialFeed /></div>
             </div>
         </div>
     );

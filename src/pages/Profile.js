@@ -375,7 +375,7 @@ const Profile = () => {
                     .profile-tab-btn { font-size: 12px; padding: 10px 12px; }
                 }
             `}</style>
-            <div className="container profile-page-container" style={{ padding: '40px 24px' }}>
+            <div className="container profile-page-container" style={{ padding: '40px 24px 72px' }}>
                 {/* Profile Hero */}
                 <div className="profile-hero">
                     <div className="profile-hero-banner" />
