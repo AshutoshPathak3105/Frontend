@@ -251,8 +251,8 @@ const Admin = () => {
                                             {u.isActive ? <Lock size={14} /> : <Unlock size={14} />}
                                         </button>
                                         <button
-                                            className="btn"
-                                            style={{ padding: '4px 10px', fontSize: 12, background: '#ef444420', color: '#ef4444', border: 'none' }}
+                                            className="btn btn-primary"
+                                            style={{ padding: '4px 10px', fontSize: 12, border: 'none' }}
                                             onClick={() => handleDeleteUser(u._id)}
                                             title="Delete user"
                                         >
@@ -307,8 +307,8 @@ const Admin = () => {
                                             <Star size={14} />
                                         </button>
                                         <button
-                                            className="btn"
-                                            style={{ padding: '4px 10px', fontSize: 12, background: '#ef444420', color: '#ef4444', border: 'none' }}
+                                            className="btn btn-primary"
+                                            style={{ padding: '4px 10px', fontSize: 12, border: 'none' }}
                                             onClick={() => handleCloseJob(j._id)}
                                             title="Close job"
                                         >

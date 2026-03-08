@@ -28,8 +28,7 @@ const Register = () => {
     // Redirect already-logged-in users away from register page
     useEffect(() => {
         if (!authLoading && user) {
-            const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            navigate('/dashboard', { replace: true });
         }
     }, [user, authLoading, navigate, location.state]);
 
@@ -69,8 +68,7 @@ const Register = () => {
                 ? 'Employer account created! Your company profile is ready. 🏢'
                 : 'Account created successfully! Welcome to Job Sarthi 🎉');
 
-            const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            navigate('/dashboard', { replace: true });
         } catch (err) {
             toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
             setCaptchaKey(prev => prev + 1);

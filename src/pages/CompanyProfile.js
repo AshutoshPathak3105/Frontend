@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Building2, Globe, Phone, Mail, Save, Upload, Link as LinkIcon, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getMyCompany, createCompany, updateCompany, getUploadUrl } from '../services/api';
+import { getMyCompany, createCompany, updateCompany, deleteCompany, getUploadUrl } from '../services/api';
 import API from '../services/api';
 
 const INDUSTRIES = ['Technology', 'Finance', 'Healthcare', 'Education', 'Retail', 'Manufacturing', 'Media', 'Consulting', 'Real Estate', 'Other'];
@@ -11,13 +11,16 @@ const CompanyProfile = () => {
     const [, setCompany] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [isNew, setIsNew] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // Logo state
     const [logoFile, setLogoFile] = useState(null);        // selected File object
     const [logoPreview, setLogoPreview] = useState('');    // local object URL for preview
     const [isDragging, setIsDragging] = useState(false);
     const [logoInputMode, setLogoInputMode] = useState('url'); // 'url' | 'file'
+    const [logoError, setLogoError] = useState(false);
     const fileInputRef = useRef(null);
 
     const [form, setForm] = useState({
@@ -90,6 +93,11 @@ const CompanyProfile = () => {
     // Effective logo preview URL (blob > URL field > existing stored logo)
     const effectiveLogoPreview = logoPreview || (form.logo ? getUploadUrl(form.logo) : '');
 
+    // Reset logo error when preview source changes
+    useEffect(() => {
+        setLogoError(false);
+    }, [effectiveLogoPreview]);
+
     const handleSave = async (e) => {
         e.preventDefault();
         if (!form.name) { toast.error('Company name is required'); return; }
@@ -106,12 +114,12 @@ const CompanyProfile = () => {
 
                 let res;
                 if (isNew) {
-                    res = await API.post('/companies', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                    res = await API.post('/companies', fd);
                     setCompany(res.data.company);
                     setIsNew(false);
                     toast.success('Company profile created! 🎉');
                 } else {
-                    res = await API.put('/companies', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                    res = await API.put('/companies', fd);
                     setCompany(res.data.company);
                     toast.success('Company profile updated!');
                 }
@@ -135,10 +143,22 @@ const CompanyProfile = () => {
                 setCompany(res.data.company);
                 toast.success('Company profile updated!');
             }
-        } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to save company profile');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        setDeleting(true);
+        try {
+            await deleteCompany();
+            toast.success('Company profile deleted successfully');
+            window.location.href = '/profile';
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to delete company profile');
+        } finally {
+            setDeleting(false);
+            setShowDeleteModal(false);
         }
     };
 
@@ -225,34 +245,24 @@ const CompanyProfile = () => {
                                     <div style={{
                                         width: 88, height: 88, background: 'var(--gradient-primary)',
                                         borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: 32, overflow: 'hidden', border: '2px solid var(--border)', flexShrink: 0,
-                                        position: 'relative'
+                                        fontSize: 32, flexShrink: 0, position: 'relative',
+                                        border: '2px solid var(--border)', overflow: 'hidden'
                                     }}>
-                                        {effectiveLogoPreview
-                                            ? <img src={effectiveLogoPreview} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                onError={(e) => { e.target.style.display = 'none'; }}
+                                        {(effectiveLogoPreview && !logoError)
+                                            ? <img
+                                                src={effectiveLogoPreview}
+                                                alt="Logo"
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                onError={() => setLogoError(true)}
                                             />
                                             : '🏢'
                                         }
-                                        {/* Clear button */}
-                                        {(logoFile || form.logo) && (
-                                            <button type="button" onClick={() => { clearLogoFile(); setForm(prev => ({ ...prev, logo: '' })); }}
-                                                style={{
-                                                    position: 'absolute', top: -8, right: -8, width: 22, height: 22,
-                                                    background: 'var(--danger)', border: 'none', borderRadius: '50%',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    cursor: 'pointer', color: 'white'
-                                                }}
-                                            >
-                                                <X size={12} />
-                                            </button>
-                                        )}
                                     </div>
 
                                     {/* Input mode toggle + inputs */}
                                     <div style={{ flex: 1, minWidth: 240 }}>
                                         {/* Mode tabs */}
-                                        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                                        <div style={{ display: 'flex', gap: 8, marginBottom: 14, alignItems: 'center' }}>
                                             <button
                                                 type="button"
                                                 className={`logo-mode-tab ${logoInputMode === 'file' ? 'active' : ''}`}
@@ -269,6 +279,20 @@ const CompanyProfile = () => {
                                                 <LinkIcon size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
                                                 Logo URL
                                             </button>
+
+                                            {(logoFile || form.logo) && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { clearLogoFile(); setForm(prev => ({ ...prev, logo: '' })); }}
+                                                    style={{
+                                                        marginLeft: 'auto', background: 'none', border: 'none',
+                                                        color: 'var(--danger)', fontSize: 12, fontWeight: 600,
+                                                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4
+                                                    }}
+                                                >
+                                                    <X size={14} /> Remove
+                                                </button>
+                                            )}
                                         </div>
 
                                         {logoInputMode === 'file' ? (
@@ -394,6 +418,50 @@ const CompanyProfile = () => {
                         </div>
                     </div>
                 </form>
+
+                {/* Danger Zone */}
+                {!isNew && (
+                    <div style={{ marginTop: 40, borderTop: '1px solid var(--border)', paddingTop: 40 }}>
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary-subtle)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)' }}>
+                            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--text-accent)' }}>Danger Zone</h2>
+                            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+                                Deleting your company profile will also close all your active job postings. This action cannot be undone.
+                            </p>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => setShowDeleteModal(true)}
+                                style={{ padding: '10px 24px', fontSize: 14, fontWeight: 600 }}
+                            >
+                                Delete Company Profile
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Delete Confirmation Modal */}
+                {showDeleteModal && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+                        onClick={e => { if (e.target === e.currentTarget) setShowDeleteModal(false); }}>
+                        <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-xl)', padding: 32, maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+                            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-accent)' }}>Delete Company Profile?</h3>
+                            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>
+                                Are you sure you want to delete <strong>{form.name}</strong>? This will permanently remove your branding, history, and close all active jobs.
+                            </p>
+                            <div style={{ display: 'flex', gap: 12 }}>
+                                <button type="button" className="btn btn-static" onClick={() => setShowDeleteModal(false)}
+                                    style={{ flex: 1, padding: '10px 0', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontWeight: 600 }}>
+                                    Cancel
+                                </button>
+                                <button type="button" disabled={deleting} onClick={handleDelete}
+                                    className="btn btn-primary"
+                                    style={{ flex: 1, padding: '10px 0', borderRadius: 'var(--radius-md)', border: 'none', fontWeight: 700, opacity: deleting ? 0.7 : 1 }}>
+                                    {deleting ? 'Deleting...' : 'Yes, Delete'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

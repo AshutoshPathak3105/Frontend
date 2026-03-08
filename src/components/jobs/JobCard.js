@@ -10,6 +10,11 @@ import './JobCard.css';
 const LogoBox = ({ logo, name, size = 52, radius = 12 }) => {
     const [imgError, setImgError] = useState(false);
     const logoUrl = getUploadUrl(logo);
+
+    React.useEffect(() => {
+        setImgError(false);
+    }, [logoUrl]);
+
     const showImg = logoUrl && !imgError;
     const initial = name?.[0]?.toUpperCase() || 'C';
     return (
@@ -92,8 +97,6 @@ const JobCard = ({ job, onSaveToggle, isSaved: initialSaved = false }) => {
             setSaved(res.data.isSaved);
             toast.success(res.data.message);
             if (onSaveToggle) onSaveToggle(job._id, res.data.isSaved);
-        } catch {
-            toast.error('Failed to save job');
         } finally {
             setSaving(false);
         }

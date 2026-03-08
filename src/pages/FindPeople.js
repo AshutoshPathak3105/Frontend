@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-    Users, UserPlus, Search, X, MapPin, Loader2, ChevronLeft, ChevronRight
+    Users, UserPlus, Search, X, MapPin, Loader2, ChevronLeft, ChevronRight, Briefcase
 } from 'lucide-react';
 import { browsePeople, sendConnectionRequest, cancelConnectionRequest, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -169,6 +169,7 @@ const FindPeople = () => {
                                             {person.headline && (
                                                 <p className="conn-headline">{person.headline}</p>
                                             )}
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2, ...(person.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' } : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }) }}>{person.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><UserPlus size={9} /> Job Seeker</>}</span>
                                             {person.location && (
                                                 <p className="fp-location">
                                                     <MapPin size={11} /> {person.location}

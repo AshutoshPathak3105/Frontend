@@ -244,8 +244,12 @@ const Navbar = () => {
     };
 
     const navLinks = [
-        { to: '/', label: 'Home', icon: <Home size={15} /> },
-        { to: '/jobs', label: 'Find Jobs', icon: <Briefcase size={15} /> },
+        { to: user ? '/dashboard' : '/', label: 'Home', icon: <Home size={15} /> },
+        {
+            to: '/jobs',
+            label: 'Find Jobs',
+            icon: <Briefcase size={15} />
+        },
         { to: '/companies', label: 'Companies', icon: <Building2 size={15} /> },
         { to: '/contact', label: 'Contact Us', icon: <Mail size={15} /> },
     ];
@@ -267,9 +271,9 @@ const Navbar = () => {
                     </button>
 
                     {/* Logo */}
-                    <div className="navbar-logo">
+                    <Link to={user ? "/dashboard" : "/"} className="navbar-logo">
                         <LogoImage height={34} withText={true} />
-                    </div>
+                    </Link>
 
                     {/* ── Global Search Bar (between logo and theme toggle) ── */}
                     <div className="navbar-search" ref={searchRef}>
@@ -769,7 +773,7 @@ const Navbar = () => {
                                     </Link>
                                     <Link to="/jobs" className="mobile-grid-link" onClick={() => setMobileOpen(false)}>
                                         <Search size={18} />
-                                        <span>Browse Jobs</span>
+                                        <span>Find Jobs</span>
                                     </Link>
                                     <Link to="/companies" className="mobile-grid-link" onClick={() => setMobileOpen(false)}>
                                         <Building2 size={18} />

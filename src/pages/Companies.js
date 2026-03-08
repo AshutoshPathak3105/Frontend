@@ -216,7 +216,12 @@ const Companies = () => {
 
 /* ── Individual Company Card ── */
 const CompanyCard = ({ company }) => {
+    const [logoError, setLogoError] = useState(false);
     const logoUrl = getUploadUrl(company.logo);
+
+    useEffect(() => {
+        setLogoError(false);
+    }, [logoUrl]);
 
     return (
         <Link to={`/companies/${company._id}`} style={{ textDecoration: 'none' }}>
@@ -242,10 +247,10 @@ const CompanyCard = ({ company }) => {
                         justifyContent: 'center', fontSize: 22, fontWeight: 800, color: 'white',
                         border: '1px solid var(--border)'
                     }}>
-                        {logoUrl
+                        {(logoUrl && !logoError)
                             ? <img src={logoUrl} alt={company.name}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onError={e => { e.target.style.display = 'none'; }}
+                                onError={() => setLogoError(true)}
                             />
                             : (company.name?.[0]?.toUpperCase() || <Building2 size={24} />)
                         }

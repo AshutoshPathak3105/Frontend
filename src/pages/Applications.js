@@ -9,7 +9,7 @@ const STATUS_CONFIG = {
     pending: { label: 'Pending', color: '#fbbf24', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
     reviewing: { label: 'Reviewing', color: '#60a5fa', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
     shortlisted: { label: 'Shortlisted', color: '#34d399', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' },
-    interview: { label: 'Interview', color: '#a78bfa', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.3)' },
+    interview: { label: 'Interview', color: 'var(--text-accent)', bg: 'var(--bg-primary-subtle)', border: 'var(--border-primary-subtle)' },
     offered: { label: 'Accepted', color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)' },
     rejected: { label: 'Rejected', color: '#f87171', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' },
     withdrawn: { label: 'Withdrawn', color: '#64748b', bg: 'rgba(100,116,139,0.1)', border: 'rgba(100,116,139,0.3)' },
@@ -326,11 +326,11 @@ const Applications = () => {
                                 </div>
 
                                 {/* ── Interview Scheduling Section ── */}
-                                <div style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 12, padding: '20px 20px 16px' }}>
-                                    <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#a78bfa', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div style={{ background: 'var(--bg-primary-subtle)', border: '1px solid var(--border-primary-subtle)', borderRadius: 12, padding: '20px 20px 16px' }}>
+                                    <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: 'var(--text-accent)', display: 'flex', alignItems: 'center', gap: 8 }}>
                                         <Calendar size={15} /> Schedule Interview
                                         {selectedApp.interviewDate && (
-                                            <span style={{ marginLeft: 8, fontSize: 11, background: 'rgba(139,92,246,0.2)', color: '#a78bfa', padding: '2px 8px', borderRadius: 20, fontWeight: 500 }}>
+                                            <span style={{ marginLeft: 8, fontSize: 11, background: 'var(--bg-primary-subtle)', color: 'var(--text-accent)', padding: '2px 8px', borderRadius: 20, fontWeight: 500 }}>
                                                 Currently: {new Date(selectedApp.interviewDate).toLocaleDateString('en-IN')}
                                             </span>
                                         )}
@@ -383,7 +383,7 @@ const Applications = () => {
                                         onClick={handleScheduleInterview}
                                         disabled={schedulingInterview || !interviewDate}
                                         className="btn btn-primary btn-sm"
-                                        style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', width: '100%', justifyContent: 'center' }}
+                                        style={{ width: '100%', justifyContent: 'center' }}
                                     >
                                         {schedulingInterview
                                             ? <><div className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} /> Scheduling...</>
@@ -395,8 +395,8 @@ const Applications = () => {
                                     {selectedApp.status === 'interview' && selectedApp.interviewDate && (
                                         <button
                                             onClick={handleCancelInterview}
-                                            className="btn btn-sm"
-                                            style={{ width: '100%', justifyContent: 'center', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', marginTop: 6 }}
+                                            className="btn btn-primary btn-sm"
+                                            style={{ width: '100%', justifyContent: 'center', marginTop: 6 }}
                                         >
                                             <X size={14} /> Cancel Interview
                                         </button>

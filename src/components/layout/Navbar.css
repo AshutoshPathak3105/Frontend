@@ -41,13 +41,12 @@
     text-decoration: none;
     flex-shrink: 0;
     padding: 0;
-    cursor: default;
-    transition: none !important;
-    transform: none !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .navbar-logo:hover {
-    transform: none !important;
+    transform: scale(1.02);
 }
 
 

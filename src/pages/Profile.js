@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, MapPin, Briefcase, GraduationCap, Plus, Trash2, Save, Upload, Tag, Camera, Users, UserCheck, UserPlus, FileText, ExternalLink, CheckCircle, Sparkles, Zap, Building2, IndianRupee, ChevronRight, Trophy } from 'lucide-react';
+import { User, MapPin, Briefcase, GraduationCap, Plus, Trash2, Save, Upload, Tag, Camera, Users, UserCheck, UserPlus, FileText, ExternalLink, CheckCircle, Sparkles, Zap, Building2, IndianRupee, ChevronRight, Trophy, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getProfile, updateProfile, uploadAvatar, addExperience, deleteExperience, addEducation, deleteEducation, updatePassword, uploadResume, deleteResume, recommendJobsFromResume, getUploadUrl, addAchievement, deleteAchievement, deleteAccount } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -18,6 +18,7 @@ const Profile = () => {
     const avatarInputRef = useRef(null);
     const [activeTab, setActiveTab] = useState('profile');
     const [skillInput, setSkillInput] = useState('');
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
 
     const [profileForm, setProfileForm] = useState({
         name: '', email: '', headline: '', bio: '', location: '', phone: '', website: '', skills: []
@@ -38,7 +39,10 @@ const Profile = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 600);
+        window.addEventListener('resize', handleResize);
         fetchProfile();
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     const fetchProfile = async () => {
@@ -317,8 +321,8 @@ const Profile = () => {
                 }
                 .profile-hero-body {
                     padding: 0 28px 24px;
-                    display: flex; flex-direction: column; align-items: center; text-align: center;
-                    margin-top: -40px;
+                    display: flex; align-items: flex-start; justify-content: space-between;
+                    margin-top: -40px; gap: 24px;
                 }
                 .profile-hero-avatar {
                     width: 80px; height: 80px; border-radius: 50%;
@@ -332,9 +336,9 @@ const Profile = () => {
                     -webkit-tap-highlight-color: transparent;
                 }
                 .profile-hero-avatar:hover { transform: scale(1.02); }
-                .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; margin-top: 12px; text-align: center; }
-                .profile-hero-info h1 { font-size: 20px; font-weight: 800; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-                .profile-hero-info p  { font-size: 13px; color: var(--text-secondary); margin: 0; }
+                .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; margin-top: 48px; text-align: left; }
+                .profile-hero-info h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+                .profile-hero-info p  { font-size: 14px; color: var(--text-secondary); margin: 0; }
 
                 /* Underline tabs */
                 .profile-tabs-bar {
@@ -365,9 +369,10 @@ const Profile = () => {
                 .about-section-info h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px; }
 
                 @media (max-width: 600px) {
-                    .profile-hero-body  { padding: 0 16px 16px; gap: 12px; }
+                    .profile-hero-body  { padding: 0 16px 16px; flex-direction: column; align-items: center; text-align: center; margin-top: -32px; gap: 12px; }
                     .profile-hero-avatar { width: 64px; height: 64px; font-size: 22px; }
-                    .profile-hero-info h1 { font-size: 16px; }
+                    .profile-hero-info { margin-top: 0; text-align: center; }
+                    .profile-hero-info h1 { font-size: 18px; }
                     .profile-hero-banner { height: 70px; }
                     .about-section-card { padding: 18px 16px; }
                     .about-section-info h2 { font-size: 15px; }
@@ -380,45 +385,46 @@ const Profile = () => {
                 <div className="profile-hero">
                     <div className="profile-hero-banner" />
                     <div className="profile-hero-body">
-                        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <label
-                                htmlFor="profile-avatar-upload"
-                                className="profile-hero-avatar"
-                                onClick={e => { if (avatarUploading) e.preventDefault(); }}
-                                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: avatarUploading ? 'default' : 'pointer' }}
-                            >
-                                {avatarPreview
-                                    ? <img src={avatarPreview} alt="avatar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                                    : getInitials(profileForm.name || user?.name)
-                                }
-                                {avatarUploading && (
-                                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <div className="spinner" style={{ width: 20, height: 20, borderTopColor: '#fff' }} />
-                                    </div>
-                                )}
-                            </label>
-                            <label
-                                htmlFor="profile-avatar-upload"
-                                onClick={e => { if (avatarUploading) e.preventDefault(); }}
-                                style={{
-                                    marginTop: 10,
-                                    background: 'var(--gradient-button)', borderRadius: 20,
-                                    padding: '6px 16px', fontSize: 12, fontWeight: 700,
-                                    cursor: avatarUploading ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-                                    color: '#fff', transition: 'all 0.2s', zIndex: 10
-                                }}
-                            >
-                                {avatarUploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
-                                <span>Edit</span>
-                            </label>
-                        </div>
-                        <div className="profile-hero-info">
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
-                                <h1 style={{ margin: 0 }}>{profileForm.name || user?.name || 'Your Name'}</h1>
-                                <span style={{
+                        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flex: 1 }}>
+                            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <label
+                                    htmlFor="profile-avatar-upload"
+                                    className="profile-hero-avatar"
+                                    onClick={e => { if (avatarUploading) e.preventDefault(); }}
+                                    style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: avatarUploading ? 'default' : 'pointer' }}
+                                >
+                                    {avatarPreview
+                                        ? <img src={avatarPreview} alt="avatar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                        : getInitials(profileForm.name || user?.name)
+                                    }
+                                    {avatarUploading && (
+                                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <div className="spinner" style={{ width: 20, height: 20, borderTopColor: '#fff' }} />
+                                        </div>
+                                    )}
+                                </label>
+                                <label
+                                    htmlFor="profile-avatar-upload"
+                                    onClick={e => { if (avatarUploading) e.preventDefault(); }}
+                                    style={{
+                                        marginTop: 10,
+                                        background: 'var(--gradient-button)', borderRadius: 20,
+                                        padding: '6px 16px', fontSize: 12, fontWeight: 700,
+                                        cursor: avatarUploading ? 'not-allowed' : 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                                        color: '#fff', transition: 'all 0.2s', zIndex: 10
+                                    }}
+                                >
+                                    {avatarUploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
+                                    <span>Edit</span>
+                                </label>
+                            </div>
+
+                            <div className="profile-hero-info">
+                                <h1 style={{ margin: '0 0 6px 0' }}>{profileForm.name || user?.name || 'Your Name'}</h1>
+                                <div style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 4,
-                                    padding: '3px 10px', borderRadius: 20,
+                                    padding: '4px 12px', borderRadius: 20,
                                     fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
                                     ...(user?.role === 'employer'
                                         ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
@@ -429,29 +435,73 @@ const Profile = () => {
                                         ? <><Briefcase size={10} /> Employer</>
                                         : <><User size={10} /> Job Seeker</>
                                     }
-                                </span>
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, fontSize: 13, color: 'var(--text-muted)', marginTop: 15, justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                                    {profileForm.location && <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={14} />{profileForm.location}</span>}
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={14} />Joined {profile?.createdAt ? new Date(profile.createdAt).getFullYear() : ''}</span>
+                                </div>
                             </div>
-                            <p>{profileForm.headline || 'Add a professional headline'}</p>
+                        </div>
 
-                            {/* New Stats Row */}
-                            <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(99, 102, 241, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}>
+                        {/* Social Stats — Top Right Area */}
+                        {!isMobile && (
+                            <div style={{ display: 'flex', gap: 12, marginTop: 48, marginRight: 24 }}>
+                                <div
+                                    onClick={() => navigate('/network?tab=connections')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(99, 102, 241, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(99,102,241,0.1)', transition: 'all 0.2s' }}
+                                    className="social-stat-link"
+                                >
                                     <Users size={15} style={{ color: 'var(--primary)' }} />
                                     <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.connections?.length || 0}</span>
                                     <span>Connections</span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(16, 185, 129, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}>
+                                <div
+                                    onClick={() => navigate('/network?tab=followers')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(16, 185, 129, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(16,185,129,0.1)', transition: 'all 0.2s' }}
+                                    className="social-stat-link"
+                                >
                                     <UserCheck size={15} style={{ color: '#10b981' }} />
                                     <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.followers?.length || 0}</span>
                                     <span>Followers</span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(245, 158, 11, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}>
+                                <div
+                                    onClick={() => navigate('/network?tab=following')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(245, 158, 11, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(245,158,11,0.1)', transition: 'all 0.2s' }}
+                                    className="social-stat-link"
+                                >
                                     <UserPlus size={15} style={{ color: '#f59e0b' }} />
                                     <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.following?.length || 0}</span>
                                     <span>Following</span>
                                 </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* For Mobile: Stats at bottom of hero */}
+                        {isMobile && (
+                            <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                                <div
+                                    onClick={() => navigate('/network?tab=connections')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(99, 102, 241, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                                >
+                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.connections?.length || 0}</span>
+                                    <span>Connections</span>
+                                </div>
+                                <div
+                                    onClick={() => navigate('/network?tab=followers')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(16, 185, 129, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                                >
+                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.followers?.length || 0}</span>
+                                    <span>Followers</span>
+                                </div>
+                                <div
+                                    onClick={() => navigate('/network?tab=following')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(245, 158, 11, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                                >
+                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.following?.length || 0}</span>
+                                    <span>Following</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 {/* Hidden file input lives here */}
@@ -1077,10 +1127,10 @@ const Profile = () => {
                             </p>
                             <a
                                 href="/company-profile"
+                                className="btn btn-primary"
                                 style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px',
-                                    background: 'linear-gradient(135deg, var(--primary), var(--primary-dark, #4f46e5))',
-                                    color: '#fff', borderRadius: 'var(--radius-full)', fontWeight: 600, fontSize: 14,
+                                    borderRadius: 'var(--radius-full)', fontWeight: 600, fontSize: 14,
                                     textDecoration: 'none', width: 'fit-content', transition: 'opacity 0.15s'
                                 }}
                             >
@@ -1106,11 +1156,11 @@ const Profile = () => {
                         </div>
 
                         {/* Danger Zone */}
-                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--danger)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)' }}>
-                            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--danger)' }}>Danger Zone</h2>
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary-subtle)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)' }}>
+                            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--text-accent)' }}>Danger Zone</h2>
                             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Once you delete your account, all your data will be permanently removed. This action cannot be undone.</p>
-                            <button type="button" className="btn btn-static" onClick={() => setShowDeleteModal(true)}
-                                style={{ background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', padding: '8px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+                            <button type="button" className="btn btn-primary" onClick={() => setShowDeleteModal(true)}
+                                style={{ borderRadius: 'var(--radius-md)', padding: '8px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
                                 Delete My Account
                             </button>
                         </div>
@@ -1120,7 +1170,7 @@ const Profile = () => {
                             <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
                                 onClick={e => { if (e.target === e.currentTarget) { setShowDeleteModal(false); setDeletePassword(''); } }}>
                                 <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-xl)', padding: 32, maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
-                                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--danger)' }}>Delete Account</h3>
+                                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-accent)' }}>Delete Account</h3>
                                     <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 20 }}>This will permanently delete your account and all associated data. Enter your password to confirm.</p>
                                     <div className="form-group">
                                         <label className="form-label">Your Password</label>
@@ -1134,7 +1184,8 @@ const Profile = () => {
                                             Cancel
                                         </button>
                                         <button type="button" disabled={deleting} onClick={handleDeleteAccount}
-                                            style={{ flex: 1, padding: '9px 0', borderRadius: 'var(--radius-md)', background: 'var(--danger)', color: '#fff', border: 'none', fontWeight: 700, cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.7 : 1 }}>
+                                            className="btn btn-primary"
+                                            style={{ flex: 1, padding: '9px 0', borderRadius: 'var(--radius-md)', border: 'none', fontWeight: 700, cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.7 : 1 }}>
                                             {deleting ? 'Deleting...' : 'Yes, Delete'}
                                         </button>
                                     </div>

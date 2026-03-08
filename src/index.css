@@ -61,6 +61,9 @@
   --gradient-orb-1: radial-gradient(circle, rgba(203, 213, 225, 0.1) 0%, transparent 70%);
   --gradient-orb-2: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
   --gradient-orb-3: radial-gradient(circle, rgba(226, 232, 240, 0.05) 0%, transparent 70%);
+  --bg-primary-subtle: rgba(37, 99, 235, 0.1);
+  --border-primary-subtle: rgba(37, 99, 235, 0.25);
+  --text-accent: #60a5fa;
   --gradient-scrollbar: #000000;
 
   /* Shadows & Glows — Grey & Gold */
@@ -147,6 +150,9 @@
   --gradient-orb-1: radial-gradient(circle, rgba(71, 85, 105, 0.08) 0%, transparent 70%);
   --gradient-orb-2: radial-gradient(circle, rgba(100, 116, 139, 0.06) 0%, transparent 70%);
   --gradient-orb-3: radial-gradient(circle, rgba(51, 65, 85, 0.04) 0%, transparent 70%);
+  --bg-primary-subtle: rgba(5, 150, 105, 0.1);
+  --border-primary-subtle: rgba(5, 150, 105, 0.25);
+  --text-accent: #059669;
   --gradient-scrollbar: #000000;
 
   --shadow-sm: 0 2px 8px rgba(31, 41, 55, 0.08);

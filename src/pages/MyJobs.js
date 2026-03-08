@@ -9,6 +9,14 @@ const MyJobs = () => {
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState(null);
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     useEffect(() => {
         fetchJobs();
     }, []);
@@ -75,13 +83,13 @@ const MyJobs = () => {
 
     return (
         <div style={{ paddingTop: 80, minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <div className="container" style={{ padding: '40px 24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+            <div className="container" style={{ padding: isMobile ? '24px 16px' : '40px 24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: 32, flexDirection: isMobile ? 'column' : 'row', gap: 16 }}>
                     <div>
-                        <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>My Job Postings</h1>
-                        <p style={{ color: 'var(--text-secondary)' }}>{jobs.length} job{jobs.length !== 1 ? 's' : ''} posted</p>
+                        <h1 style={{ fontSize: isMobile ? 24 : 28, fontWeight: 800, marginBottom: 4 }}>My Job Postings</h1>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>{jobs.length} job{jobs.length !== 1 ? 's' : ''} posted</p>
                     </div>
-                    <Link to="/post-job" className="btn btn-primary">
+                    <Link to="/post-job" className="btn btn-primary" style={{ width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}>
                         <Plus size={16} /> Post New Job
                     </Link>
                 </div>
@@ -91,13 +99,13 @@ const MyJobs = () => {
                         {jobs.map(job => (
                             <div key={job._id} style={{
                                 background: 'var(--bg-card)', border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius-xl)', padding: 24, transition: 'var(--transition)'
+                                borderRadius: 'var(--radius-xl)', padding: isMobile ? 18 : 24, transition: 'var(--transition)'
                             }}
                                 onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
                                 onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
                             >
-                                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                                    <div style={{ flex: 1, minWidth: 200 }}>
+                                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexDirection: isMobile ? 'column' : 'row' }}>
+                                    <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
                                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
                                             <span className={`badge ${job.status === 'active' ? 'badge-success' : 'badge-secondary'}`}>
                                                 {job.status === 'active' ? '● Active' : job.status === 'paused' ? '⏸ Paused' : job.status === 'closed' ? '○ Closed' : job.status}
@@ -141,8 +149,7 @@ const MyJobs = () => {
                                         <button
                                             onClick={() => handleDelete(job._id)}
                                             disabled={deletingId === job._id}
-                                            className="btn btn-sm"
-                                            style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.2)' }}
+                                            className="btn btn-primary btn-sm"
                                         >
                                             {deletingId === job._id ? <div className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Trash2 size={14} />}
                                             Delete

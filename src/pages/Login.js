@@ -24,8 +24,7 @@ const Login = () => {
     // Redirect already-logged-in users away from login page
     useEffect(() => {
         if (!loading && user) {
-            const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            navigate('/dashboard', { replace: true });
         }
     }, [user, loading, navigate, location.state]);
 
@@ -48,8 +47,7 @@ const Login = () => {
             const res = await login({ ...form, role });
             loginUser(res.data.user, res.data.token);
             toast.success(`Welcome back, ${res.data.user.name}!`);
-            const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            navigate('/dashboard', { replace: true });
         } catch (err) {
             const status = err.response?.status;
             const msg = err.response?.data?.message;

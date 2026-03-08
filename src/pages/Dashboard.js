@@ -15,7 +15,7 @@ const STATUS_CONFIG = {
     pending: { label: 'Applied', color: '#fbbf24', bg: 'rgba(245,158,11,0.1)' },
     reviewing: { label: 'Reviewing', color: '#60a5fa', bg: 'rgba(59,130,246,0.1)' },
     shortlisted: { label: 'Shortlisted', color: '#34d399', bg: 'rgba(16,185,129,0.1)' },
-    interview: { label: 'Interview', color: '#a78bfa', bg: 'rgba(139,92,246,0.1)' },
+    interview: { label: 'Interview', color: 'var(--text-accent)', bg: 'var(--bg-primary-subtle)' },
     offered: { label: 'Offered', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
     rejected: { label: 'Rejected', color: '#f87171', bg: 'rgba(239,68,68,0.1)' },
     withdrawn: { label: 'Withdrawn', color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
@@ -61,7 +61,7 @@ const JobSeekerDashboard = () => {
         { key: 'pending', label: 'Applied', color: '#fbbf24', emoji: '📤' },
         { key: 'reviewing', label: 'Reviewing', color: '#60a5fa', emoji: '👁️' },
         { key: 'shortlisted', label: 'Shortlisted', color: '#34d399', emoji: '✅' },
-        { key: 'interviews', label: 'Interviews', color: '#a78bfa', emoji: '📅' },
+        { key: 'interviews', label: 'Interviews', color: 'var(--text-accent)', emoji: '📅' },
         { key: 'offered', label: 'Offered', color: '#10b981', emoji: '🎉' },
     ];
 

@@ -54,6 +54,30 @@ export const getUploadUrl = (filePath) => {
     // If it's already an absolute URL (Cloudinary, AWS S3, or fixed above)
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
 
+    // Handle Data URLs (base64)
+    if (path.startsWith('data:image/')) return path;
+
+    // Detect raw base64 strings and prefix them
+    // PNG starts with iVBOR, JPG with /9j/, SVG with PHN2Zy
+    const isBase64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(path);
+    if (isBase64 && path.length > 50) {
+        // Try to guess type or default to png
+        let type = 'png';
+        if (path.startsWith('/9j/')) type = 'jpeg';
+        else if (path.startsWith('PHN')) type = 'svg+xml';
+        else if (path.startsWith('R0l')) type = 'gif';
+        return `data:image/${type};base64,${path}`;
+    }
+
+    // Handle URLs starting with www. (assume https)
+    if (path.startsWith('www.')) return `https://${path}`;
+
+    // Handle other potentially absolute URLs (contains a TLD-like structure and not an internal path)
+    if (!path.startsWith('/') && !path.startsWith('uploads/') && path.includes('.') &&
+        (path.includes('.com/') || path.includes('.org/') || path.includes('.net/') || path.includes('.io/') || path.includes('.co/'))) {
+        return `https://${path}`;
+    }
+
     // Prepend backend base to relative paths (e.g. /uploads/...)
     if (backendBaseFromEnv) {
         return `${backendBaseFromEnv}${path.startsWith('/') ? '' : '/'}${path}`;
@@ -141,7 +165,7 @@ export const updateProfile = (data) => API.put('/users/profile', data);
 export const uploadAvatar = (file) => {
     const fd = new FormData();
     fd.append('avatar', file);
-    return API.put('/users/profile', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return API.put('/users/profile', fd);
 };
 export const addExperience = (data) => API.post('/users/experience', data);
 export const updateExperience = (expId, data) => API.put(`/users/experience/${expId}`, data);
@@ -151,9 +175,7 @@ export const deleteAchievement = (achId) => API.delete(`/users/achievements/${ac
 export const addEducation = (data) => API.post('/users/education', data);
 export const updateEducation = (eduId, data) => API.put(`/users/education/${eduId}`, data);
 export const deleteEducation = (eduId) => API.delete(`/users/education/${eduId}`);
-export const uploadResume = (data) => API.post('/users/resume', data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-});
+export const uploadResume = (data) => API.post('/users/resume', data);
 export const deleteResume = () => API.delete('/users/resume');
 export const getSavedJobs = () => API.get('/users/saved-jobs');
 export const getEmployerDashboardStats = () => API.get('/users/employer-stats');
@@ -213,9 +235,7 @@ export const sendMessageWithAttachment = (conversationId, file, caption = '') =>
     const fd = new FormData();
     fd.append('file', file);
     if (caption) fd.append('content', caption);
-    return API.post(`/messages/conversations/${conversationId}/messages/file`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    return API.post(`/messages/conversations/${conversationId}/messages/file`, fd);
 };
 export const sendGifMessageAPI = (conversationId, gifUrl, gifTitle) =>
     API.post(`/messages/conversations/${conversationId}/messages/gif`, { gifUrl, gifTitle });
@@ -249,6 +269,8 @@ export const getConnectionRequests = () => API.get('/connections/requests');
 export const respondToConnectionRequest = (id, status) => API.put(`/connections/respond/${id}`, { status });
 export const getConnections = () => API.get('/connections');
 export const toggleFollow = (id) => API.post(`/connections/follow/${id}`);
+export const getFollowers = () => API.get('/connections/followers');
+export const getFollowing = () => API.get('/connections/following');
 export const removeConnection = (id) => API.delete(`/connections/${id}`);
 export const browsePeople = (params) => API.get('/connections/people', { params });
 export const cancelConnectionRequest = (id) => API.delete(`/connections/request/${id}`);

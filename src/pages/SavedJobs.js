@@ -62,13 +62,13 @@ const SavedJobs = () => {
                                     title="Remove from saved"
                                     style={{
                                         position: 'absolute', top: 54, right: 16, width: 32, height: 32,
-                                        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                                        background: 'var(--bg-primary-subtle)', border: '1px solid var(--border-primary-subtle)',
                                         borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', color: 'var(--danger)', transition: 'var(--transition)',
+                                        cursor: 'pointer', color: 'var(--text-accent)', transition: 'var(--transition)',
                                         zIndex: 2
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-glass-light)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-primary-subtle)'; }}
                                 >
                                     <BookmarkX size={15} />
                                 </button>

@@ -17,7 +17,7 @@ const HERO_STATS = [
 const TESTIMONIALS = [];
 
 const Home = () => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchLocation, setSearchLocation] = useState('');
@@ -26,6 +26,12 @@ const Home = () => {
     const [, setStats] = useState(null);
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!authLoading && user) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [user, authLoading, navigate]);
 
     useEffect(() => {
         const fetchData = async () => {

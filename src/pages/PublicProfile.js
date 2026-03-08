@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
     User, MapPin, Briefcase, GraduationCap, Calendar,
-    MessageCircle, ThumbsUp, Tag,
+    MessageCircle, ThumbsUp, Tag, UserPlus,
     MoreHorizontal, Users, UserCheck, X, Clock, Camera
 } from 'lucide-react';
 import {
@@ -200,9 +200,17 @@ const PublicProfile = () => {
     const [uploading, setUploading] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
-    const [followHover, setFollowHover] = useState(false);
+
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const fileInputRef = useRef(null);
     const moreMenuRef = useRef(null);
+
+    // Handle responsiveness
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Show edit button if it's the current user's profile
     const isMe = currentUser && (!id || String(currentUser._id) === String(id) || String(currentUser.id) === String(id));
@@ -362,225 +370,170 @@ const PublicProfile = () => {
     const joinYear = profile.createdAt ? new Date(profile.createdAt).getFullYear() : '';
 
     return (
-        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '88px 20px 72px' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', padding: isMobile ? '70px 0 72px' : '88px 20px 72px' }}>
             {/* ─── HEADER CARD ──────────────────────────────────────────────── */}
-            <div className="card" style={{ padding: 0, overflow: 'visible', marginBottom: 20, borderRadius: 16, position: 'relative' }}>
-                {/* Gradient banner */}
-                <div style={{ height: 100, background: 'var(--gradient-primary)', borderRadius: '16px 16px 0 0' }} />
-                {/* Avatar — outside banner so overflow:hidden never clips it */}
-                <div style={{ position: 'absolute', top: 48, left: 28, border: '4px solid var(--bg-card)', borderRadius: '50%', lineHeight: 0, zIndex: 2 }}>
-                    <Avatar user={profile} size={108} />
-                    {isMe && (
-                        <div style={{ position: 'absolute', bottom: -32, left: '50%', transform: 'translateX(-50%)', zIndex: 100 }}>
-                            <input
-                                type="file"
-                                id="public-profile-avatar-upload"
-                                ref={fileInputRef}
-                                onChange={handleAvatarChange}
-                                style={{ display: 'none' }}
-                                accept="image/*"
-                                disabled={uploading}
-                            />
-                            <label
-                                htmlFor="public-profile-avatar-upload"
-                                onClick={e => { if (uploading) e.preventDefault(); }}
-                                style={{
-                                    background: 'var(--gradient-button)', borderRadius: 20,
-                                    padding: '6px 16px', fontSize: 12, fontWeight: 700,
-                                    cursor: uploading ? 'not-allowed' : 'pointer',
-                                    whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6,
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)', color: '#fff',
-                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                                }}
-                                className="edit-avatar-btn"
-                            >
-                                {uploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
-                                <span>Edit</span>
-                            </label>
+            <div className="card" style={{ padding: 0, overflow: 'visible', marginBottom: 20, borderRadius: 16, border: '1px solid var(--border)', position: 'relative' }}>
+                <div style={{ height: 140, background: 'var(--gradient-primary)', borderRadius: '16px 16px 0 0' }} />
+
+                <div style={{
+                    padding: isMobile ? '0 16px 24px' : '0 28px 28px',
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    justifyContent: 'space-between',
+                    alignItems: isMobile ? 'center' : 'flex-start',
+                    marginTop: -60,
+                    position: 'relative',
+                    zIndex: 5
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        gap: isMobile ? 12 : 24,
+                        alignItems: isMobile ? 'center' : 'flex-start',
+                        flex: 1,
+                        textAlign: isMobile ? 'center' : 'left'
+                    }}>
+                        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ border: '4px solid var(--bg-card)', borderRadius: '50%', background: 'var(--bg-card)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                                <Avatar user={profile} size={isMobile ? 100 : 120} />
+                            </div>
+                            {isMe && (
+                                <label
+                                    htmlFor="public-profile-avatar-upload"
+                                    onClick={e => { if (uploading) e.preventDefault(); }}
+                                    style={{
+                                        marginTop: 10,
+                                        background: 'var(--gradient-button)', borderRadius: 20,
+                                        padding: '6px 16px', fontSize: 12, fontWeight: 700,
+                                        cursor: uploading ? 'not-allowed' : 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: 6,
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.12)', color: '#fff'
+                                    }}
+                                >
+                                    <input type="file" id="public-profile-avatar-upload" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" disabled={uploading} />
+                                    {uploading ? <div className="spinner" style={{ width: 12, height: 12 }} /> : <Camera size={14} />}
+                                    <span>Edit</span>
+                                </label>
+                            )}
                         </div>
-                    )}
-                </div>
-                {/* Info row */}
-                <div style={{ padding: '80px 28px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-                    <div style={{ flex: 1, minWidth: 260 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
-                            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800 }}>{profile.name}</h1>
-                            <span style={{
+
+                        <div style={{ marginTop: isMobile ? 0 : 70 }}>
+                            <h1 style={{ margin: '0 0 6px 0', fontSize: isMobile ? 24 : 28, fontWeight: 800 }}>{profile.name}</h1>
+                            <div style={{
                                 display: 'inline-flex', alignItems: 'center', gap: 4,
-                                padding: '3px 10px', borderRadius: 20,
+                                padding: '4px 12px', borderRadius: 20,
                                 fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
                                 ...(profile.role === 'employer'
                                     ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
                                     : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }
                                 )
                             }}>
-                                {profile.role === 'employer'
-                                    ? <><Briefcase size={10} /> Employer</>
-                                    : <><User size={10} /> Job Seeker</>
-                                }
-                            </span>
-                        </div>
-                        <p style={{ margin: '0 0 12px', fontSize: 15, color: 'var(--text-secondary)', fontWeight: 500 }}>
-                            {profile.headline || (currentExp ? `${currentExp.title} at ${currentExp.company}` : profile.role)}
-                        </p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, fontSize: 13, color: 'var(--text-muted)' }}>
-                            {profile.location && <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={14} />{profile.location}</span>}
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={14} />Joined {joinYear}</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Clock size={14} />Member for {memberFor}</span>
-                            {profile.connections?.length > 0 && (
-                                <span style={{ fontWeight: 700, color: 'var(--primary-light)' }}>{profile.connections.length} friends</span>
-                            )}
-                            <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>{(profile.followers?.length || 0) + (isFollowing ? 1 : 0)} followers</span>
-                            <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>{profile.following?.length || 0} following</span>
+                                {profile.role === 'employer' ? <><Briefcase size={10} /> Employer</> : <><User size={10} /> Job Seeker</>}
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, fontSize: 13, color: 'var(--text-muted)', marginTop: 15, justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                                {profile.location && <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={14} />{profile.location}</span>}
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={14} />Joined {joinYear}</span>
+                            </div>
                         </div>
                     </div>
-                    {/* Action buttons */}
-                    {!isMe && (
-                        <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center', position: 'relative' }}>
-                            <button
-                                onClick={handleFollow}
-                                onMouseEnter={() => setFollowHover(true)}
-                                onMouseLeave={() => setFollowHover(false)}
-                                className={`btn ${isFollowing ? (followHover ? 'btn-danger-outline' : 'btn-secondary') : 'btn-outline'}`}
-                                style={{
-                                    height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
-                                    ...(isFollowing && followHover ? {
-                                        background: 'rgba(239,68,68,0.08)',
-                                        borderColor: 'rgba(239,68,68,0.5)',
-                                        color: '#f87171',
-                                    } : {})
-                                }}
+
+                    {!isMobile && (
+                        <div style={{ display: 'flex', gap: 12, marginTop: 70 }}>
+                            <div
+                                onClick={() => isMe ? navigate('/network?tab=connections') : navigate(`/users/profile/${profile._id}`)}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(99, 102, 241, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(99,102,241,0.1)', transition: 'all 0.2s' }}
+                                title={isMe ? 'View your connections' : `${profile.connections?.length || 0} connections`}
                             >
-                                {isFollowing
-                                    ? (followHover ? 'Unfollow' : 'Following')
-                                    : 'Follow'}
-                            </button>
-
-                            {isFriend ? (
-                                <button
-                                    onClick={handleMessage}
-                                    disabled={msgLoading}
-                                    className="btn btn-primary"
-                                    style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}
-                                >
-                                    <MessageCircle size={15} />{msgLoading ? 'Opening…' : 'Message'}
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleFriend}
-                                    disabled={friendSent}
-                                    className="btn btn-primary"
-                                    style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}
-                                    title="Connect first to enable messaging"
-                                >
-                                    {friendSent ? <UserCheck size={16} /> : <Users size={16} />}
-                                    {friendSent ? 'Request Sent' : 'Add Friend'}
-                                </button>
-                            )}
-
-                            <div ref={moreMenuRef}>
-                                <button
-                                    onClick={() => setShowMoreMenu(s => !s)}
-                                    className="btn btn-outline"
-                                    style={{ height: 38, width: 38, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                >
-                                    <MoreHorizontal size={18} />
-                                </button>
+                                <Users size={15} style={{ color: 'var(--primary)' }} />
+                                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.connections?.length || 0}</span>
+                                <span>Connections</span>
                             </div>
-
-                            {/* ── Bottom Action Sheet ── */}
-                            {showMoreMenu && (
-                                <>
-                                    {/* Backdrop */}
-                                    <div
-                                        onClick={() => setShowMoreMenu(false)}
-                                        style={{
-                                            position: 'fixed', inset: 0,
-                                            background: 'rgba(0,0,0,0.45)',
-                                            backdropFilter: 'blur(3px)',
-                                            WebkitBackdropFilter: 'blur(3px)',
-                                            zIndex: 99998,
-                                        }}
-                                    />
-                                    {/* Sheet */}
-                                    <div style={{
-                                        position: 'fixed', bottom: 0, left: 0, right: 0,
-                                        background: 'var(--bg-card)',
-                                        borderRadius: '24px 24px 0 0',
-                                        padding: '0 16px 32px',
-                                        zIndex: 99999,
-                                        boxShadow: '0 -12px 48px rgba(0,0,0,0.35)',
-                                        border: '1px solid var(--border)',
-                                        borderBottom: 'none',
-                                    }}>
-                                        {/* Drag handle */}
-                                        <div style={{ width: 44, height: 4, background: 'var(--border)', borderRadius: 99, margin: '14px auto 18px' }} />
-                                        <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Options</p>
-
-                                        {[{
-                                            label: 'Share Profile',
-                                            emoji: '🔗',
-                                            onClick: handleShareProfile,
-                                            danger: false,
-                                        }, {
-                                            label: 'Report User',
-                                            emoji: '🚩',
-                                            onClick: () => { toast.error('Coming soon!'); setShowMoreMenu(false); },
-                                            danger: false,
-                                        }, {
-                                            label: 'Block User',
-                                            emoji: '🚫',
-                                            onClick: () => { toast.error('Coming soon!'); setShowMoreMenu(false); },
-                                            danger: true,
-                                        }].map((item, i) => (
-                                            <button key={i} onClick={item.onClick} style={{
-                                                display: 'flex', alignItems: 'center', gap: 14,
-                                                width: '100%', textAlign: 'left', background: 'none',
-                                                border: 'none', borderRadius: 14,
-                                                padding: '14px 16px', fontSize: 16,
-                                                cursor: 'pointer', fontWeight: 600,
-                                                color: item.danger ? 'var(--danger)' : 'var(--text-primary)',
-                                                marginBottom: 4,
-                                                transition: 'background 0.15s',
-                                            }}
-                                                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                                                onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                                            >
-                                                <span style={{ fontSize: 22, lineHeight: 1 }}>{item.emoji}</span>
-                                                {item.label}
-                                            </button>
-                                        ))}
-
-                                        <button
-                                            onClick={() => setShowMoreMenu(false)}
-                                            style={{
-                                                width: '100%', marginTop: 10, padding: '14px',
-                                                borderRadius: 14, background: 'var(--bg-secondary)',
-                                                border: '1px solid var(--border)', fontSize: 15,
-                                                fontWeight: 700, cursor: 'pointer',
-                                                color: 'var(--text-secondary)',
-                                            }}
-                                        >Cancel</button>
-                                    </div>
-                                </>
-                            )}
+                            <div
+                                onClick={() => isMe ? navigate('/network?tab=followers') : navigate(`/users/profile/${profile._id}`)}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(16, 185, 129, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(16,185,129,0.1)', transition: 'all 0.2s' }}
+                                title={isMe ? 'View your followers' : `${profile.followers?.length || 0} followers`}
+                            >
+                                <UserCheck size={15} style={{ color: '#10b981' }} />
+                                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.followers?.length || 0}</span>
+                                <span>Followers</span>
+                            </div>
+                            <div
+                                onClick={() => isMe ? navigate('/network?tab=following') : navigate(`/users/profile/${profile._id}`)}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(245, 158, 11, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(245,158,11,0.1)', transition: 'all 0.2s' }}
+                                title={isMe ? 'View who you follow' : `${profile.following?.length || 0} following`}
+                            >
+                                <UserPlus size={15} style={{ color: '#f59e0b' }} />
+                                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.following?.length || 0}</span>
+                                <span>Following</span>
+                            </div>
                         </div>
                     )}
                 </div>
+
+                {isMobile && (
+                    <div style={{ display: 'flex', gap: 10, padding: '0 16px 20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <div
+                            onClick={() => isMe ? navigate('/network?tab=connections') : navigate(`/users/profile/${profile._id}`)}
+                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(99, 102, 241, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                        >
+                            <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.connections?.length || 0}</span>
+                            <span>Connections</span>
+                        </div>
+                        <div
+                            onClick={() => isMe ? navigate('/network?tab=followers') : navigate(`/users/profile/${profile._id}`)}
+                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(16, 185, 129, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                        >
+                            <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.followers?.length || 0}</span>
+                            <span>Followers</span>
+                        </div>
+                        <div
+                            onClick={() => isMe ? navigate('/network?tab=following') : navigate(`/users/profile/${profile._id}`)}
+                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(245, 158, 11, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                        >
+                            <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.following?.length || 0}</span>
+                            <span>Following</span>
+                        </div>
+                    </div>
+                )}
+
+                {!isMe && (
+                    <div style={{ position: isMobile ? 'static' : 'absolute', bottom: 24, right: 28, display: 'flex', gap: 8, padding: isMobile ? '0 16px 24px' : 0, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'center' : 'flex-end' }}>
+                        <button onClick={handleFollow} className={`btn ${isFollowing ? 'btn-secondary' : 'btn-outline'}`} style={{ height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>{isFollowing ? 'Following' : 'Follow'}</button>
+                        {isFriend ? (
+                            <button onClick={handleMessage} disabled={msgLoading} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}><MessageCircle size={15} />{msgLoading ? 'Opening…' : 'Message'}</button>
+                        ) : (
+                            <button onClick={handleFriend} disabled={friendSent} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>{friendSent ? <UserCheck size={16} /> : <Users size={16} />}{friendSent ? 'Request Sent' : 'Add Friend'}</button>
+                        )}
+                        <div ref={moreMenuRef} style={{ position: 'relative' }}>
+                            <button onClick={() => setShowMoreMenu(s => !s)} className="btn btn-outline" style={{ height: 38, width: 38, padding: 0 }}><MoreHorizontal size={18} /></button>
+                        </div>
+                        {showMoreMenu && (
+                            <>
+                                <div onClick={() => setShowMoreMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)', zIndex: 99998 }} />
+                                <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderRadius: '24px 24px 0 0', padding: '0 16px 32px', zIndex: 99999, boxShadow: '0 -12px 48px rgba(0,0,0,0.35)', border: '1px solid var(--border)', borderBottom: 'none' }}>
+                                    <div style={{ width: 44, height: 4, background: 'var(--border)', borderRadius: 99, margin: '14px auto 18px' }} />
+                                    <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Options</p>
+                                    {[{ label: 'Share Profile', emoji: '🔗', onClick: handleShareProfile }, { label: 'Report User', emoji: '🚩', onClick: () => toast.error('Coming soon!') }, { label: 'Block User', emoji: '🚫', onClick: () => toast.error('Coming soon!'), danger: true }].map((item, i) => (
+                                        <button key={i} onClick={item.onClick} style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%', padding: '14px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600, color: item.danger ? 'var(--danger)' : 'var(--text-primary)', background: 'none', border: 'none' }}>
+                                            <span style={{ fontSize: 22 }}>{item.emoji}</span>{item.label}
+                                        </button>
+                                    ))}
+                                    <button onClick={() => setShowMoreMenu(false)} style={{ width: '100%', marginTop: 10, padding: '14px', borderRadius: 14, background: 'var(--bg-secondary)', border: '1px solid var(--border)', fontWeight: 700, color: 'var(--text-secondary)' }}>Cancel</button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* ─── SECTION 0: About + Education + Skills ───────────────────── */}
-
-            {/* About — full-width accent card */}
+            {/* About */}
             {profile.bio && (
                 <div className="card" style={{ marginBottom: 16, padding: 0, borderRadius: 16, overflow: 'hidden' }}>
                     <div style={{ display: 'flex' }}>
                         <div style={{ width: 4, flexShrink: 0, background: 'var(--gradient-primary)' }} />
                         <div style={{ padding: '20px 24px', flex: 1 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                                <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <User size={15} color="var(--primary-light)" />
-                                </div>
+                                <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={15} color="var(--primary-light)" /></div>
                                 <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>About</span>
                             </div>
                             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)' }}>{profile.bio}</p>
@@ -589,70 +542,41 @@ const PublicProfile = () => {
                 </div>
             )}
 
-            {/* Education + Skills — stacked */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
-
-                {/* Education — timeline style */}
+                {/* Education */}
                 <div className="card" style={{ padding: 0, borderRadius: 16, overflow: 'hidden' }}>
                     <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <GraduationCap size={16} color="var(--primary-light)" />
-                        </div>
+                        <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><GraduationCap size={16} color="var(--primary-light)" /></div>
                         <span style={{ fontWeight: 700, fontSize: 15 }}>Education</span>
                     </div>
-                    <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    <div style={{ padding: '16px 20px' }}>
                         {profile.education?.length > 0 ? profile.education.map((edu, i) => (
                             <div key={i} style={{ display: 'flex', gap: 14, position: 'relative', paddingBottom: i < profile.education.length - 1 ? 20 : 0 }}>
-                                {/* Timeline line */}
-                                {i < profile.education.length - 1 && (
-                                    <div style={{ position: 'absolute', left: 15, top: 32, bottom: 0, width: 2, background: 'var(--border)' }} />
-                                )}
-                                <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(99,102,241,0.1)', border: '2px solid var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, zIndex: 1 }}>
-                                    <GraduationCap size={14} color="var(--primary-light)" />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
+                                {i < profile.education.length - 1 && <div style={{ position: 'absolute', left: 15, top: 32, bottom: 0, width: 2, background: 'var(--border)' }} />}
+                                <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(99,102,241,0.1)', border: '2px solid var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><GraduationCap size={14} color="var(--primary-light)" /></div>
+                                <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 700, fontSize: 14 }}>{edu.school}</div>
-                                    <div style={{ fontSize: 12, color: 'var(--primary-light)', marginBottom: 2 }}>{edu.degree}{edu.fieldOfStudy ? ` · ${edu.fieldOfStudy}` : ''}</div>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <Calendar size={10} />
-                                        {edu.from && new Date(edu.from).getFullYear()} — {edu.current ? 'Present' : (edu.to && new Date(edu.to).getFullYear())}
-                                    </div>
+                                    <div style={{ fontSize: 12, color: 'var(--primary-light)' }}>{edu.degree}{edu.fieldOfStudy ? ` · ${edu.fieldOfStudy}` : ''}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={10} />{edu.from && new Date(edu.from).getFullYear()} — {edu.current ? 'Present' : (edu.to && new Date(edu.to).getFullYear())}</div>
                                 </div>
                             </div>
-                        )) : (
-                            <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>No education added yet.</p>
-                        )}
+                        )) : <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>No education added yet.</p>}
                     </div>
                 </div>
 
-                {/* Skills — colorful chips */}
+                {/* Skills */}
                 <div className="card" style={{ padding: 0, borderRadius: 16, overflow: 'hidden' }}>
                     <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Tag size={16} color="var(--primary-light)" />
-                        </div>
+                        <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Tag size={16} color="var(--primary-light)" /></div>
                         <span style={{ fontWeight: 700, fontSize: 15 }}>Skills &amp; Expertise</span>
                     </div>
                     <div style={{ padding: '16px 20px' }}>
                         {profile.skills?.length > 0 ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                                 {profile.skills.map((s, i) => {
-                                    const colors = [
-                                        { bg: 'rgba(99,102,241,0.12)', color: '#818cf8', border: 'rgba(99,102,241,0.25)' },
-                                        { bg: 'rgba(16,185,129,0.1)', color: '#34d399', border: 'rgba(16,185,129,0.25)' },
-                                        { bg: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: 'rgba(245,158,11,0.25)' },
-                                        { bg: 'rgba(236,72,153,0.1)', color: '#f472b6', border: 'rgba(236,72,153,0.25)' },
-                                        { bg: 'rgba(14,165,233,0.1)', color: '#38bdf8', border: 'rgba(14,165,233,0.25)' },
-                                    ];
+                                    const colors = [{ bg: 'rgba(99,102,241,0.12)', color: '#818cf8', border: 'rgba(99,102,241,0.25)' }, { bg: 'rgba(16,185,129,0.1)', color: '#34d399', border: 'rgba(16,185,129,0.25)' }, { bg: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: 'rgba(245,158,11,0.25)' }, { bg: 'rgba(236,72,153,0.1)', color: '#f472b6', border: 'rgba(236,72,153,0.25)' }, { bg: 'rgba(14,165,233,0.1)', color: '#38bdf8', border: 'rgba(14,165,233,0.25)' }];
                                     const c = colors[i % colors.length];
-                                    return (
-                                        <span key={i} style={{
-                                            padding: '5px 13px', borderRadius: 20,
-                                            background: c.bg, border: `1px solid ${c.border}`,
-                                            fontSize: 12, fontWeight: 600, color: c.color,
-                                            whiteSpace: 'nowrap'
-                                        }}>{s}</span>
-                                    );
+                                    return <span key={i} style={{ padding: '5px 13px', borderRadius: 20, background: c.bg, border: `1px solid ${c.border}`, fontSize: 12, fontWeight: 600, color: c.color }}>{s}</span>;
                                 })}
                             </div>
                         ) : <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>No skills listed yet.</p>}
@@ -660,64 +584,27 @@ const PublicProfile = () => {
                 </div>
             </div>
 
-            {/* ─── SECTION 1: CURRENT WORKING STATUS ───────────────────────── */}
+            {/* Current Working Status */}
             {currentExp && (
                 <div className="card" style={{ marginBottom: 20, padding: 0, overflow: 'hidden', borderRadius: 16 }}>
-                    <div style={{ padding: '14px 24px', background: 'var(--gradient-primary)', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Briefcase size={16} />
-                        <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Current Working Status</span>
-                    </div>
+                    <div style={{ padding: '14px 24px', background: 'var(--gradient-primary)', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}><Briefcase size={16} /><span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Current Working Status</span></div>
                     <div style={{ padding: '20px 24px', display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 4 }}>Company</div>
-                            <div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.company}</div>
-                        </div>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 4 }}>Position</div>
-                            <div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.title}</div>
-                        </div>
-                        <div style={{ flex: 1, minWidth: 180 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 4 }}>Using This Platform</div>
-                            <div style={{ fontSize: 18, fontWeight: 800 }}>{memberFor}</div>
-                        </div>
-                        {currentExp.location && (
-                            <div style={{ flex: 1, minWidth: 160 }}>
-                                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 4 }}>Location</div>
-                                <div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.location}</div>
-                            </div>
-                        )}
+                        <div style={{ flex: 1, minWidth: 200 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Company</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.company}</div></div>
+                        <div style={{ flex: 1, minWidth: 200 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Position</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.title}</div></div>
+                        <div style={{ flex: 1, minWidth: 180 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Platform Use</div><div style={{ fontSize: 18, fontWeight: 800 }}>{memberFor}</div></div>
+                        {currentExp.location && <div style={{ flex: 1, minWidth: 160 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Location</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.location}</div></div>}
                     </div>
                 </div>
             )}
 
-            {/* ─── SECTION 2: ALL POSTS ─────────────────────────────────────── */}
+            {/* Posts */}
             <div className="card" style={{ marginBottom: 16, padding: 0, borderRadius: 16, overflow: 'hidden' }}>
-                {/* Custom header with controlled equal padding top & bottom */}
                 <div style={{ padding: '16px 20px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 4, height: 22, background: 'var(--gradient-primary)', borderRadius: 4 }} />
-                        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Posts</h2>
-                    </div>
-                    {posts.length > 0 && (
-                        <p style={{ margin: '2px 0 0 14px', fontSize: 13, color: 'var(--text-muted)' }}>{timeAgo(posts[0].createdAt)}</p>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 4, height: 22, background: 'var(--gradient-primary)', borderRadius: 4 }} /><h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Posts</h2></div>
+                    {posts.length > 0 && <p style={{ margin: '2px 0 0 14px', fontSize: 13, color: 'var(--text-muted)' }}>{timeAgo(posts[0].createdAt)}</p>}
                 </div>
-                {postsLoading ? (
-                    <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /></div>
-                ) : posts.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', marginTop: 0 }}>
-                        <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
-                        <p style={{ margin: 0, fontSize: 14 }}>No posts yet.</p>
-                    </div>
-                ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
-                        {posts.map(post => (
-                            <PostCard key={post._id} post={post} currentUser={currentUser} onLike={handleLike} />
-                        ))}
-                    </div>
-                )}
+                {postsLoading ? <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /></div> : posts.length === 0 ? <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}><div style={{ fontSize: 36, marginBottom: 10 }}>📭</div><p style={{ margin: 0, fontSize: 14 }}>No posts yet.</p></div> : <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>{posts.map(post => <PostCard key={post._id} post={post} currentUser={currentUser} onLike={handleLike} />)}</div>}
             </div>
-
         </div>
     );
 };

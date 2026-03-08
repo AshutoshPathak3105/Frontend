@@ -38,6 +38,10 @@ const CompanyDetail = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
+    useEffect(() => {
+        setLogoError(false);
+    }, [company?.logo]);
+
     const handleCategoryFilter = (category) => {
         setSelectedCategory(category);
         if (category === 'All Roles') {
