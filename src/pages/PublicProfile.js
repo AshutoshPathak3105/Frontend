@@ -8,11 +8,13 @@ import {
 import {
     getProfile, getOrCreateConversation, getFeedPosts,
     togglePostLike, sendConnectionRequest, uploadAvatar,
-    addPostComment, toggleFollow, getMe, getUploadUrl
+    addPostComment, toggleFollow, getMe, getUploadUrl, respondToConnectionRequest, removeConnection,
+    cancelConnectionRequest
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import Avatar from '../components/common/Avatar';
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const timeAgo = (date) => {
@@ -250,17 +252,28 @@ const PublicProfile = () => {
                     getProfile(id),
                     getFeedPosts({ author: id, limit: 20 })
                 ]);
+
                 const loadedProfile = profileRes.data.user || profileRes.data.profile;
                 setProfile(loadedProfile);
                 setPosts(postsRes.data.posts || []);
-                // Check if following — use String() to handle ObjectId vs string mismatch
-                const myId = String(currentUser?._id || currentUser?.id || '');
-                if (myId && loadedProfile?.followers?.some(f => String(f?._id || f) === myId)) {
-                    setIsFollowing(true);
+
+                // Use isFollowing from backend if available, fallback to local check
+                if (loadedProfile.isFollowing !== undefined) {
+                    setIsFollowing(loadedProfile.isFollowing);
                 } else {
-                    setIsFollowing(false);
+                    const myId = String(currentUser?._id || currentUser?.id || '');
+                    setIsFollowing(myId && loadedProfile?.followers?.some(f => String(f?._id || f) === myId));
                 }
-            } catch {
+
+                // Handle friend request status
+                if (loadedProfile.connectionStatus === 'sent') {
+                    setFriendSent(true);
+                } else {
+                    setFriendSent(false);
+                }
+
+            } catch (err) {
+                console.error("Error loading profile:", err);
                 toast.error('Failed to load profile');
             } finally {
                 setLoading(false);
@@ -272,7 +285,7 @@ const PublicProfile = () => {
 
     const handleMessage = async () => {
         if (!currentUser) return navigate('/login');
-        if (!isFriend) {
+        if (profile.connectionStatus !== 'connected') {
             toast.error('You can only message friends.');
             return;
         }
@@ -280,8 +293,6 @@ const PublicProfile = () => {
         try {
             const res = await getOrCreateConversation(id);
             const conv = res.data.conversation;
-            // Pass the full conversation object so Messages page can open it
-            // immediately without waiting for the conversations list to load
             navigate('/messages', { state: { convId: conv._id, targetUserId: id, conversation: conv } });
         } catch {
             toast.error('Could not open conversation. Please try again.');
@@ -292,10 +303,15 @@ const PublicProfile = () => {
 
     const handleFriend = async () => {
         if (!currentUser) return navigate('/login');
+        if (friendSent) return;
+
         try {
             await sendConnectionRequest(id);
             setFriendSent(true);
             toast.success('Friend request sent! 🎉');
+
+            // Update local profile state to reflect "sent" status
+            setProfile(prev => ({ ...prev, connectionStatus: 'sent' }));
         } catch (err) {
             toast.error(err.response?.data?.message || 'Could not send request');
         }
@@ -307,6 +323,7 @@ const PublicProfile = () => {
             const { data } = await toggleFollow(id);
             const nowFollowing = data.isFollowing;
             setIsFollowing(nowFollowing);
+
             // Update local follower count on the rendered profile
             setProfile(prev => {
                 if (!prev) return prev;
@@ -315,19 +332,55 @@ const PublicProfile = () => {
                 const updated = nowFollowing
                     ? [...followers, myId]
                     : followers.filter(f => String(f) !== myId);
-                return { ...prev, followers: updated };
+                return { ...prev, followers: updated, isFollowing: nowFollowing };
             });
             toast.success(nowFollowing ? 'Followed! 🔔' : 'Unfollowed');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to update follow status');
             return;
         }
-        // Sync global auth user separately — don't let this failure affect follow state
+    };
+
+    const handleAccept = async () => {
+        if (!currentUser || !profile.requestId) return;
         try {
-            const me = await getMe();
-            if (updateUser && me.data?.user) updateUser(me.data.user);
-        } catch {
-            // non-critical, ignore
+            await respondToConnectionRequest(profile.requestId, 'accepted');
+            toast.success('Connection request accepted! 🤝');
+            // Refresh profile to update UI
+            setProfile(prev => ({
+                ...prev,
+                connectionStatus: 'connected',
+                connections: [...(prev.connections || []), currentUser._id]
+            }));
+        } catch (err) {
+            toast.error('Failed to accept request');
+        }
+    };
+
+    const handleCancelRequest = async () => {
+        if (!currentUser) return;
+        try {
+            await cancelConnectionRequest(id);
+            toast.success('Request cancelled');
+            setProfile(prev => ({ ...prev, connectionStatus: 'none' }));
+        } catch (err) {
+            toast.error('Failed to cancel request');
+        }
+    };
+
+    const handleUnfriend = async () => {
+        if (!currentUser) return;
+        try {
+            await removeConnection(id);
+            toast.success('Connection removed');
+            // Update local state
+            setProfile(prev => ({
+                ...prev,
+                connectionStatus: 'none',
+                connections: (prev.connections || []).filter(c => String(c) !== String(currentUser._id || currentUser.id))
+            }));
+        } catch (err) {
+            toast.error('Failed to remove connection');
         }
     };
 
@@ -363,6 +416,142 @@ const PublicProfile = () => {
             <Link to="/" className="btn btn-primary">Go Home</Link>
         </div>
     );
+
+    // Render Action Buttons
+    const renderActions = () => {
+        if (isMe) return null;
+
+        const connectionStatus = profile.connectionStatus;
+
+        return (
+            <div style={{
+                position: isMobile ? 'static' : 'absolute',
+                bottom: 24,
+                right: 28,
+                display: 'flex',
+                gap: 8,
+                padding: isMobile ? '0 16px 24px' : 0,
+                width: isMobile ? '100%' : 'auto',
+                justifyContent: isMobile ? 'center' : 'flex-end',
+                zIndex: 10
+            }}>
+                {/* Follow Button */}
+                <button
+                    onClick={handleFollow}
+                    className="btn btn-primary"
+                    style={{
+                        height: 38,
+                        padding: '0 14px',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        ...(isFollowing ? { opacity: 0.95 } : {})
+                    }}
+                >
+                    {isFollowing ? 'Following' : 'Follow'}
+                </button>
+
+                {/* Connection Action Button */}
+                {connectionStatus === 'connected' ? (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <button onClick={handleMessage} disabled={msgLoading} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>
+                            <MessageCircle size={15} />
+                            {msgLoading ? 'Opening…' : 'Message'}
+                        </button>
+                        <button onClick={handleUnfriend} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, opacity: 0.9 }}>
+                            <UserPlus size={15} style={{ transform: 'rotate(45deg)' }} />
+                            Unfriend
+                        </button>
+                    </div>
+                ) : connectionStatus === 'sent' ? (
+                    <button onClick={handleCancelRequest} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700, opacity: 0.9 }}>
+                        <Clock size={15} />
+                        Request Sent
+                    </button>
+                ) : connectionStatus === 'received' ? (
+                    <button onClick={handleAccept} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>
+                        <UserCheck size={16} />
+                        Accept Request
+                    </button>
+                ) : (
+                    <button onClick={handleFriend} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>
+                        <Users size={16} />
+                        Add Friend
+                    </button>
+                )}
+
+                {/* More Menu */}
+                <div ref={moreMenuRef} style={{ position: 'relative' }}>
+                    <button onClick={() => setShowMoreMenu(s => !s)} className="btn btn-primary" style={{ height: 38, width: 38, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <MoreHorizontal size={18} />
+                    </button>
+
+                    {showMoreMenu && !isMobile && (
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '100%',
+                            right: 0,
+                            marginBottom: 8,
+                            background: 'var(--bg-card)',
+                            borderRadius: 12,
+                            padding: '8px',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                            border: '1px solid var(--border)',
+                            minWidth: 180,
+                            zIndex: 100
+                        }}>
+                            {[
+                                { label: 'Share Profile', icon: '🔗', onClick: handleShareProfile },
+                                { label: 'Report User', icon: '🚩', onClick: () => toast.error('Coming soon!') },
+                                { label: 'Block User', icon: '🚫', onClick: () => toast.error('Coming soon!'), danger: true }
+                            ].map((item, i) => (
+                                <button key={i} onClick={item.onClick} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 10,
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    fontSize: 14,
+                                    cursor: 'pointer',
+                                    fontWeight: 600,
+                                    color: item.danger ? 'var(--danger)' : 'var(--text-primary)',
+                                    background: 'none',
+                                    border: 'none',
+                                    borderRadius: 6,
+                                    textAlign: 'left',
+                                    transition: 'background 0.2s'
+                                }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                                >
+                                    <span>{item.icon}</span>{item.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {showMoreMenu && isMobile && (
+                    <>
+                        <div onClick={() => setShowMoreMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)', zIndex: 99998 }} />
+                        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '0 16px 32px', zIndex: 99999, boxShadow: '0 -12px 48px rgba(0,0,0,0.35)', border: '1px solid var(--border)', borderBottom: 'none' }}>
+                            <div style={{ width: 44, height: 4, background: 'var(--border)', borderRadius: 99, margin: '14px auto 18px' }} />
+                            <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Options</p>
+                            {[
+                                { label: 'Share Profile', emoji: '🔗', onClick: handleShareProfile },
+                                { label: 'Report User', emoji: '🚩', onClick: () => toast.error('Coming soon!') },
+                                { label: 'Block User', emoji: '🚫', onClick: () => toast.error('Coming soon!'), danger: true }
+                            ].map((item, i) => (
+                                <button key={i} onClick={item.onClick} style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%', padding: '14px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600, color: item.danger ? 'var(--danger)' : 'var(--text-primary)', background: 'none', border: 'none' }}>
+                                    <span style={{ fontSize: 22 }}>{item.emoji}</span>{item.label}
+                                </button>
+                            ))}
+                            <button onClick={() => setShowMoreMenu(false)} style={{ width: '100%', marginTop: 10, padding: '14px', borderRadius: 14, background: 'var(--bg-secondary)', border: '1px solid var(--border)', fontWeight: 700, color: 'var(--text-secondary)' }}>Cancel</button>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    };
 
     // Compute data
     const currentExp = profile.experience?.find(e => e.current) || profile.experience?.[0];
@@ -496,51 +685,26 @@ const PublicProfile = () => {
                     </div>
                 )}
 
-                {!isMe && (
-                    <div style={{ position: isMobile ? 'static' : 'absolute', bottom: 24, right: 28, display: 'flex', gap: 8, padding: isMobile ? '0 16px 24px' : 0, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'center' : 'flex-end' }}>
-                        <button onClick={handleFollow} className={`btn ${isFollowing ? 'btn-secondary' : 'btn-outline'}`} style={{ height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>{isFollowing ? 'Following' : 'Follow'}</button>
-                        {isFriend ? (
-                            <button onClick={handleMessage} disabled={msgLoading} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}><MessageCircle size={15} />{msgLoading ? 'Opening…' : 'Message'}</button>
-                        ) : (
-                            <button onClick={handleFriend} disabled={friendSent} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 14px', fontSize: 13, fontWeight: 700 }}>{friendSent ? <UserCheck size={16} /> : <Users size={16} />}{friendSent ? 'Request Sent' : 'Add Friend'}</button>
-                        )}
-                        <div ref={moreMenuRef} style={{ position: 'relative' }}>
-                            <button onClick={() => setShowMoreMenu(s => !s)} className="btn btn-outline" style={{ height: 38, width: 38, padding: 0 }}><MoreHorizontal size={18} /></button>
-                        </div>
-                        {showMoreMenu && (
-                            <>
-                                <div onClick={() => setShowMoreMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)', zIndex: 99998 }} />
-                                <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderRadius: '24px 24px 0 0', padding: '0 16px 32px', zIndex: 99999, boxShadow: '0 -12px 48px rgba(0,0,0,0.35)', border: '1px solid var(--border)', borderBottom: 'none' }}>
-                                    <div style={{ width: 44, height: 4, background: 'var(--border)', borderRadius: 99, margin: '14px auto 18px' }} />
-                                    <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Options</p>
-                                    {[{ label: 'Share Profile', emoji: '🔗', onClick: handleShareProfile }, { label: 'Report User', emoji: '🚩', onClick: () => toast.error('Coming soon!') }, { label: 'Block User', emoji: '🚫', onClick: () => toast.error('Coming soon!'), danger: true }].map((item, i) => (
-                                        <button key={i} onClick={item.onClick} style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%', padding: '14px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600, color: item.danger ? 'var(--danger)' : 'var(--text-primary)', background: 'none', border: 'none' }}>
-                                            <span style={{ fontSize: 22 }}>{item.emoji}</span>{item.label}
-                                        </button>
-                                    ))}
-                                    <button onClick={() => setShowMoreMenu(false)} style={{ width: '100%', marginTop: 10, padding: '14px', borderRadius: 14, background: 'var(--bg-secondary)', border: '1px solid var(--border)', fontWeight: 700, color: 'var(--text-secondary)' }}>Cancel</button>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                )}
+                {renderActions()}
             </div>
 
             {/* About */}
-            {profile.bio && (
-                <div className="card" style={{ marginBottom: 16, padding: 0, borderRadius: 16, overflow: 'hidden' }}>
-                    <div style={{ display: 'flex' }}>
-                        <div style={{ width: 4, flexShrink: 0, background: 'var(--gradient-primary)' }} />
-                        <div style={{ padding: '20px 24px', flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                                <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={15} color="var(--primary-light)" /></div>
-                                <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>About</span>
+            {
+                profile.bio && (
+                    <div className="card" style={{ marginBottom: 16, padding: 0, borderRadius: 16, overflow: 'hidden' }}>
+                        <div style={{ display: 'flex' }}>
+                            <div style={{ width: 4, flexShrink: 0, background: 'var(--gradient-primary)' }} />
+                            <div style={{ padding: '20px 24px', flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                    <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={15} color="var(--primary-light)" /></div>
+                                    <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>About</span>
+                                </div>
+                                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)' }}>{profile.bio}</p>
                             </div>
-                            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)' }}>{profile.bio}</p>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
                 {/* Education */}
@@ -585,17 +749,19 @@ const PublicProfile = () => {
             </div>
 
             {/* Current Working Status */}
-            {currentExp && (
-                <div className="card" style={{ marginBottom: 20, padding: 0, overflow: 'hidden', borderRadius: 16 }}>
-                    <div style={{ padding: '14px 24px', background: 'var(--gradient-primary)', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}><Briefcase size={16} /><span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Current Working Status</span></div>
-                    <div style={{ padding: '20px 24px', display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1, minWidth: 200 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Company</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.company}</div></div>
-                        <div style={{ flex: 1, minWidth: 200 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Position</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.title}</div></div>
-                        <div style={{ flex: 1, minWidth: 180 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Platform Use</div><div style={{ fontSize: 18, fontWeight: 800 }}>{memberFor}</div></div>
-                        {currentExp.location && <div style={{ flex: 1, minWidth: 160 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Location</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.location}</div></div>}
+            {
+                currentExp && (
+                    <div className="card" style={{ marginBottom: 20, padding: 0, overflow: 'hidden', borderRadius: 16 }}>
+                        <div style={{ padding: '14px 24px', background: 'var(--gradient-primary)', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}><Briefcase size={16} /><span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Current Working Status</span></div>
+                        <div style={{ padding: '20px 24px', display: 'flex', gap: 28, flexWrap: 'wrap' }}>
+                            <div style={{ flex: 1, minWidth: 200 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Company</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.company}</div></div>
+                            <div style={{ flex: 1, minWidth: 200 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Position</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.title}</div></div>
+                            <div style={{ flex: 1, minWidth: 180 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Platform Use</div><div style={{ fontSize: 18, fontWeight: 800 }}>{memberFor}</div></div>
+                            {currentExp.location && <div style={{ flex: 1, minWidth: 160 }}><div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Location</div><div style={{ fontSize: 18, fontWeight: 800 }}>{currentExp.location}</div></div>}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Posts */}
             <div className="card" style={{ marginBottom: 16, padding: 0, borderRadius: 16, overflow: 'hidden' }}>
@@ -605,7 +771,7 @@ const PublicProfile = () => {
                 </div>
                 {postsLoading ? <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /></div> : posts.length === 0 ? <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}><div style={{ fontSize: 36, marginBottom: 10 }}>📭</div><p style={{ margin: 0, fontSize: 14 }}>No posts yet.</p></div> : <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>{posts.map(post => <PostCard key={post._id} post={post} currentUser={currentUser} onLike={handleLike} />)}</div>}
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     ArrowLeft, User, MapPin, Phone, Download, Briefcase,
-    GraduationCap, Code, ExternalLink, Calendar, X, ChevronRight,
+    GraduationCap, Code, ExternalLink, Calendar, CalendarDays, X, ChevronRight,
     Users, FileText, Mail,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -11,6 +11,36 @@ import {
     scheduleInterviewAPI, cancelInterviewAPI,
     getJob, getUploadUrl,
 } from '../services/api';
+
+// ── Custom DateTime Picker with modern Lucide icon ────────────────────────────
+const DateTimePickerField = ({ value, onChange, min }) => {
+    const inputRef = useRef(null);
+    const [focused, setFocused] = useState(false);
+    const openPicker = () => { if (inputRef.current) { inputRef.current.focus(); inputRef.current.showPicker?.(); } };
+    return (
+        <div style={{ position: 'relative' }}>
+            <input ref={inputRef} type="datetime-local" className="datetime-picker-input"
+                value={value} onChange={e => onChange(e.target.value)} min={min}
+                onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+                style={{
+                    width: '100%', padding: '7px 36px 7px 10px', fontSize: 12,
+                    background: 'var(--bg_glass-light)', border: `1px solid ${focused ? 'var(--primary)' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif',
+                    outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', cursor: 'pointer',
+                    boxShadow: focused ? '0 0 0 3px rgba(96,165,250,0.18)' : 'inset 0 2px 4px rgba(0,0,0,0.04)',
+                }} />
+            <button type="button" onClick={openPicker} tabIndex={-1} style={{
+                position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', cursor: 'pointer', padding: 3,
+                display: 'flex', alignItems: 'center', zIndex: 2,
+                color: focused ? 'var(--primary)' : 'var(--text-muted)',
+                filter: focused ? 'drop-shadow(0 0 5px rgba(96,165,250,0.5))' : 'none',
+                transition: 'color 0.2s, filter 0.2s',
+            }}><CalendarDays size={15} strokeWidth={2} /></button>
+        </div>
+    );
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
     pending: { label: 'Pending', color: '#fbbf24', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
@@ -533,13 +563,10 @@ const JobApplicationsPage = () => {
                                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 10 }}>
                                                 <div>
                                                     <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 5 }}>Date & Time *</label>
-                                                    <input
-                                                        type="datetime-local"
-                                                        className="form-input"
+                                                    <DateTimePickerField
                                                         value={interviewDate}
-                                                        onChange={e => setInterviewDate(e.target.value)}
+                                                        onChange={setInterviewDate}
                                                         min={new Date().toISOString().slice(0, 16)}
-                                                        style={{ fontSize: 12, padding: '7px 10px' }}
                                                     />
                                                 </div>
                                                 <div>

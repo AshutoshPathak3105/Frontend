@@ -1,9 +1,79 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MapPin, Clock, Eye, X, Calendar, User, Download, Briefcase, GraduationCap, Code, ExternalLink, Phone } from 'lucide-react';
+import { MapPin, Clock, Eye, X, Calendar, CalendarDays, User, Download, Briefcase, GraduationCap, Code, ExternalLink, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getMyApplications, getCompanyApplications, updateApplicationStatus, withdrawApplication, scheduleInterviewAPI, cancelInterviewAPI, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+
+// ── Custom DateTime Picker with modern Lucide icon ────────────────────────────
+const DateTimePickerField = ({ value, onChange, min }) => {
+    const inputRef = useRef(null);
+    const [focused, setFocused] = useState(false);
+
+    const openPicker = () => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.showPicker?.();
+        }
+    };
+
+    return (
+        <div style={{ position: 'relative' }}>
+            <input
+                ref={inputRef}
+                type="datetime-local"
+                className="datetime-picker-input"
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                min={min}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                style={{
+                    width: '100%',
+                    padding: '8px 40px 8px 12px',
+                    fontSize: 13,
+                    background: 'var(--bg_glass-light)',
+                    border: `1px solid ${focused ? 'var(--primary)' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'Inter, sans-serif',
+                    outline: 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    boxShadow: focused
+                        ? '0 0 0 3px rgba(96,165,250,0.18), 0 0 20px rgba(96,165,250,0.08)'
+                        : 'inset 0 2px 4px rgba(0,0,0,0.04)',
+                    cursor: 'pointer',
+                }}
+            />
+            {/* Modern calendar icon overlay — hides native icon, shows Lucide instead */}
+            <button
+                type="button"
+                onClick={openPicker}
+                tabIndex={-1}
+                style={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: focused ? 'var(--primary)' : 'var(--text-muted)',
+                    transition: 'color 0.2s, filter 0.2s',
+                    filter: focused ? 'drop-shadow(0 0 6px rgba(96,165,250,0.5))' : 'none',
+                    pointerEvents: 'auto',
+                    zIndex: 2,
+                }}
+            >
+                <CalendarDays size={16} strokeWidth={2} />
+            </button>
+        </div>
+    );
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
     pending: { label: 'Pending', color: '#fbbf24', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
@@ -251,8 +321,9 @@ const Applications = () => {
                                     )}
                                     {/* External Links */}
                                     <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 4 }}>
-                                        {selectedApp.resume && (
-                                            <a href={getUploadUrl(selectedApp.resume)} target="_blank" rel="noopener noreferrer"
+                                        {/* Prefer the applicant's current live resume over the (potentially stale) application-level copy */}
+                                        {(selectedApp.applicant?.resume || selectedApp.resume) && (
+                                            <a href={getUploadUrl(selectedApp.applicant?.resume || selectedApp.resume)} target="_blank" rel="noopener noreferrer"
                                                 style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)', textDecoration: 'none' }}>
                                                 <Download size={12} /> Download Resume
                                             </a>
@@ -338,13 +409,10 @@ const Applications = () => {
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                                         <div>
                                             <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>Date & Time *</label>
-                                            <input
-                                                type="datetime-local"
-                                                className="form-input"
+                                            <DateTimePickerField
                                                 value={interviewDate}
-                                                onChange={e => setInterviewDate(e.target.value)}
+                                                onChange={setInterviewDate}
                                                 min={new Date().toISOString().slice(0, 16)}
-                                                style={{ fontSize: 13, padding: '8px 12px' }}
                                             />
                                         </div>
                                         <div>

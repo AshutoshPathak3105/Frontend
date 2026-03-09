@@ -588,6 +588,28 @@ img {
   background: var(--bg-card);
 }
 
+/* ── Custom datetime picker — hides ugly native browser calendar icon ── */
+.datetime-picker-input {
+  color-scheme: dark;
+}
+
+.datetime-picker-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+}
+
+.datetime-picker-input::-webkit-datetime-edit-fields-wrapper {
+  color: var(--text-primary);
+}
+
+.datetime-picker-input::-webkit-datetime-edit-text {
+  color: var(--text-muted);
+}
+
 /* ============================================================
    BADGES — Gradient versions
 ============================================================ */
