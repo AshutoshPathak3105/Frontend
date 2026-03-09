@@ -179,8 +179,8 @@ const Network = () => {
                                 <div className="network-hero-stat-label">Connections</div>
                             </div>
                             <div className="network-hero-stat">
-                                <div className="network-hero-stat-val">{requests.length}</div>
-                                <div className="network-hero-stat-label">Requests</div>
+                                <div className="network-hero-stat-val">{followers.length}</div>
+                                <div className="network-hero-stat-label">Followers</div>
                             </div>
                         </div>
                     </div>
@@ -218,21 +218,18 @@ const Network = () => {
                             onClick={() => setActiveTab('connections')}
                         >
                             My Connections
-                            {connections.length > 0 && <span className="tab-badge secondary">{connections.length}</span>}
                         </button>
                         <button
                             className={`tab-btn ${activeTab === 'followers' ? 'active' : ''}`}
                             onClick={() => setActiveTab('followers')}
                         >
                             Followers
-                            {followers.length > 0 && <span className="tab-badge" style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>{followers.length}</span>}
                         </button>
                         <button
                             className={`tab-btn ${activeTab === 'following' ? 'active' : ''}`}
                             onClick={() => setActiveTab('following')}
                         >
                             Following
-                            {following.length > 0 && <span className="tab-badge" style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>{following.length}</span>}
                         </button>
                     </div>
                 )}
@@ -262,9 +259,11 @@ const Network = () => {
                                                 <div className="conn-body">
                                                     <Link to={`/users/profile/${person._id}`} className="conn-name-link"><h3>{person.name}</h3></Link>
                                                     {person.headline && <p className="conn-headline">{person.headline}</p>}
-                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2, ...(person.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' } : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }) }}>{person.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
-                                                    {status === 'connected' && <span className="badge badge-primary-light" style={{ marginTop: 6 }}>Connected</span>}
-                                                    {status === 'pending' && <span className="badge" style={{ marginTop: 6, background: 'rgba(251,191,36,0.1)', color: '#f59e0b', border: '1px solid rgba(251,191,36,0.2)' }}>Request Sent</span>}
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...(person.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' } : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }) }}>{person.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                                        {status === 'connected' && <span className="badge badge-primary-light">Connected</span>}
+                                                        {status === 'pending' && <span className="badge" style={{ background: 'rgba(251,191,36,0.1)', color: '#f59e0b', border: '1px solid rgba(251,191,36,0.2)' }}>Request Sent</span>}
+                                                    </div>
                                                 </div>
                                                 <div className="connection-footer">
                                                     {status === 'connected' ? (
@@ -301,7 +300,9 @@ const Network = () => {
                                         <div className="conn-body">
                                             <Link to={`/users/profile/${req.sender?._id}`} className="conn-name-link"><h3>{req.sender?.name}</h3></Link>
                                             {req.sender?.headline && <p className="conn-headline">{req.sender.headline}</p>}
-                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2, ...(req.sender?.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' } : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }) }}>{req.sender?.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...(req.sender?.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' } : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }) }}>{req.sender?.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                            </div>
                                         </div>
                                         <div className="request-footer">
                                             <button className="btn btn-primary req-action-btn" onClick={() => handleRespond(req._id, 'accepted')}><Check size={15} /> Accept</button>
@@ -326,8 +327,10 @@ const Network = () => {
                                         <div className="conn-body">
                                             <Link to={`/users/profile/${conn._id}`} className="conn-name-link"><h3>{conn.name}</h3></Link>
                                             {conn.headline && <p className="conn-headline">{conn.headline}</p>}
-                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2, ...(conn.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' } : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }) }}>{conn.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
-                                            <span className="badge badge-primary-light">Connected</span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...(conn.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' } : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }) }}>{conn.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                                <span className="badge badge-primary-light">Connected</span>
+                                            </div>
                                         </div>
                                         <div className="connection-footer">
                                             <button className="btn btn-primary btn-full" onClick={() => navigate('/messages')}><MessageCircle size={16} /> Message</button>
@@ -361,7 +364,10 @@ const Network = () => {
                                         <div className="conn-body">
                                             <Link to={`/users/profile/${f._id}`} className="conn-name-link"><h3>{f.name}</h3></Link>
                                             {f.headline && <p className="conn-headline">{f.headline}</p>}
-                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2, ...(f.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' } : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }) }}>{f.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...(f.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' } : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }) }}>{f.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                                {connections.some(c => c._id === f._id) && <span className="badge badge-primary-light">Connected</span>}
+                                            </div>
                                         </div>
                                         <div className="connection-footer">
                                             <button className="btn btn-primary btn-full" onClick={() => navigate(`/users/profile/${f._id}`)}>View Profile</button>
@@ -384,7 +390,10 @@ const Network = () => {
                                         <div className="conn-body">
                                             <Link to={`/users/profile/${f._id}`} className="conn-name-link"><h3>{f.name}</h3></Link>
                                             {f.headline && <p className="conn-headline">{f.headline}</p>}
-                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2, ...(f.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' } : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }) }}>{f.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...(f.role === 'employer' ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' } : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }) }}>{f.role === 'employer' ? <><Briefcase size={9} /> Employer</> : <><User size={9} /> Job Seeker</>}</span>
+                                                {connections.some(c => c._id === f._id) && <span className="badge badge-primary-light">Connected</span>}
+                                            </div>
                                         </div>
                                         <div className="connection-footer">
                                             <button className="btn btn-primary btn-full" onClick={() => handleToggleFollow(f._id)}>Unfollow</button>

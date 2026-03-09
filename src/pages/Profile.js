@@ -336,9 +336,9 @@ const Profile = () => {
                     -webkit-tap-highlight-color: transparent;
                 }
                 .profile-hero-avatar:hover { transform: scale(1.02); }
-                .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; margin-top: 48px; text-align: left; }
-                .profile-hero-info h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
-                .profile-hero-info p  { font-size: 14px; color: var(--text-secondary); margin: 0; }
+                .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; margin-top: 48px; text-align: left; transition: all 0.3s; }
+                .profile-hero-info h1 { font-size: 24px; font-weight: 800; margin: 0 0 6px; color: var(--text-primary); }
+                .profile-hero-info p  { font-size: 15px; color: var(--text-secondary); margin: 0; }
 
                 /* Underline tabs */
                 .profile-tabs-bar {
@@ -369,15 +369,15 @@ const Profile = () => {
                 .about-section-info h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px; }
 
                 @media (max-width: 600px) {
-                    .profile-hero-body  { padding: 0 16px 16px; flex-direction: column; align-items: center; text-align: center; margin-top: -32px; gap: 12px; }
-                    .profile-hero-avatar { width: 64px; height: 64px; font-size: 22px; }
-                    .profile-hero-info { margin-top: 0; text-align: center; }
-                    .profile-hero-info h1 { font-size: 18px; }
-                    .profile-hero-banner { height: 70px; }
-                    .about-section-card { padding: 18px 16px; }
-                    .about-section-info h2 { font-size: 15px; }
-                    .profile-page-container { padding: 16px 12px !important; }
-                    .profile-tab-btn { font-size: 12px; padding: 10px 12px; }
+                    .profile-hero-body { padding: 0 16px 24px; flex-direction: column; align-items: center; text-align: center; margin-top: -32px; gap: 12px; }
+                    .profile-hero-avatar { width: 72px; height: 72px; font-size: 24px; border-width: 4px; }
+                    .profile-hero-info { margin-top: 2px; text-align: center; width: 100%; }
+                    .profile-hero-info h1 { font-size: 22px; margin-bottom: 4px; font-weight: 800; }
+                    .profile-hero-banner { height: 110px; }
+                    .about-section-card { padding: 20px 16px; margin-bottom: 16px; }
+                    .about-section-info h2 { font-size: 16px; }
+                    .profile-page-container { padding: 16px 12px 80px !important; }
+                    .profile-tab-btn { font-size: 13px; padding: 12px 14px; }
                 }
             `}</style>
             <div className="container profile-page-container" style={{ padding: '40px 24px 72px' }}>
@@ -385,7 +385,14 @@ const Profile = () => {
                 <div className="profile-hero">
                     <div className="profile-hero-banner" />
                     <div className="profile-hero-body">
-                        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flex: 1 }}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: isMobile ? 'column' : 'row',
+                            gap: isMobile ? 12 : 24,
+                            alignItems: isMobile ? 'center' : 'flex-start',
+                            flex: 1,
+                            width: '100%'
+                        }}>
                             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <label
                                     htmlFor="profile-avatar-upload"
@@ -421,14 +428,14 @@ const Profile = () => {
                             </div>
 
                             <div className="profile-hero-info">
-                                <h1 style={{ margin: '0 0 6px 0' }}>{profileForm.name || user?.name || 'Your Name'}</h1>
+                                <h1 style={{ margin: '0 0 4px 0', fontSize: isMobile ? 20 : 24 }}>{profileForm.name || user?.name || 'Your Name'}</h1>
                                 <div style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                                    padding: '4px 12px', borderRadius: 20,
-                                    fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                                    padding: isMobile ? '3px 10px' : '4px 12px', borderRadius: 20,
+                                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
                                     ...(user?.role === 'employer'
-                                        ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
-                                        : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }
+                                        ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }
+                                        : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }
                                     )
                                 }}>
                                     {user?.role === 'employer'
@@ -755,32 +762,32 @@ const Profile = () => {
                                             <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>Uploaded</span>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: 5, flexShrink: 0, flexWrap: 'nowrap' }}>
+                                    <div style={{ display: 'flex', gap: isMobile ? 6 : 8, flexShrink: 0, flexWrap: isMobile ? 'nowrap' : 'nowrap', width: isMobile ? '100%' : 'auto', marginTop: isMobile ? 12 : 0 }}>
                                         <a
                                             href={getUploadUrl(profile.resume)}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="btn btn-secondary btn-sm"
-                                            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', fontSize: 11, whiteSpace: 'nowrap' }}
+                                            className="btn btn-secondary"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: isMobile ? '4px 6px' : '6px 12px', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center' }}
                                         >
-                                            <ExternalLink size={12} /> View
+                                            <ExternalLink size={12} /> {isMobile ? 'View' : 'View'}
                                         </a>
                                         <button
                                             onClick={() => resumeInputRef.current?.click()}
                                             disabled={resumeUploading}
-                                            className="btn btn-primary btn-sm"
-                                            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', fontSize: 11, whiteSpace: 'nowrap' }}
+                                            className="btn btn-primary"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: isMobile ? '4px 6px' : '6px 12px', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center' }}
                                         >
-                                            <Upload size={12} /> Replace
+                                            <Upload size={12} /> {isMobile ? 'Replace' : 'Replace Resume'}
                                         </button>
                                         <button
                                             onClick={handleResumeDelete}
                                             disabled={resumeDeleting}
-                                            className="btn btn-sm"
-                                            style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: '1px solid var(--danger)', color: 'var(--danger)', borderRadius: 'var(--radius-md)', padding: '4px 8px', cursor: 'pointer', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}
+                                            className="btn"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', borderRadius: 'var(--radius-md)', padding: isMobile ? '4px 6px' : '6px 12px', cursor: 'pointer', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center' }}
                                         >
                                             {resumeDeleting ? <div className="spinner" style={{ width: 11, height: 11, borderWidth: 2 }} /> : <Trash2 size={12} />}
-                                            Remove
+                                            {isMobile ? 'Remove' : 'Remove'}
                                         </button>
                                     </div>
                                 </div>

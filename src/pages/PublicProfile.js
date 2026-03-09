@@ -80,12 +80,14 @@ const MediaGrid = ({ media }) => {
 };
 
 // ── Post Card (mini) ─────────────────────────────────────────────────────────
-const PostCard = ({ post, currentUser, onLike }) => {
+const PostCard = ({ post, currentUser, onLike, onFollow, onConnect, isFriend, isFollowing }) => {
     const liked = post.likes?.includes(currentUser?._id);
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState('');
     const [comments, setComments] = useState(post.comments || []);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isOwner = currentUser && String(post.author?._id || post.author) === String(currentUser._id || currentUser.id);
 
     const handleComment = async (e) => {
         e.preventDefault();
@@ -94,13 +96,10 @@ const PostCard = ({ post, currentUser, onLike }) => {
         setIsSubmitting(true);
         try {
             const res = await addPostComment(post._id, commentText);
-            // Backend returns { success: true, comment: ... }, 
-            // but we need to update the list. Let's look for comments in the response or fetch them.
             if (res.data.success) {
-                // If backend only returns the single comment, add it to our local list
                 setComments(prev => [...prev, res.data.comment]);
                 setCommentText('');
-                setShowComments(false); // Close the comment box after posting
+                setShowComments(false);
                 toast.success('Comment added!');
             }
         } catch (err) {
@@ -111,32 +110,75 @@ const PostCard = ({ post, currentUser, onLike }) => {
     };
 
     return (
-        <div style={{ borderBottom: '1px solid var(--border)' }}>
+        <div style={{ borderBottom: '1px solid var(--border)', position: 'relative' }}>
+            {/* Header / Meta with top-right Follow button */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px 0' }}>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Clock size={11} /> {timeAgo(post.createdAt)}
+                </span>
+
+                {!isOwner && currentUser && (
+                    <button
+                        onClick={() => onFollow(post.author?._id || post.author)}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            background: isFollowing ? 'rgba(0,0,0,0.05)' : 'rgba(99, 102, 241, 0.08)',
+                            border: isFollowing ? '1px solid var(--border)' : '1px solid var(--primary)',
+                            borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700,
+                            color: isFollowing ? 'var(--text-muted)' : 'var(--primary)',
+                            cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                    >
+                        {isFollowing ? <UserCheck size={11} /> : <UserPlus size={11} />}
+                        <span>{isFollowing ? 'Following' : 'Follow'}</span>
+                    </button>
+                )}
+            </div>
+
             {/* Text content with padding */}
             {post.text && (
-                <div style={{ padding: '14px 20px 8px', maxHeight: 70, overflowY: 'auto', background: 'rgba(99,102,241,0.03)', borderRadius: 8 }}>
+                <div style={{ padding: '8px 20px 8px' }}>
                     <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{post.text}</p>
                 </div>
             )}
 
-            {/* Media — flush to card edges (no inner padding, card has overflow:hidden) */}
+            {/* Media */}
             {post.media?.length > 0 && (
                 <div style={{ width: '100%', overflow: 'hidden' }}>
                     <MediaGrid media={post.media} />
                 </div>
             )}
 
-            {/* Engagement Bar */}
-            <div style={{ display: 'flex', gap: 16, padding: '16px 20px', fontSize: 12, color: 'var(--text-muted)' }}>
-                <button onClick={() => onLike(post._id)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: liked ? 'var(--primary)' : 'var(--text-muted)', fontSize: 13, fontWeight: liked ? 700 : 400 }}>
-                    <ThumbsUp size={16} fill={liked ? 'currentColor' : 'none'} /> {post.likes?.length || 0}
-                </button>
-                <button
-                    onClick={() => setShowComments(!showComments)}
-                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: showComments ? 'var(--primary)' : 'var(--text-muted)', fontSize: 13 }}
-                >
-                    <MessageCircle size={16} fill={showComments ? 'currentColor' : 'none'} /> {comments.length || 0}
-                </button>
+            {/* Engagement Bar with bottom-right Friend button */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px' }}>
+                <div style={{ display: 'flex', gap: 16 }}>
+                    <button onClick={() => onLike(post._id)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: liked ? 'var(--primary)' : 'var(--text-muted)', fontSize: 13, fontWeight: liked ? 700 : 400 }}>
+                        <ThumbsUp size={16} fill={liked ? 'currentColor' : 'none'} /> {post.likes?.length || 0}
+                    </button>
+                    <button
+                        onClick={() => setShowComments(!showComments)}
+                        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: showComments ? 'var(--primary)' : 'var(--text-muted)', fontSize: 13 }}
+                    >
+                        <MessageCircle size={16} fill={showComments ? 'currentColor' : 'none'} /> {comments.length || 0}
+                    </button>
+                </div>
+
+                {!isOwner && currentUser && (
+                    <button
+                        onClick={() => onConnect(post.author?._id || post.author, isFriend)}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: 5,
+                            background: isFriend ? 'rgba(16, 185, 129, 0.08)' : 'rgba(99, 102, 241, 0.08)',
+                            border: isFriend ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--primary)',
+                            borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 700,
+                            color: isFriend ? '#10b981' : 'var(--primary)',
+                            cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                    >
+                        {isFriend ? <UserCheck size={14} /> : <Users size={14} />}
+                        <span>{isFriend ? 'Connected' : 'Add Friend'}</span>
+                    </button>
+                )}
             </div>
 
             {/* Comments Section */}
@@ -390,6 +432,15 @@ const PublicProfile = () => {
         setShowMoreMenu(false);
     };
 
+    const handleConnect = async (userId, alreadyConnected) => {
+        if (!currentUser) return navigate('/login');
+        if (alreadyConnected) {
+            await handleUnfriend();
+        } else {
+            await handleFriend();
+        }
+    };
+
     const handleLike = async (postId) => {
         if (!currentUser) return navigate('/login');
         try {
@@ -485,7 +536,7 @@ const PublicProfile = () => {
                         <MoreHorizontal size={18} />
                     </button>
 
-                    {showMoreMenu && !isMobile && (
+                    {showMoreMenu && (
                         <div style={{
                             position: 'absolute',
                             bottom: '100%',
@@ -493,10 +544,10 @@ const PublicProfile = () => {
                             marginBottom: 8,
                             background: 'var(--bg-card)',
                             borderRadius: 12,
-                            padding: '8px',
+                            padding: '6px',
                             boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                             border: '1px solid var(--border)',
-                            minWidth: 180,
+                            minWidth: isMobile ? 160 : 180,
                             zIndex: 100
                         }}>
                             {[
@@ -516,39 +567,19 @@ const PublicProfile = () => {
                                     color: item.danger ? 'var(--danger)' : 'var(--text-primary)',
                                     background: 'none',
                                     border: 'none',
-                                    borderRadius: 6,
+                                    borderRadius: 8,
                                     textAlign: 'left',
                                     transition: 'background 0.2s'
                                 }}
                                     onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
                                     onMouseLeave={e => e.currentTarget.style.background = 'none'}
                                 >
-                                    <span>{item.icon}</span>{item.label}
+                                    <span style={{ fontSize: isMobile ? 18 : 16 }}>{item.icon}</span>{item.label}
                                 </button>
                             ))}
                         </div>
                     )}
                 </div>
-
-                {showMoreMenu && isMobile && (
-                    <>
-                        <div onClick={() => setShowMoreMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)', zIndex: 99998 }} />
-                        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '0 16px 32px', zIndex: 99999, boxShadow: '0 -12px 48px rgba(0,0,0,0.35)', border: '1px solid var(--border)', borderBottom: 'none' }}>
-                            <div style={{ width: 44, height: 4, background: 'var(--border)', borderRadius: 99, margin: '14px auto 18px' }} />
-                            <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Options</p>
-                            {[
-                                { label: 'Share Profile', emoji: '🔗', onClick: handleShareProfile },
-                                { label: 'Report User', emoji: '🚩', onClick: () => toast.error('Coming soon!') },
-                                { label: 'Block User', emoji: '🚫', onClick: () => toast.error('Coming soon!'), danger: true }
-                            ].map((item, i) => (
-                                <button key={i} onClick={item.onClick} style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%', padding: '14px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600, color: item.danger ? 'var(--danger)' : 'var(--text-primary)', background: 'none', border: 'none' }}>
-                                    <span style={{ fontSize: 22 }}>{item.emoji}</span>{item.label}
-                                </button>
-                            ))}
-                            <button onClick={() => setShowMoreMenu(false)} style={{ width: '100%', marginTop: 10, padding: '14px', borderRadius: 14, background: 'var(--bg-secondary)', border: '1px solid var(--border)', fontWeight: 700, color: 'var(--text-secondary)' }}>Cancel</button>
-                        </div>
-                    </>
-                )}
             </div>
         );
     };
@@ -559,7 +590,7 @@ const PublicProfile = () => {
     const joinYear = profile.createdAt ? new Date(profile.createdAt).getFullYear() : '';
 
     return (
-        <div style={{ maxWidth: 1180, margin: '0 auto', padding: isMobile ? '70px 0 72px' : '88px 20px 72px' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', padding: isMobile ? '70px 16px 72px' : '88px 20px 72px' }}>
             {/* ─── HEADER CARD ──────────────────────────────────────────────── */}
             <div className="card" style={{ padding: 0, overflow: 'visible', marginBottom: 20, borderRadius: 16, border: '1px solid var(--border)', position: 'relative' }}>
                 <div style={{ height: 140, background: 'var(--gradient-primary)', borderRadius: '16px 16px 0 0' }} />
@@ -769,7 +800,7 @@ const PublicProfile = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 4, height: 22, background: 'var(--gradient-primary)', borderRadius: 4 }} /><h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Posts</h2></div>
                     {posts.length > 0 && <p style={{ margin: '2px 0 0 14px', fontSize: 13, color: 'var(--text-muted)' }}>{timeAgo(posts[0].createdAt)}</p>}
                 </div>
-                {postsLoading ? <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /></div> : posts.length === 0 ? <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}><div style={{ fontSize: 36, marginBottom: 10 }}>📭</div><p style={{ margin: 0, fontSize: 14 }}>No posts yet.</p></div> : <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>{posts.map(post => <PostCard key={post._id} post={post} currentUser={currentUser} onLike={handleLike} />)}</div>}
+                {postsLoading ? <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /></div> : posts.length === 0 ? <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}><div style={{ fontSize: 36, marginBottom: 10 }}>📭</div><p style={{ margin: 0, fontSize: 14 }}>No posts yet.</p></div> : <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>{posts.map(post => <PostCard key={post._id} post={post} currentUser={currentUser} onLike={handleLike} onFollow={handleFollow} onConnect={handleConnect} isFriend={isFriend} isFollowing={isFollowing} />)}</div>}
             </div>
         </div >
     );

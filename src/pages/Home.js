@@ -27,11 +27,7 @@ const Home = () => {
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (!authLoading && user) {
-            navigate('/dashboard', { replace: true });
-        }
-    }, [user, authLoading, navigate]);
+    // Removed auto-redirect to allow logged-in users to see landing page
 
     useEffect(() => {
         const fetchData = async () => {

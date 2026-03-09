@@ -244,7 +244,7 @@ const Navbar = () => {
     };
 
     const navLinks = [
-        { to: user ? '/dashboard' : '/', label: 'Home', icon: <Home size={15} /> },
+        { to: '/', label: 'Home', icon: <Home size={15} /> },
         {
             to: '/jobs',
             label: 'Find Jobs',
@@ -271,7 +271,7 @@ const Navbar = () => {
                     </button>
 
                     {/* Logo */}
-                    <Link to={user ? "/dashboard" : "/"} className="navbar-logo">
+                    <Link to="/" className="navbar-logo">
                         <LogoImage height={34} withText={true} />
                     </Link>
 
