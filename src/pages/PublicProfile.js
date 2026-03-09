@@ -608,13 +608,14 @@ const PublicProfile = () => {
                     <div style={{
                         display: 'flex',
                         flexDirection: isMobile ? 'column' : 'row',
-                        gap: isMobile ? 12 : 24,
-                        alignItems: isMobile ? 'center' : 'flex-start',
+                        gap: isMobile ? 16 : 28,
+                        alignItems: isMobile ? 'center' : 'center',
                         flex: 1,
-                        textAlign: isMobile ? 'center' : 'left'
+                        textAlign: isMobile ? 'center' : 'left',
+                        marginTop: isMobile ? 0 : 70
                     }}>
-                        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <div style={{ border: '4px solid var(--bg-card)', borderRadius: '50%', background: 'var(--bg-card)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                            <div style={{ border: '4px solid var(--bg-card)', borderRadius: '50%', background: 'var(--bg-card)', boxShadow: '0 8px 20px rgba(0,0,0,0.12)', overflow: 'hidden' }}>
                                 <Avatar user={profile} size={isMobile ? 100 : 120} />
                             </div>
                             {isMe && (
@@ -622,67 +623,79 @@ const PublicProfile = () => {
                                     htmlFor="public-profile-avatar-upload"
                                     onClick={e => { if (uploading) e.preventDefault(); }}
                                     style={{
-                                        marginTop: 10,
-                                        background: 'var(--gradient-button)', borderRadius: 20,
-                                        padding: '6px 16px', fontSize: 12, fontWeight: 700,
+                                        position: 'absolute',
+                                        bottom: 5,
+                                        right: 5,
+                                        background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                                        borderRadius: '50%',
+                                        width: 32,
+                                        height: 32,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
                                         cursor: uploading ? 'not-allowed' : 'pointer',
-                                        display: 'flex', alignItems: 'center', gap: 6,
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.12)', color: '#fff'
+                                        boxShadow: '0 4px 10px rgba(99, 102, 241, 0.4)',
+                                        color: '#fff',
+                                        border: '3px solid var(--bg-card)',
+                                        transition: 'all 0.2s',
+                                        zIndex: 11
                                     }}
+                                    title="Change Profile Picture"
                                 >
                                     <input type="file" id="public-profile-avatar-upload" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" disabled={uploading} />
-                                    {uploading ? <div className="spinner" style={{ width: 12, height: 12 }} /> : <Camera size={14} />}
-                                    <span>Edit</span>
+                                    {uploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
                                 </label>
                             )}
                         </div>
 
-                        <div style={{ marginTop: isMobile ? 0 : 70 }}>
-                            <h1 style={{ margin: '0 0 6px 0', fontSize: isMobile ? 24 : 28, fontWeight: 800 }}>{profile.name}</h1>
-                            <div style={{
-                                display: 'inline-flex', alignItems: 'center', gap: 4,
-                                padding: '4px 12px', borderRadius: 20,
-                                fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
-                                ...(profile.role === 'employer'
-                                    ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
-                                    : { background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }
-                                )
-                            }}>
-                                {profile.role === 'employer' ? <><Briefcase size={10} /> Employer</> : <><User size={10} /> Job Seeker</>}
-                            </div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, fontSize: 13, color: 'var(--text-muted)', marginTop: 15, justifyContent: isMobile ? 'center' : 'flex-start' }}>
-                                {profile.location && <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={14} />{profile.location}</span>}
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={14} />Joined {joinYear}</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <h1 style={{ margin: 0, fontSize: isMobile ? 24 : 28, fontWeight: 800, lineHeight: 1.2 }}>{profile.name}</h1>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: isMobile ? 'center' : 'flex-start' }}>
+                                <div style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                                    padding: '5px 14px', borderRadius: 25, width: 'fit-content',
+                                    fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+                                    ...(profile.role === 'employer'
+                                        ? { background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }
+                                        : { background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }
+                                    )
+                                }}>
+                                    {profile.role === 'employer' ? <><Briefcase size={12} /> Employer</> : <><User size={12} /> Job Seeker</>}
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500, justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                                    {profile.location && <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={14} style={{ opacity: 0.7 }} />{profile.location}</span>}
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={14} style={{ opacity: 0.7 }} />Joined {joinYear}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {!isMobile && (
-                        <div style={{ display: 'flex', gap: 12, marginTop: 70 }}>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 70 }}>
                             <div
                                 onClick={() => isMe ? navigate('/network?tab=connections') : navigate(`/users/profile/${profile._id}`)}
-                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(99, 102, 241, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(99,102,241,0.1)', transition: 'all 0.2s' }}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(99, 102, 241, 0.08)', padding: '5px 10px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(99,102,241,0.1)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
                                 title={isMe ? 'View your connections' : `${profile.connections?.length || 0} connections`}
                             >
-                                <Users size={15} style={{ color: 'var(--primary)' }} />
+                                <Users size={14} style={{ color: 'var(--primary)' }} />
                                 <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.connections?.length || 0}</span>
                                 <span>Connections</span>
                             </div>
                             <div
                                 onClick={() => isMe ? navigate('/network?tab=followers') : navigate(`/users/profile/${profile._id}`)}
-                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(16, 185, 129, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(16,185,129,0.1)', transition: 'all 0.2s' }}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(16, 185, 129, 0.08)', padding: '5px 10px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(16,185,129,0.1)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
                                 title={isMe ? 'View your followers' : `${profile.followers?.length || 0} followers`}
                             >
-                                <UserCheck size={15} style={{ color: '#10b981' }} />
+                                <UserCheck size={14} style={{ color: '#10b981' }} />
                                 <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.followers?.length || 0}</span>
                                 <span>Followers</span>
                             </div>
                             <div
                                 onClick={() => isMe ? navigate('/network?tab=following') : navigate(`/users/profile/${profile._id}`)}
-                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(245, 158, 11, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(245,158,11,0.1)', transition: 'all 0.2s' }}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(245, 158, 11, 0.08)', padding: '5px 10px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(245,158,11,0.1)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
                                 title={isMe ? 'View who you follow' : `${profile.following?.length || 0} following`}
                             >
-                                <UserPlus size={15} style={{ color: '#f59e0b' }} />
+                                <UserPlus size={14} style={{ color: '#f59e0b' }} />
                                 <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.following?.length || 0}</span>
                                 <span>Following</span>
                             </div>
@@ -691,24 +704,24 @@ const PublicProfile = () => {
                 </div>
 
                 {isMobile && (
-                    <div style={{ display: 'flex', gap: 10, padding: '0 16px 20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', gap: 6, padding: '0 16px 20px', flexWrap: 'nowrap', justifyContent: 'center', width: '100%' }}>
                         <div
                             onClick={() => isMe ? navigate('/network?tab=connections') : navigate(`/users/profile/${profile._id}`)}
-                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(99, 102, 241, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                            style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, fontSize: 10, background: 'rgba(99, 102, 241, 0.08)', padding: '6px 4px', borderRadius: 8, color: 'var(--text-secondary)', minWidth: 0, whiteSpace: 'nowrap' }}
                         >
                             <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.connections?.length || 0}</span>
                             <span>Connections</span>
                         </div>
                         <div
                             onClick={() => isMe ? navigate('/network?tab=followers') : navigate(`/users/profile/${profile._id}`)}
-                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(16, 185, 129, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                            style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, fontSize: 10, background: 'rgba(16, 185, 129, 0.08)', padding: '6px 4px', borderRadius: 8, color: 'var(--text-secondary)', minWidth: 0, whiteSpace: 'nowrap' }}
                         >
                             <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.followers?.length || 0}</span>
                             <span>Followers</span>
                         </div>
                         <div
                             onClick={() => isMe ? navigate('/network?tab=following') : navigate(`/users/profile/${profile._id}`)}
-                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(245, 158, 11, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
+                            style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, fontSize: 10, background: 'rgba(245, 158, 11, 0.08)', padding: '6px 4px', borderRadius: 8, color: 'var(--text-secondary)', minWidth: 0, whiteSpace: 'nowrap' }}
                         >
                             <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile.following?.length || 0}</span>
                             <span>Following</span>

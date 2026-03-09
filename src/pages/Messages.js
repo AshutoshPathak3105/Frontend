@@ -183,6 +183,36 @@ const Messages = () => {
 
     useEffect(() => {
         loadConversations();
+
+        // ── Mobile Keyboard Fix ───────────────────────────────────────────
+        // Prevent body scroll to stop browser from pushing the header up
+        const originalBodyStyle = document.body.style.overflow;
+        const originalHtmlStyle = document.documentElement.style.overflow;
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        // Manual height adjustment for mobile viewports (handles keyboard)
+        const handleResize = () => {
+            if (window.visualViewport && window.innerWidth <= 640) {
+                const height = window.visualViewport.height;
+                const offset = 58; // Navbar height on mobile
+                const page = document.querySelector('.messages-page');
+                if (page) {
+                    page.style.height = `${height - offset}px`;
+                    // On some browsers, we need to adjust the top as well if the whole page scrolled
+                    window.scrollTo(0, 0);
+                }
+            }
+        };
+
+        window.visualViewport?.addEventListener('resize', handleResize);
+        handleResize();
+
+        return () => {
+            document.body.style.overflow = originalBodyStyle;
+            document.documentElement.style.overflow = originalHtmlStyle;
+            window.visualViewport?.removeEventListener('resize', handleResize);
+        };
     }, [loadConversations]);
 
     // Auto-open conversation from navigation state (e.g., from PublicProfile → Message button)

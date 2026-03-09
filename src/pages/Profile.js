@@ -316,8 +316,8 @@ const Profile = () => {
                     border-radius: var(--radius-xl); margin-bottom: 8px; overflow: hidden;
                 }
                 .profile-hero-banner {
-                    height: 90px;
-                    background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 50%, #8b7cf8 100%);
+                    height: 120px;
+                    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
                 }
                 .profile-hero-body {
                     padding: 0 28px 24px;
@@ -336,8 +336,8 @@ const Profile = () => {
                     -webkit-tap-highlight-color: transparent;
                 }
                 .profile-hero-avatar:hover { transform: scale(1.02); }
-                .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; margin-top: 48px; text-align: left; transition: all 0.3s; }
-                .profile-hero-info h1 { font-size: 24px; font-weight: 800; margin: 0 0 6px; color: var(--text-primary); }
+                .profile-hero-info { flex: 1; min-width: 0; padding-bottom: 4px; text-align: left; transition: all 0.3s; }
+                .profile-hero-info h1 { font-size: 26px; font-weight: 800; margin: 0; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.2; }
                 .profile-hero-info p  { font-size: 15px; color: var(--text-secondary); margin: 0; }
 
                 /* Underline tabs */
@@ -369,9 +369,9 @@ const Profile = () => {
                 .about-section-info h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px; }
 
                 @media (max-width: 600px) {
-                    .profile-hero-body { padding: 0 16px 24px; flex-direction: column; align-items: center; text-align: center; margin-top: -32px; gap: 12px; }
+                    .profile-hero-body { padding: 0 16px 24px; flex-direction: column; align-items: flex-start; text-align: left; margin-top: -32px; gap: 12px; }
                     .profile-hero-avatar { width: 72px; height: 72px; font-size: 24px; border-width: 4px; }
-                    .profile-hero-info { margin-top: 2px; text-align: center; width: 100%; }
+                    .profile-hero-info { margin-top: 2px; text-align: left; width: 100%; }
                     .profile-hero-info h1 { font-size: 22px; margin-bottom: 4px; font-weight: 800; }
                     .profile-hero-banner { height: 110px; }
                     .about-section-card { padding: 20px 16px; margin-bottom: 16px; }
@@ -388,25 +388,30 @@ const Profile = () => {
                         <div style={{
                             display: 'flex',
                             flexDirection: isMobile ? 'column' : 'row',
-                            gap: isMobile ? 12 : 24,
-                            alignItems: isMobile ? 'center' : 'flex-start',
+                            gap: isMobile ? 16 : 28,
+                            alignItems: isMobile ? 'flex-start' : 'center',
                             flex: 1,
                             width: '100%'
                         }}>
-                            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
                                 <label
                                     htmlFor="profile-avatar-upload"
                                     className="profile-hero-avatar"
                                     onClick={e => { if (avatarUploading) e.preventDefault(); }}
-                                    style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: avatarUploading ? 'default' : 'pointer' }}
+                                    style={{
+                                        width: isMobile ? 80 : 110,
+                                        height: isMobile ? 80 : 110,
+                                        boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
+                                        cursor: avatarUploading ? 'default' : 'pointer'
+                                    }}
                                 >
                                     {avatarPreview
                                         ? <img src={avatarPreview} alt="avatar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                                        : getInitials(profileForm.name || user?.name)
+                                        : <span style={{ fontSize: isMobile ? 28 : 40 }}>{getInitials(profileForm.name || user?.name)}</span>
                                     }
                                     {avatarUploading && (
-                                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <div className="spinner" style={{ width: 20, height: 20, borderTopColor: '#fff' }} />
+                                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                                            <div className="spinner" style={{ width: 24, height: 24, borderTopColor: '#fff' }} />
                                         </div>
                                     )}
                                 </label>
@@ -414,101 +419,79 @@ const Profile = () => {
                                     htmlFor="profile-avatar-upload"
                                     onClick={e => { if (avatarUploading) e.preventDefault(); }}
                                     style={{
-                                        marginTop: 10,
-                                        background: 'var(--gradient-button)', borderRadius: 20,
-                                        padding: '6px 16px', fontSize: 12, fontWeight: 700,
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        right: 0,
+                                        background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                                        borderRadius: '50%',
+                                        width: isMobile ? 28 : 36,
+                                        height: isMobile ? 28 : 36,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
                                         cursor: avatarUploading ? 'not-allowed' : 'pointer',
-                                        display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-                                        color: '#fff', transition: 'all 0.2s', zIndex: 10
+                                        boxShadow: '0 4px 10px rgba(99, 102, 241, 0.4)',
+                                        color: '#fff',
+                                        border: '3px solid var(--bg-card)',
+                                        transition: 'all 0.2s',
+                                        zIndex: 11
                                     }}
+                                    title="Change Profile Picture"
                                 >
-                                    {avatarUploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
-                                    <span>Edit</span>
+                                    {avatarUploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={isMobile ? 14 : 18} />}
                                 </label>
                             </div>
 
-                            <div className="profile-hero-info">
-                                <h1 style={{ margin: '0 0 4px 0', fontSize: isMobile ? 20 : 24 }}>{profileForm.name || user?.name || 'Your Name'}</h1>
-                                <div style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                                    padding: isMobile ? '3px 10px' : '4px 12px', borderRadius: 20,
-                                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
-                                    ...(user?.role === 'employer'
-                                        ? { background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }
-                                        : { background: 'rgba(99,102,241,0.12)', color: 'var(--primary)', border: '1px solid rgba(99,102,241,0.2)' }
-                                    )
-                                }}>
-                                    {user?.role === 'employer'
-                                        ? <><Briefcase size={10} /> Employer</>
-                                        : <><User size={10} /> Job Seeker</>
-                                    }
-                                </div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, fontSize: 13, color: 'var(--text-muted)', marginTop: 15, justifyContent: isMobile ? 'center' : 'flex-start' }}>
-                                    {profileForm.location && <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={14} />{profileForm.location}</span>}
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={14} />Joined {profile?.createdAt ? new Date(profile.createdAt).getFullYear() : ''}</span>
+                            <div className="profile-hero-info" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <h1 style={{ marginBottom: 2 }}>{profileForm.name || user?.name || 'Your Name'}</h1>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    <div style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                                        padding: '5px 14px', borderRadius: 25, width: 'fit-content',
+                                        fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+                                        background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)'
+                                    }}>
+                                        <User size={12} /> {user?.role === 'employer' ? 'Employer' : 'Job Seeker'}
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>
+                                        <Calendar size={15} style={{ opacity: 0.7 }} /> Joined {profile?.createdAt ? new Date(profile.createdAt).getFullYear() : '2026'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Social Stats — Top Right Area */}
-                        {!isMobile && (
-                            <div style={{ display: 'flex', gap: 12, marginTop: 48, marginRight: 24 }}>
-                                <div
-                                    onClick={() => navigate('/network?tab=connections')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(99, 102, 241, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(99,102,241,0.1)', transition: 'all 0.2s' }}
-                                    className="social-stat-link"
-                                >
-                                    <Users size={15} style={{ color: 'var(--primary)' }} />
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.connections?.length || 0}</span>
-                                    <span>Connections</span>
-                                </div>
-                                <div
-                                    onClick={() => navigate('/network?tab=followers')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(16, 185, 129, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(16,185,129,0.1)', transition: 'all 0.2s' }}
-                                    className="social-stat-link"
-                                >
-                                    <UserCheck size={15} style={{ color: '#10b981' }} />
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.followers?.length || 0}</span>
-                                    <span>Followers</span>
-                                </div>
-                                <div
-                                    onClick={() => navigate('/network?tab=following')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, background: 'rgba(245, 158, 11, 0.08)', padding: '6px 12px', borderRadius: 10, color: 'var(--text-secondary)', border: '1px solid rgba(245,158,11,0.1)', transition: 'all 0.2s' }}
-                                    className="social-stat-link"
-                                >
-                                    <UserPlus size={15} style={{ color: '#f59e0b' }} />
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.following?.length || 0}</span>
-                                    <span>Following</span>
-                                </div>
+                        {/* Social Stats — Always visible and styled like the image */}
+                        <div style={{
+                            display: 'flex',
+                            gap: isMobile ? 6 : 10,
+                            marginTop: 24,
+                            flexWrap: 'nowrap',
+                            width: '100%',
+                            justifyContent: isMobile ? 'space-between' : 'flex-start'
+                        }}>
+                            <div
+                                onClick={() => navigate('/network?tab=connections')}
+                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: '#f5f7ff', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(99,102,241,0.1)', whiteSpace: 'nowrap' }}
+                            >
+                                <span style={{ fontWeight: 800 }}>{profile?.connections?.length || 0}</span>
+                                <span style={{ color: 'var(--text-secondary)' }}>Connections</span>
                             </div>
-                        )}
+                            <div
+                                onClick={() => navigate('/network?tab=followers')}
+                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: '#f0fdf4', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(16,185,129,0.1)', whiteSpace: 'nowrap' }}
+                            >
+                                <span style={{ fontWeight: 800 }}>{profile?.followers?.length || 0}</span>
+                                <span style={{ color: 'var(--text-secondary)' }}>Followers</span>
+                            </div>
+                            <div
+                                onClick={() => navigate('/network?tab=following')}
+                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: '#fffbeb', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(245,158,11,0.1)', whiteSpace: 'nowrap' }}
+                            >
+                                <span style={{ fontWeight: 800 }}>{profile?.following?.length || 0}</span>
+                                <span style={{ color: 'var(--text-secondary)' }}>Following</span>
+                            </div>
+                        </div>
 
-                        {/* For Mobile: Stats at bottom of hero */}
-                        {isMobile && (
-                            <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-                                <div
-                                    onClick={() => navigate('/network?tab=connections')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(99, 102, 241, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
-                                >
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.connections?.length || 0}</span>
-                                    <span>Connections</span>
-                                </div>
-                                <div
-                                    onClick={() => navigate('/network?tab=followers')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(16, 185, 129, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
-                                >
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.followers?.length || 0}</span>
-                                    <span>Followers</span>
-                                </div>
-                                <div
-                                    onClick={() => navigate('/network?tab=following')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, background: 'rgba(245, 158, 11, 0.08)', padding: '4px 10px', borderRadius: 8, color: 'var(--text-secondary)' }}
-                                >
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{profile?.following?.length || 0}</span>
-                                    <span>Following</span>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
                 {/* Hidden file input lives here */}
@@ -663,14 +646,14 @@ const Profile = () => {
 
                         {/* ── Achievements Section ── */}
                         <div style={{ marginTop: 36 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12, marginBottom: 24 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                     <div style={{ width: 36, height: 36, background: 'rgba(245,158,11,0.12)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
                                         <Trophy size={18} />
                                     </div>
                                     <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Achievements</h2>
                                 </div>
-                                <button onClick={() => setShowAchForm(!showAchForm)} className="btn btn-primary btn-sm">
+                                <button onClick={() => setShowAchForm(!showAchForm)} className="btn btn-primary btn-sm" style={{ borderRadius: 20, padding: '8px 20px' }}>
                                     <Plus size={14} /> Add Achievement
                                 </button>
                             </div>
@@ -749,36 +732,48 @@ const Profile = () => {
                             </div>
 
                             {profile?.resume ? (
-                                <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, flexWrap: 'nowrap' }}>
-                                    <div style={{ width: 40, height: 40, background: 'rgba(99,102,241,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                        <FileText size={20} style={{ color: 'var(--primary)' }} />
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                                        <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {profile.resumeName || 'resume.pdf'}
+                                <div style={{
+                                    background: 'var(--bg-secondary)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--radius-lg)',
+                                    padding: isMobile ? '16px' : '18px 20px',
+                                    display: 'flex',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    alignItems: isMobile ? 'stretch' : 'center',
+                                    gap: isMobile ? 12 : 16,
+                                    marginBottom: 24
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div style={{ width: 40, height: 40, background: 'rgba(99,102,241,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <FileText size={20} style={{ color: 'var(--primary)' }} />
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'nowrap' }}>
-                                            <CheckCircle size={13} style={{ color: '#10b981', flexShrink: 0 }} />
-                                            <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>Uploaded</span>
+                                        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                                            <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {profile.resumeName || 'resume.pdf'}
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                <CheckCircle size={13} style={{ color: '#10b981', flexShrink: 0 }} />
+                                                <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>Uploaded</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: isMobile ? 6 : 8, flexShrink: 0, flexWrap: isMobile ? 'nowrap' : 'nowrap', width: isMobile ? '100%' : 'auto', marginTop: isMobile ? 12 : 0 }}>
+                                    <div style={{ display: 'flex', gap: 8, flexShrink: 0, justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
                                         <a
                                             href={getUploadUrl(profile.resume)}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="btn btn-secondary"
-                                            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: isMobile ? '4px 6px' : '6px 12px', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center' }}
+                                            className="btn"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#7c3aed', color: '#fff', padding: isMobile ? '4px 6px' : '6px 12px', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center', borderRadius: 8, border: 'none' }}
                                         >
                                             <ExternalLink size={12} /> {isMobile ? 'View' : 'View'}
                                         </a>
                                         <button
                                             onClick={() => resumeInputRef.current?.click()}
                                             disabled={resumeUploading}
-                                            className="btn btn-primary"
-                                            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: isMobile ? '4px 6px' : '6px 12px', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center' }}
+                                            className="btn"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#7c3aed', color: '#fff', padding: isMobile ? '4px 6px' : '6px 12px', fontSize: isMobile ? 10 : 11, height: isMobile ? 28 : 32, fontWeight: 700, flex: isMobile ? 1 : 'unset', justifyContent: 'center', borderRadius: 8, border: 'none' }}
                                         >
-                                            <Upload size={12} /> {isMobile ? 'Replace' : 'Replace Resume'}
+                                            <Upload size={12} /> {isMobile ? 'Replace' : 'Replace'}
                                         </button>
                                         <button
                                             onClick={handleResumeDelete}
@@ -834,20 +829,20 @@ const Profile = () => {
                             <div style={{ marginTop: 24 }}>
                                 <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.08) 100%)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 'var(--radius-xl)', padding: 28 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                                        <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #6366f1, #a855f7)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                            <Sparkles size={22} color="#fff" />
+                                        <div style={{ width: 48, height: 48, background: '#7c3aed', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(124, 58, 237, 0.2)' }}>
+                                            <Sparkles size={24} color="#fff" />
                                         </div>
                                         <div>
-                                            <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>AI Job Recommendations</h3>
-                                            <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '4px 0 0' }}>Scan your resume and find the best matching jobs instantly</p>
+                                            <h3 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>AI Job Recommendations</h3>
+                                            <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '4px 0 0', opacity: 0.8 }}>Scan your resume and find the best matching jobs instantly</p>
                                         </div>
                                     </div>
 
                                     <button
                                         onClick={handleScanResume}
                                         disabled={scanLoading}
-                                        className="btn btn-primary"
-                                        style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #6366f1, #a855f7)', border: 'none', width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15, fontWeight: 700 }}
+                                        className="btn"
+                                        style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#7c3aed', color: '#fff', border: 'none', width: '100%', justifyContent: 'center', padding: '14px 24px', fontSize: 16, fontWeight: 800, borderRadius: 14, boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)', cursor: 'pointer' }}
                                     >
                                         {scanLoading
                                             ? <><div className="spinner" style={{ width: 18, height: 18, borderWidth: 3, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} /> Scanning your resume...</>
