@@ -41,8 +41,15 @@ const Profile = () => {
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 600);
         window.addEventListener('resize', handleResize);
+
+        // Refresh profile when window gets focus (handles stale data on mobile switching)
+        window.addEventListener('focus', fetchProfile);
+
         fetchProfile();
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('focus', fetchProfile);
+        };
     }, []);
 
     const fetchProfile = async () => {

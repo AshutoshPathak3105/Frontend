@@ -195,23 +195,27 @@ const Messages = () => {
         const handleResize = () => {
             if (window.visualViewport && window.innerWidth <= 640) {
                 const height = window.visualViewport.height;
-                const offset = 58; // Navbar height on mobile
+                const offset = 66; // Match navbar height
                 const page = document.querySelector('.messages-page');
                 if (page) {
                     page.style.height = `${height - offset}px`;
-                    // On some browsers, we need to adjust the top as well if the whole page scrolled
-                    window.scrollTo(0, 0);
+                    // Ensure the viewport is centered - avoids upward creep
+                    if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                        window.scrollTo(0, 0);
+                    }
                 }
             }
         };
 
         window.visualViewport?.addEventListener('resize', handleResize);
+        window.visualViewport?.addEventListener('scroll', handleResize);
         handleResize();
 
         return () => {
             document.body.style.overflow = originalBodyStyle;
             document.documentElement.style.overflow = originalHtmlStyle;
             window.visualViewport?.removeEventListener('resize', handleResize);
+            window.visualViewport?.removeEventListener('scroll', handleResize);
         };
     }, [loadConversations]);
 
@@ -298,7 +302,8 @@ const Messages = () => {
 
     // ── Scroll to bottom when messages change ───────────────────────────
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        // Use auto behavior initially or if already at bottom to avoid triggering layout shifts
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
     }, [messages]);
 
     // ── Select conversation ─────────────────────────────────────────────

@@ -4,6 +4,8 @@ const getBaseURL = () => {
     if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
 
     const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+
     // Localhost: use CRA proxy (proxy target defined in package.json)
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
         return '/api';
@@ -12,12 +14,12 @@ const getBaseURL = () => {
     // Check if hostname is an IP (local dev with mobile phone)
     const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
     if (isIP) {
-        return `http://${hostname}:8000/api`;
+        // Use the same port as the current window or default to 8000 if it feels like dev
+        const port = window.location.port || '8000';
+        return `${protocol}//${hostname}:${port}/api`;
     }
 
-    // Production build without REACT_APP_API_URL:
-    // Try /api assuming it might be behind a reverse proxy or same-domain hosting
-    console.warn('[api] REACT_APP_API_URL not set. Falling back to relative path /api');
+    // Production fallback
     return '/api';
 };
 
@@ -92,7 +94,13 @@ export const getUploadUrl = (filePath) => {
 
     // Fallback for local development
     const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
-    const backendBase = (isIP || hostname === 'localhost') ? `${protocol}//${hostname}:8000` : `${protocol}//${hostname}`;
+
+    // Check if we are likely on dev port 3000 but backend is on 8000
+    let port = window.location.port;
+    if (port === '3000') port = '8000'; // Common dev setup
+    if (!port && (isIP || hostname === 'localhost')) port = '8000';
+
+    const backendBase = port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
 
     return `${backendBase}${path.startsWith('/') ? '' : '/'}${path}`;
 };
@@ -190,6 +198,7 @@ export const getMyCompany = () => API.get('/companies/my-company');
 export const createCompany = (data) => API.post('/companies', data);
 export const updateCompany = (data) => API.put('/companies', data);
 export const deleteCompany = () => API.delete('/companies');
+export const toggleFollowCompany = (id) => API.post(`/companies/${id}/follow`);
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 export const getCategories = () => API.get('/categories');
