@@ -160,8 +160,8 @@ const CompanyDetail = () => {
                     flex: 1;
                     display: flex;
                     flex-direction: column;
-                    align-items: flex-end;
-                    text-align: right;
+                    align-items: flex-start;
+                    text-align: left;
                 }
 
                 .company-name-h1 {

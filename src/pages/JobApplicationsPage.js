@@ -206,17 +206,6 @@ const JobApplicationsPage = () => {
 
                 {/* ── Page Header ── */}
                 <div style={{ marginBottom: 28 }}>
-                    <button
-                        onClick={() => navigate('/my-jobs')}
-                        style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 6,
-                            background: 'none', border: 'none', cursor: 'pointer',
-                            color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600,
-                            marginBottom: 16, padding: 0,
-                        }}
-                    >
-                        <ArrowLeft size={15} /> Back to My Jobs
-                    </button>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'flex-start', flexDirection: isMobile ? 'column' : 'row', gap: 16 }}>
                         <div>
@@ -322,7 +311,7 @@ const JobApplicationsPage = () => {
                                                     }}>
                                                         {STATUS_CONFIG[app.status]?.label}
                                                     </span>
-                                                    {app.status === 'interview' && app.interviewDate && (
+                                                    {app.status === 'interview' && app.interviewDate && new Date(app.interviewDate) >= new Date() && (
                                                         <span style={{ fontSize: 11, color: '#a78bfa', display: 'flex', alignItems: 'center', gap: 3 }}>
                                                             <Calendar size={10} />
                                                             {new Date(app.interviewDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
@@ -383,7 +372,7 @@ const JobApplicationsPage = () => {
                                         }}>
                                             {STATUS_CONFIG[selectedApp.status]?.label}
                                         </span>
-                                        {selectedApp.status === 'interview' && selectedApp.interviewDate && (
+                                        {selectedApp.status === 'interview' && selectedApp.interviewDate && new Date(selectedApp.interviewDate) >= new Date() && (
                                             <span style={{
                                                 padding: '5px 12px', borderRadius: 99, fontSize: 11, fontWeight: 600,
                                                 background: 'var(--bg-primary-subtle)', color: 'var(--text-accent)',
@@ -615,7 +604,7 @@ const JobApplicationsPage = () => {
                                                     : <><Calendar size={13} /> {selectedApp.status === 'interview' && selectedApp.interviewDate ? 'Reschedule & Notify' : 'Schedule & Notify Candidate'}</>
                                                 }
                                             </button>
-                                            {selectedApp.status === 'interview' && selectedApp.interviewDate && (
+                                            {selectedApp.status === 'interview' && selectedApp.interviewDate && new Date(selectedApp.interviewDate) >= new Date() && (
                                                 <button
                                                     onClick={handleCancelInterview}
                                                     className="btn btn-primary btn-sm"

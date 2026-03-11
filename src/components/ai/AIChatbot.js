@@ -17,10 +17,12 @@ const getAIResponse = async (message, conversationHistory) => {
     try {
         const token = localStorage.getItem('token');
         const hostname = window.location.hostname;
+        const protocol = window.location.protocol;
+        const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
         const apiBase = process.env.REACT_APP_API_URL ||
-            ((hostname === 'localhost' || hostname === '127.0.0.1')
+            ((hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]')
                 ? '/api'
-                : `http://${hostname}:8000/api`);
+                : `${protocol}//${hostname}:8000/api`);
         const response = await fetch(`${apiBase}/ai/chat`, {
             method: 'POST',
             headers: {

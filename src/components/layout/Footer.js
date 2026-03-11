@@ -3,12 +3,39 @@ import { Link } from 'react-router-dom';
 import { Twitter, Linkedin, Github, Mail, MapPin, Phone, ArrowRight, Briefcase, Users, Building2, Zap, ChevronRight } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import LogoImage from '../common/Logo';
+import { getJobStats } from '../../services/api';
 
 const Footer = () => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const [email, setEmail] = useState('');
     const [subscribed, setSubscribed] = useState(false);
+    const [statsData, setStatsData] = useState({
+        jobs: '0',
+        seekers: '0',
+        companies: '0',
+        rate: '99%'
+    });
+
+    React.useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await getJobStats();
+                if (response.data.success) {
+                    const { totalJobs, totalCompanies, totalApplications, totalUsers } = response.data.stats;
+                    setStatsData({
+                        jobs: totalJobs > 0 ? `${totalJobs}` : '0',
+                        seekers: totalUsers > 0 ? `${totalUsers}` : '0',
+                        companies: totalCompanies > 0 ? `${totalCompanies}` : '0',
+                        rate: '99%' // Authentic estimation or based on feedback
+                    });
+                }
+            } catch (err) {
+                console.error('Error fetching footer stats:', err);
+            }
+        };
+        fetchStats();
+    }, []);
 
     const handleSubscribe = (e) => {
         e.preventDefault();
@@ -16,7 +43,7 @@ const Footer = () => {
     };
 
     const colHeadStyle = {
-        fontSize: 11,
+        fontSize: 15,
         fontWeight: 800,
         letterSpacing: '1.5px',
         textTransform: 'uppercase',
@@ -27,16 +54,16 @@ const Footer = () => {
     const linkStyle = {
         display: 'flex', alignItems: 'center', gap: 7,
         color: isDark ? '#94a3b8' : 'var(--text-secondary)',
-        fontSize: 14, textDecoration: 'none',
+        fontSize: 13, textDecoration: 'none',
         transition: 'all 0.2s ease',
         padding: '4px 0',
     };
 
     const stats = [
-        { icon: <Briefcase size={20} />, value: '50K+', label: 'Active Jobs' },
-        { icon: <Users size={20} />, value: '200K+', label: 'Job Seekers' },
-        { icon: <Building2 size={20} />, value: '10K+', label: 'Companies' },
-        { icon: <Zap size={20} />, value: '95%', label: 'Success Rate' },
+        { icon: <Briefcase size={20} />, value: statsData.jobs, label: 'Active Jobs' },
+        { icon: <Users size={20} />, value: statsData.seekers, label: 'Job Seekers' },
+        { icon: <Building2 size={20} />, value: statsData.companies, label: 'Companies' },
+        { icon: <Zap size={20} />, value: statsData.rate, label: 'Success Rate' },
     ];
 
     return (
@@ -71,9 +98,9 @@ const Footer = () => {
                 /* main grid */
                 .footer-main-grid {
                     display: grid;
-                    grid-template-columns: 2.2fr 1fr 1fr 1.4fr;
-                    gap: 52px;
-                    padding: 56px 0 48px;
+                    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+                    gap: 32px;
+                    padding: 56px 60px 48px 0;
                 }
 
                 /* newsletter input group */
@@ -187,6 +214,7 @@ const Footer = () => {
             <div className="container">
                 <div className="footer-main-grid">
                     {/* Brand column */}
+                    {/* Brand column */}
                     <div>
                         <div style={{ display: 'inline-flex', alignItems: 'center', marginBottom: 18, pointerEvents: 'none', cursor: 'default' }}>
                             <LogoImage height={32} withText={true} />
@@ -258,7 +286,7 @@ const Footer = () => {
                     </div>
 
                     {/* For Job Seekers */}
-                    <div>
+                    <div style={{ paddingLeft: '15px' }}>
                         <h4 style={colHeadStyle}>Job Seekers</h4>
                         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {[
@@ -280,7 +308,7 @@ const Footer = () => {
                     </div>
 
                     {/* For Employers */}
-                    <div>
+                    <div style={{ paddingLeft: '20px' }}>
                         <h4 style={colHeadStyle}>Employers</h4>
                         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {[
@@ -302,17 +330,17 @@ const Footer = () => {
                     </div>
 
                     {/* Contact */}
-                    <div>
+                    <div style={{ paddingLeft: '40px' }}>
                         <h4 style={colHeadStyle}>Get In Touch</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
                             {[
                                 { icon: <Mail size={16} />, text: 'hello@jobsarthi.in', href: 'mailto:hello@jobsarthi.in' },
-                                { icon: <Phone size={16} />, text: '+91 98765 43210', href: 'tel:+919876543210' },
-                                { icon: <MapPin size={16} />, text: 'Bengaluru, India', href: '#' },
+                                { icon: <Phone size={16} />, text: '+91 90655 53105', href: 'tel:+919065553105' },
+                                { icon: <MapPin size={16} />, text: 'Bilaspur, India', href: '#' },
                             ].map((item, i) => (
                                 <a key={i} href={item.href} style={{
                                     display: 'flex', alignItems: 'center', gap: 12,
-                                    color: isDark ? '#94a3b8' : 'var(--text-secondary)', fontSize: 14,
+                                    color: isDark ? '#94a3b8' : 'var(--text-secondary)', fontSize: 13,
                                     textDecoration: 'none', transition: 'color 0.2s',
                                 }}
                                     onMouseEnter={e => e.currentTarget.style.color = 'var(--primary-light)'}
@@ -347,25 +375,43 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="footer-bottom-bar" style={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
+                <div className="footer-bottom-bar" style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    gap: 3,
+                    padding: '12px 0'
+                }}>
                     <p style={{ fontSize: 13, color: isDark ? '#475569' : 'var(--text-muted)', margin: 0 }}>
                         All rights reserved. Made with ❤️ in India.
                     </p>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
                         {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item, i, arr) => (
                             <React.Fragment key={item}>
-                                <button type="button" style={{ color: isDark ? '#475569' : 'var(--text-muted)', fontSize: 10, textDecoration: 'none', transition: 'color 0.2s', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                <button type="button" style={{
+                                    color: isDark ? '#475569' : 'var(--text-muted)',
+                                    fontSize: 10,
+                                    textDecoration: 'none',
+                                    transition: 'color 0.2s',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: 0
+                                }}
                                     onMouseEnter={e => e.currentTarget.style.color = 'var(--primary-light)'}
                                     onMouseLeave={e => e.currentTarget.style.color = isDark ? '#475569' : 'var(--text-muted)'}
                                 >
                                     {item}
                                 </button>
                                 {i < arr.length - 1 && (
-                                    <span style={{ color: isDark ? '#2d3748' : 'var(--border)', userSelect: 'none' }}>·</span>
+                                    <span style={{ color: isDark ? '#2d3748' : 'var(--border)', userSelect: 'none', fontSize: 10 }}>·</span>
                                 )}
                             </React.Fragment>
                         ))}
                     </div>
+
                     <p style={{ fontSize: 10, color: isDark ? '#475569' : 'var(--text-muted)', margin: 0 }}>
                         © {new Date().getFullYear()} <span style={{ fontWeight: 700, color: isDark ? '#64748b' : 'var(--text-secondary)' }}>Job Sarthi</span>
                     </p>

@@ -267,6 +267,7 @@
     color: var(--text-secondary);
     text-decoration: none;
     transition: var(--transition);
+    position: relative;
     cursor: pointer;
     flex-shrink: 0;
 }

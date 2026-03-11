@@ -113,7 +113,30 @@ const Navbar = () => {
                 setUnreadNotifs(prev => Math.max(0, prev - 1));
             } catch { /* silent */ }
         }
-        if (notif.link) navigate(notif.link);
+
+        // Determine destination link
+        let target = notif.link;
+        const lowTitle = (notif.title || '').toLowerCase();
+        const lowMsg = (notif.message || '').toLowerCase();
+        const isSocial = lowTitle.includes('post') || lowMsg.includes('shared a post') || lowMsg.includes('new post');
+
+        // Force social links to dashboard since single post routes are not defined
+        if (target && (target.startsWith('/posts/') || target.startsWith('/social/'))) {
+            target = '/dashboard#feed';
+        }
+
+        if (target) {
+            navigate(target);
+        } else if (isSocial) {
+            navigate('/dashboard#feed');
+        } else if (lowTitle.includes('connection') || lowTitle.includes('friend') || lowMsg.includes('connection request')) {
+            navigate('/network');
+        } else if (lowTitle.includes('message') || lowMsg.includes('sent you a message')) {
+            navigate('/messages');
+        } else if (lowTitle.includes('job') || lowMsg.includes('new job')) {
+            navigate('/jobs');
+        }
+
         setNotifOpen(false);
     };
 
@@ -789,8 +812,8 @@ const Navbar = () => {
                                 <span className="mobile-section-label">For Employers</span>
                                 <div className="mobile-grid-2">
                                     <Link to="/dashboard" className="mobile-grid-link" onClick={() => setMobileOpen(false)}>
-                                        <Users size={18} />
-                                        <span>Account</span>
+                                        <LayoutDashboard size={18} />
+                                        <span>Dashboard</span>
                                     </Link>
                                     <Link to="/my-jobs" className="mobile-grid-link" onClick={() => setMobileOpen(false)}>
                                         <Briefcase size={18} />

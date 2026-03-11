@@ -1,4 +1,18 @@
 /* ── Social Feed styles ────────────────────────────────────────────────────── */
+.social-feed-container {
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+    .social-feed-container {
+        margin-top: 24px !important;
+        margin-bottom: 24px !important;
+        padding: 8px 0;
+    }
+}
+
 .social-feed {
     display: flex;
     flex-direction: column;
@@ -18,6 +32,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: 14px 16px 28px;
+    margin-bottom: 24px;
 }
 
 .create-post-card {
@@ -216,6 +231,7 @@
 
     .post-card {
         padding: 12px 12px 28px;
+        margin-bottom: 16px;
     }
 
     .create-post-actions {

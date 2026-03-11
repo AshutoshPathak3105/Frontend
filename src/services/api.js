@@ -24,48 +24,42 @@ const getBaseURL = () => {
     return '/api';
 };
 
-// Converts a stored upload path like "/uploads/resumes/file.pdf"
-// into the correct absolute URL served by the Express backend.
-// CRA's proxy only forwards XHR requests, NOT direct browser navigation,
-// so we must always point href/src at the real backend port.
+// Converts a stored upload path (relative or absolute, possibly with localhost)
+// into the correct absolute URL accessible from ANY device (desktop, mobile, LAN).
 export const getUploadUrl = (filePath) => {
     if (!filePath) return '';
 
-    let path = filePath;
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
-    const isProduction = !/localhost|127\.0\.0\.1|\[::1\]/.test(hostname) && !/^(?:192\.168\.|172\.16\.|10\.|169\.254\.)/.test(hostname);
 
-    // Get live backend URL from env
-    const backendBaseFromEnv = process.env.REACT_APP_API_URL
-        ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '')
-        : null;
-
-    // Hot-fix for database records containing "localhost" urls (common in local dev)
-    // when viewing from a different device (mobile IP) or production (Render)
-    if (path.startsWith('http://localhost') || path.startsWith('http://127.0.0.1')) {
-        if (isProduction && backendBaseFromEnv) {
-            // We are on Render/Vercel: replace localhost with the real backend site
-            path = path.replace(/^http:\/\/(localhost|127\.0\.0\.1)(:[\d]+)?/, backendBaseFromEnv);
-        } else if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-            // We are on Mobile IP: swap localhost with PC's IP (assume backend on port 8000)
-            const pcHost = hostname; // The current hostname is the IP of the PC serving the app
-            path = path.replace(/localhost:[\d]+/, `${pcHost}:8000`);
-            path = path.replace(/(localhost|127\.0\.0\.1)/, pcHost);
+    // ── Determine the backend base URL for this client ────────────────────────
+    // Priority: env var > LAN IP direct > localhost proxy
+    const backendBase = (() => {
+        // 1. Explicit env override (production / staging)
+        if (process.env.REACT_APP_API_URL) {
+            return process.env.REACT_APP_API_URL.replace(/\/api\/?$/, '');
         }
-    }
+        // 2. Client is accessing via LAN IP (mobile, other PC on same network)
+        const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
+        if (isIP) {
+            return `${protocol}//${hostname}:8000`;
+        }
+        // 3. localhost → backend is on port 8000 same machine
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
+            return `${protocol}//localhost:8000`;
+        }
+        // 4. Production domain without REACT_APP_API_URL (same-domain deployment)
+        return `${protocol}//${hostname}`;
+    })();
 
-    // If it's already an absolute URL (Cloudinary, AWS S3, or fixed above)
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    let path = filePath;
 
-    // Handle Data URLs (base64)
-    if (path.startsWith('data:image/')) return path;
+    // ── Handle data URIs straight away ───────────────────────────────────────
+    if (path.startsWith('data:')) return path;
 
-    // Detect raw base64 strings and prefix them
-    // PNG starts with iVBOR, JPG with /9j/, SVG with PHN2Zy
-    const isBase64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(path);
-    if (isBase64 && path.length > 50) {
-        // Try to guess type or default to png
+    // ── Detect raw base64 (PNG, JPEG, SVG, GIF) ──────────────────────────────
+    const isBase64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}={0,2})$/.test(path);
+    if (isBase64 && path.length > 60) {
         let type = 'png';
         if (path.startsWith('/9j/')) type = 'jpeg';
         else if (path.startsWith('PHN')) type = 'svg+xml';
@@ -73,37 +67,27 @@ export const getUploadUrl = (filePath) => {
         return `data:image/${type};base64,${path}`;
     }
 
-    // Handle URLs starting with www. (assume https)
+    // ── Rewrite any localhost/127.0.0.1 embedded in stored absolute URLs ─────
+    // This handles media stored during local dev: "http://localhost:8000/uploads/..."
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(path)) {
+        path = path.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, backendBase);
+    }
+
+    // ── Already absolute (Cloudinary, S3, Giphy, fixed above) ────────────────
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+
+    // ── www. shorthand ────────────────────────────────────────────────────────
     if (path.startsWith('www.')) return `https://${path}`;
 
-    // Handle other potentially absolute URLs (contains a TLD-like structure and not an internal path)
-    if (!path.startsWith('/') && !path.startsWith('uploads/') && path.includes('.') &&
-        (path.includes('.com/') || path.includes('.org/') || path.includes('.net/') || path.includes('.io/') || path.includes('.co/'))) {
+    // ── External-looking paths (has a known TLD) ──────────────────────────────
+    if (!path.startsWith('/') && !path.startsWith('uploads/') &&
+        /\.(com|org|net|io|co)(\/|$)/.test(path)) {
         return `https://${path}`;
     }
 
-    // Prepend backend base to relative paths (e.g. /uploads/...)
-    if (backendBaseFromEnv) {
-        return `${backendBaseFromEnv}${path.startsWith('/') ? '' : '/'}${path}`;
-    }
-
-    // Fallback for production if REACT_APP_API_URL is missing
-    if (isProduction) {
-        console.warn('[getUploadUrl] WARNING: REACT_APP_API_URL is not set in production. Images might not load if the backend is on a separate domain.');
-        // If we are on Render, assuming the backend might be on the same domain or proxied
-        return `${protocol}//${hostname}${path.startsWith('/') ? '' : '/'}${path}`;
-    }
-
-    // Fallback for local development
-    const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
-
-    // Check if we are likely on dev port 3000 but backend is on 8000
-    let port = window.location.port;
-    if (port === '3000' || isIP || hostname === 'localhost') port = '8000';
-
-    const backendBase = port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
-
-    return `${backendBase}${path.startsWith('/') ? '' : '/'}${path}`;
+    // ── Relative paths: /uploads/... or uploads/... ───────────────────────────
+    const normalised = path.startsWith('/') ? path : `/${path}`;
+    return `${backendBase}${normalised}`;
 };
 
 const API = axios.create({

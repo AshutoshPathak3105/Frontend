@@ -153,6 +153,13 @@ const JobDetail = () => {
                     .content-box { padding: 24px; }
                     .desktop-flex { flex-direction: column; align-items: flex-start !important; gap: 20px; }
                 }
+
+                @media (min-width: 1025px) {
+                    .desktop-hide { display: none !important; }
+                }
+                @media (max-width: 1024px) {
+                    .mobile-hide { display: none !important; }
+                }
             `}</style>
 
             {/* Apply Modal */}
@@ -190,7 +197,6 @@ const JobDetail = () => {
 
             <div className="job-hero">
                 <div className="container">
-                    <Link to="/jobs" className="back-btn"><ChevronLeft size={18} /> Back to Jobs</Link>
 
                     <div className="desktop-flex" style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
                         <div style={{
@@ -261,6 +267,16 @@ const JobDetail = () => {
                                 ))}
                             </div>
                         </div>
+
+                        {/* About Company - Laptop version (appears on left under Skills) */}
+                        <div className="sidebar-widget mobile-hide" style={{ textAlign: 'center', marginTop: -8 }}>
+                            <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: 'var(--primary)' }}>
+                                <Globe size={32} />
+                            </div>
+                            <h4 style={{ fontWeight: 700, marginBottom: 8 }}>About the Company</h4>
+                            <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Learn more about their mission and values.</p>
+                            <Link to={`/companies/${job.company?._id}`} className="btn btn-outline btn-full">View Profile</Link>
+                        </div>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -306,7 +322,8 @@ const JobDetail = () => {
                             </div>
                         </div>
 
-                        <div className="sidebar-widget" style={{ textAlign: 'center' }}>
+                        {/* About Company - Mobile/Tablet version (stays in sidebar) */}
+                        <div className="sidebar-widget desktop-hide" style={{ textAlign: 'center' }}>
                             <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: 'var(--primary)' }}>
                                 <Globe size={32} />
                             </div>

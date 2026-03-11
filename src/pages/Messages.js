@@ -186,33 +186,42 @@ const Messages = () => {
     useEffect(() => {
         loadConversations();
 
-        // ── Mobile Keyboard Fix ───────────────────────────────────────────
-        // Prevent body scroll to stop browser from pushing the header up
-        const originalBodyStyle = document.body.style.overflow;
-        const originalHtmlStyle = document.documentElement.style.overflow;
+        // ── Mobile: lock body scroll so browser doesn't push header up ────────
+        const originalBodyOverflow = document.body.style.overflow;
+        const originalHtmlOverflow = document.documentElement.style.overflow;
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
 
-        // Manual height adjustment for mobile viewports (handles keyboard)
-        const handleResize = () => {
-            if (window.visualViewport && window.innerWidth <= 640) {
-                const height = window.visualViewport.height;
-                const offset = 66; // Match navbar height
-                const page = document.querySelector('.messages-page');
-                if (page) {
-                    page.style.height = `${height - offset}px`;
+        // ── Mobile keyboard handling via CSS custom property ──────────────────
+        // When the virtual keyboard opens, visualViewport shrinks.
+        // We set a CSS var so the chat can adjust its height WITHOUT causing
+        // the messages to auto-scroll (which caused the "jump" bug).
+        const applyViewportHeight = () => {
+            const page = document.querySelector('.messages-page');
+            if (!page) return;
+            if (window.visualViewport) {
+                const vh = window.visualViewport.height;
+                page.style.setProperty('--messages-page-height', `${vh}px`);
+                // Scroll the input into view only if user was at bottom
+                if (isAtBottomRef.current && activeConv) {
+                    requestAnimationFrame(() => {
+                        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+                    });
                 }
             }
         };
 
-        window.visualViewport?.addEventListener('resize', handleResize);
-        handleResize();
+        applyViewportHeight();
+        window.visualViewport?.addEventListener('resize', applyViewportHeight);
+        window.visualViewport?.addEventListener('scroll', applyViewportHeight);
 
         return () => {
-            document.body.style.overflow = originalBodyStyle;
-            document.documentElement.style.overflow = originalHtmlStyle;
-            window.visualViewport?.removeEventListener('resize', handleResize);
+            document.body.style.overflow = originalBodyOverflow;
+            document.documentElement.style.overflow = originalHtmlOverflow;
+            window.visualViewport?.removeEventListener('resize', applyViewportHeight);
+            window.visualViewport?.removeEventListener('scroll', applyViewportHeight);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadConversations]);
 
     // Auto-open conversation from navigation state (e.g., from PublicProfile → Message button)
@@ -721,28 +730,32 @@ const Messages = () => {
                                     </button>
                                     {showOptions && (
                                         <div className="chat-options-menu">
-                                            {selectedMsg && !selectedMsg.isDeletedForEveryone && (
+                                            {selectedMsg && (
                                                 <>
-                                                    {selectedMsg.content && (
-                                                        <button className="chat-option-item" onClick={() => handleCopyMsg(selectedMsg.content)}>
-                                                            <Copy size={15} /> Copy
-                                                        </button>
+                                                    {!selectedMsg.isDeletedForEveryone && (
+                                                        <>
+                                                            {selectedMsg.content && (
+                                                                <button className="chat-option-item" onClick={() => handleCopyMsg(selectedMsg.content)}>
+                                                                    <Copy size={15} /> Copy
+                                                                </button>
+                                                            )}
+                                                            {selectedMsg.isMine && (selectedMsg.messageType === 'text' || !selectedMsg.messageType) && (
+                                                                <button className="chat-option-item" onClick={() => handleStartEdit(selectedMsg)}>
+                                                                    <Pencil size={15} /> Edit
+                                                                </button>
+                                                            )}
+                                                            <button className="chat-option-item" onClick={() => handlePinMessage(selectedMsg)}>
+                                                                <Pin size={15} /> {pinnedMsg?._id === selectedMsg._id ? 'Unpin' : 'Pin'}
+                                                            </button>
+                                                        </>
                                                     )}
-                                                    {selectedMsg.isMine && (selectedMsg.messageType === 'text' || !selectedMsg.messageType) && (
-                                                        <button className="chat-option-item" onClick={() => handleStartEdit(selectedMsg)}>
-                                                            <Pencil size={15} /> Edit
-                                                        </button>
-                                                    )}
-                                                    <button className="chat-option-item" onClick={() => handlePinMessage(selectedMsg)}>
-                                                        <Pin size={15} /> {pinnedMsg?._id === selectedMsg._id ? 'Unpin' : 'Pin'}
-                                                    </button>
                                                     <button className="chat-option-item danger" onClick={() => setDeleteSubOpen(v => !v)}>
                                                         <Trash2 size={15} /> Delete <span className="ctx-sub-arrow">{deleteSubOpen ? '▲' : '▼'}</span>
                                                     </button>
                                                     {deleteSubOpen && (
                                                         <div className="msg-ctx-delete-sub">
                                                             <button className="chat-option-item" onClick={() => { handleDeleteMsg(selectedMsg._id, 'me'); setShowOptions(false); }}>Delete for me</button>
-                                                            {selectedMsg.isMine && (
+                                                            {selectedMsg.isMine && !selectedMsg.isDeletedForEveryone && (
                                                                 <button className="chat-option-item danger" onClick={() => { handleDeleteMsg(selectedMsg._id, 'everyone'); setShowOptions(false); }}>Delete for everyone</button>
                                                             )}
                                                         </div>

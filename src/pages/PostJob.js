@@ -26,6 +26,13 @@ const PostJob = () => {
     const [loading, setLoading] = useState(false);
     const [skillInput, setSkillInput] = useState('');
     const [requirementInput, setRequirementInput] = useState('');
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
+
+    React.useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 640);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const [form, setForm] = useState({
         title: '',
@@ -252,7 +259,7 @@ const PostJob = () => {
                         </div>
 
                         {/* Submit */}
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                        <div style={{ display: 'flex', gap: 12, justifyContent: isMobile ? 'center' : 'flex-end', width: '100%', marginBottom: 24, marginTop: 24 }}>
                             <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '12px 36px' }}>
                                 {loading ? <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Posting...</> : <><Send size={16} /> Post Job</>}
                             </button>

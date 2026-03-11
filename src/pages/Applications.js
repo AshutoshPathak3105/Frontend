@@ -222,7 +222,7 @@ const Applications = () => {
                             <span style={{ padding: '6px 16px', borderRadius: 'var(--radius-full)', fontSize: 13, fontWeight: 600, background: STATUS_CONFIG[selectedApp.status]?.bg, color: STATUS_CONFIG[selectedApp.status]?.color, border: `1px solid ${STATUS_CONFIG[selectedApp.status]?.border}` }}>
                                 {STATUS_CONFIG[selectedApp.status]?.label}
                             </span>
-                            {selectedApp.status === 'interview' && selectedApp.interviewDate && (
+                            {selectedApp.status === 'interview' && selectedApp.interviewDate && new Date(selectedApp.interviewDate) >= new Date() && (
                                 <span style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: 12, fontWeight: 600, background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)', display: 'flex', alignItems: 'center', gap: 6 }}>
                                     <Calendar size={12} />
                                     {new Date(selectedApp.interviewDate).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
@@ -232,7 +232,7 @@ const Applications = () => {
                         </div>
 
                         {/* Job seeker: interview reminder box */}
-                        {!isEmployer && selectedApp.status === 'interview' && selectedApp.interviewDate && (
+                        {!isEmployer && selectedApp.status === 'interview' && selectedApp.interviewDate && new Date(selectedApp.interviewDate) >= new Date() && (
                             <div style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 12, padding: '16px 20px', marginBottom: 20 }}>
                                 <h4 style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                                     🎯 Interview Scheduled
@@ -400,7 +400,7 @@ const Applications = () => {
                                 <div style={{ background: 'var(--bg-primary-subtle)', border: '1px solid var(--border-primary-subtle)', borderRadius: 12, padding: '20px 20px 16px' }}>
                                     <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: 'var(--text-accent)', display: 'flex', alignItems: 'center', gap: 8 }}>
                                         <Calendar size={15} /> Schedule Interview
-                                        {selectedApp.interviewDate && (
+                                        {selectedApp.interviewDate && new Date(selectedApp.interviewDate) >= new Date() && (
                                             <span style={{ marginLeft: 8, fontSize: 11, background: 'var(--bg-primary-subtle)', color: 'var(--text-accent)', padding: '2px 8px', borderRadius: 20, fontWeight: 500 }}>
                                                 Currently: {new Date(selectedApp.interviewDate).toLocaleDateString('en-IN')}
                                             </span>
@@ -460,7 +460,7 @@ const Applications = () => {
                                                 : <><Calendar size={14} /> Schedule Interview & Notify Applicant</>
                                         }
                                     </button>
-                                    {selectedApp.status === 'interview' && selectedApp.interviewDate && (
+                                    {selectedApp.status === 'interview' && selectedApp.interviewDate && new Date(selectedApp.interviewDate) >= new Date() && (
                                         <button
                                             onClick={handleCancelInterview}
                                             className="btn btn-primary btn-sm"
@@ -576,7 +576,7 @@ const Applications = () => {
                                                 <Clock size={11} />
                                                 {new Date(app.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </span>
-                                            {app.status === 'interview' && app.interviewDate && (
+                                            {app.status === 'interview' && app.interviewDate && new Date(app.interviewDate) >= new Date() && (
                                                 <span style={{
                                                     display: 'inline-flex', alignItems: 'center', gap: 4,
                                                     fontSize: 12, fontWeight: 600,

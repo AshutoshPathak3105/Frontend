@@ -21,7 +21,14 @@ const CompanyProfile = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [logoInputMode, setLogoInputMode] = useState('url'); // 'url' | 'file'
     const [logoError, setLogoError] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 640);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const [form, setForm] = useState({
         name: '', description: '', industry: '', size: '', location: '',
@@ -411,7 +418,7 @@ const CompanyProfile = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-end', width: '100%', marginBottom: 24, marginTop: 24 }}>
                             <button type="submit" disabled={saving} className="btn btn-primary" style={{ padding: '12px 36px' }}>
                                 {saving ? <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Saving...</> : <><Save size={16} /> {isNew ? 'Create Profile' : 'Save Changes'}</>}
                             </button>
@@ -421,7 +428,7 @@ const CompanyProfile = () => {
 
                 {/* Danger Zone */}
                 {!isNew && (
-                    <div style={{ marginTop: 40, borderTop: '1px solid var(--border)', paddingTop: 40 }}>
+                    <div style={{ marginTop: 24, borderTop: '1px solid var(--border)', paddingTop: 40, marginBottom: 24 }}>
                         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary-subtle)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)' }}>
                             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--text-accent)' }}>Danger Zone</h2>
                             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>

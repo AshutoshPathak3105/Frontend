@@ -65,9 +65,8 @@ const AppContent = () => {
   // Full-screen pages where footer & chatbot should be hidden
   const noFooterPaths = ['/messages'];
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
-  // Profile menu pages where chatbot should be hidden
-  const noChatbotPaths = ['/profile', '/applications', '/saved-jobs', '/network', '/my-jobs', '/company-profile', '/admin', '/messages', '/people', '/users/profile', '/jobs'];
-  const shouldHideChatbot = noChatbotPaths.some(path => location.pathname.startsWith(path));
+  // Show chatbot only on the dashboard
+  const isDashboard = location.pathname === '/dashboard';
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -88,6 +87,7 @@ const AppContent = () => {
           <Route path="/success-stories" element={<SuccessStories />} />
           <Route path="/users/profile/:id" element={<PublicProfile />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/posts/:id" element={<Navigate to="/dashboard#feed" replace />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/saved-jobs" element={<ProtectedRoute roles={['jobseeker']}><SavedJobs /></ProtectedRoute>} />
           <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
@@ -104,7 +104,7 @@ const AppContent = () => {
         </Routes>
       </main>
       {!shouldHideLayout && !shouldHideFooter && <Footer />}
-      {!shouldHideLayout && !shouldHideChatbot && <AIChatbot />}
+      {!shouldHideLayout && isDashboard && <AIChatbot />}
       <Toaster
         position="top-right"
         toastOptions={{

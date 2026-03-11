@@ -100,13 +100,18 @@
 .network-tabs {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0px;
     margin-bottom: 28px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 6px;
-    width: fit-content;
+    border-bottom: 2px solid var(--border);
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.network-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .tab-btn {
@@ -116,63 +121,41 @@
     font-size: 14px;
     font-weight: 600;
     color: var(--text-secondary);
-    padding: 10px 20px;
+    padding: 12px 20px;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     gap: 8px;
     transition: all 0.2s ease;
     white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
 }
 
 .tab-btn:hover {
-    color: var(--primary);
-    background: rgba(var(--primary-rgb), 0.06);
-}
-
-.tab-btn.active {
-    background: var(--gradient-button);
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3);
-}
-
-.tab-btn.active::after {
-    display: none;
-}
-
-.network-tabs::-webkit-scrollbar {
-    height: 3px;
-}
-
-.network-tabs::-webkit-scrollbar-track {
+    color: var(--text-primary);
     background: transparent;
 }
 
-.network-tabs::-webkit-scrollbar-thumb {
-    background: #10b981;
-    border-radius: 10px;
+.tab-btn.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+    background: transparent;
+    box-shadow: none;
 }
 
-[data-theme="dark"] .network-tabs::-webkit-scrollbar-thumb {
-    background: #2563eb;
-}
-
+/* Scrollbar hidden */
 .network-tabs {
-    scrollbar-width: thin;
-    scrollbar-color: #10b981 transparent;
-}
-
-[data-theme="dark"] .network-tabs {
-    scrollbar-color: #2563eb transparent;
+    scrollbar-width: none;
 }
 
 .tab-badge {
-    background: rgba(255, 255, 255, 0.25);
-    color: #fff;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
     font-size: 10px;
     padding: 1px 6px;
-    border-radius: 20px;
+    border-radius: 6px;
     min-width: 14px;
     height: 14px;
     display: flex;
@@ -181,13 +164,12 @@
     font-weight: 800;
 }
 
-.tab-btn:not(.active) .tab-badge {
-    background: #10b981;
+.tab-btn.active .tab-badge {
+    background: #6366f1;
     color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.tab-badge.secondary {}
+/* .tab-badge.secondary removed as it was empty */
 
 /* ── Content ────────────────────────────── */
 .network-content {
@@ -720,6 +702,13 @@
 /* Content Area */
 .network-content {
     min-height: 400px;
+}
+
+@media (max-width: 768px) {
+    .network-content {
+        margin-top: 20px;
+        padding-bottom: 40px;
+    }
 }
 
 /* Requests Grid */

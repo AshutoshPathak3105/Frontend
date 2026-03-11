@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getDashboardStats, getEmployerDashboardStats, getMyApplications, getMyJobs, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 import SocialFeed from '../components/social/SocialFeed';
 import './Dashboard.css';
 
@@ -23,7 +24,10 @@ const STATUS_CONFIG = {
 
 const getGreeting = () => {
     const h = new Date().getHours();
-    return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+    if (h >= 5 && h < 12) return 'Good Morning';
+    if (h >= 12 && h < 18) return 'Good Afternoon';
+    if (h >= 18 && h < 23) return 'Good Evening';
+    return 'Good Night';
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -31,9 +35,17 @@ const getGreeting = () => {
 // ─────────────────────────────────────────────────────────────────────────────
 const JobSeekerDashboard = () => {
     const { user } = useAuth();
+    const location = useLocation();
     const [stats, setStats] = useState(null);
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (location.hash === '#feed') {
+            const el = document.getElementById('feed');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [location.hash, loading]);
 
     useEffect(() => {
         (async () => {
@@ -293,7 +305,7 @@ const JobSeekerDashboard = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 48 }}><SocialFeed /></div>
+                <div id="feed"><SocialFeed /></div>
             </div>
         </div>
     );
@@ -304,9 +316,17 @@ const JobSeekerDashboard = () => {
 // ─────────────────────────────────────────────────────────────────────────────
 const EmployerDashboard = () => {
     const { user } = useAuth();
+    const location = useLocation();
     const [stats, setStats] = useState(null);
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (location.hash === '#feed') {
+            const el = document.getElementById('feed');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [location.hash, loading]);
 
     useEffect(() => {
         (async () => {
@@ -509,7 +529,7 @@ const EmployerDashboard = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 48 }}><SocialFeed /></div>
+                <div id="feed"><SocialFeed /></div>
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 
-const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
 
 const generateCode = (len = 6) => {
     let code = '';
@@ -22,7 +22,7 @@ const drawCaptcha = (canvas, code) => {
     for (let i = 0; i < 40; i++) {
         ctx.beginPath();
         ctx.arc(Math.random() * W, Math.random() * H, Math.random() * 1.5, 0, 2 * Math.PI);
-        ctx.fillStyle = `rgba(${Math.floor(Math.random()*180+60)},${Math.floor(Math.random()*180+60)},${Math.floor(Math.random()*255)},0.5)`;
+        ctx.fillStyle = `rgba(${Math.floor(Math.random() * 180 + 60)},${Math.floor(Math.random() * 180 + 60)},${Math.floor(Math.random() * 255)},0.5)`;
         ctx.fill();
     }
 
@@ -30,7 +30,7 @@ const drawCaptcha = (canvas, code) => {
         ctx.beginPath();
         ctx.moveTo(Math.random() * W, Math.random() * H);
         ctx.lineTo(Math.random() * W, Math.random() * H);
-        ctx.strokeStyle = `rgba(${Math.floor(Math.random()*150+80)},${Math.floor(Math.random()*150+80)},${Math.floor(Math.random()*255)},0.35)`;
+        ctx.strokeStyle = `rgba(${Math.floor(Math.random() * 150 + 80)},${Math.floor(Math.random() * 150 + 80)},${Math.floor(Math.random() * 255)},0.35)`;
         ctx.lineWidth = 1;
         ctx.stroke();
     }
@@ -66,7 +66,7 @@ const MathCaptcha = ({ onVerify }) => {
 
     useEffect(() => {
         if (input.length === 0) { onVerify(false); return; }
-        const ok = input.toUpperCase() === code.toUpperCase();
+        const ok = input === code;
         setVerified(ok);
         onVerify(ok);
     }, [input, code, onVerify]);

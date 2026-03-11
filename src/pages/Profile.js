@@ -593,7 +593,7 @@ const Profile = () => {
                                 </div>
                             </div>
 
-                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end' }}>
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: isMobile ? 'center' : 'flex-end', width: '100%', marginBottom: 24, marginTop: 24 }}>
                                 <button onClick={handleProfileSave} disabled={saving} className="btn btn-primary" style={{ padding: '12px 32px' }}>
                                     {saving ? <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Saving...</> : <><Save size={16} /> Save Changes</>}
                                 </button>
@@ -1058,7 +1058,7 @@ const Profile = () => {
                 )}
 
                 {/* Education + Skills — stacked */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16, marginBottom: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24, marginBottom: 24 }}>
                     {/* Education timeline */}
                     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', overflow: 'hidden' }}>
                         <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1165,7 +1165,7 @@ const Profile = () => {
                         </div>
 
                         {/* Danger Zone */}
-                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary-subtle)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)' }}>
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary-subtle)', borderRadius: 'var(--radius-xl)', padding: 'clamp(14px, 4vw, 32px)', marginBottom: 24, marginTop: 24 }}>
                             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--text-accent)' }}>Danger Zone</h2>
                             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Once you delete your account, all your data will be permanently removed. This action cannot be undone.</p>
                             <button type="button" className="btn btn-primary" onClick={() => setShowDeleteModal(true)}

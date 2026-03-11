@@ -26,18 +26,18 @@ const formatSalary = (salary) => {
 
 // ─── Experience level badge ───────────────────────────────────────────────────
 const LEVEL_COLORS = {
-    entry:     { bg: 'rgba(99,102,241,0.1)',  color: '#818cf8', label: 'Entry Level' },
-    mid:       { bg: 'rgba(59,130,246,0.1)',  color: '#60a5fa', label: 'Mid Level'   },
-    senior:    { bg: 'rgba(16,185,129,0.1)',  color: '#34d399', label: 'Senior'      },
-    lead:      { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', label: 'Lead'        },
-    executive: { bg: 'rgba(239,68,68,0.1)',   color: '#f87171', label: 'Executive'   },
+    entry: { bg: 'rgba(99,102,241,0.1)', color: '#818cf8', label: 'Entry Level' },
+    mid: { bg: 'rgba(59,130,246,0.1)', color: '#60a5fa', label: 'Mid Level' },
+    senior: { bg: 'rgba(16,185,129,0.1)', color: '#34d399', label: 'Senior' },
+    lead: { bg: 'rgba(245,158,11,0.1)', color: '#fbbf24', label: 'Lead' },
+    executive: { bg: 'rgba(239,68,68,0.1)', color: '#f87171', label: 'Executive' },
 };
 
 const ResumeAI = () => {
-    const [profile, setProfile]   = useState(null);
-    const [loading, setLoading]   = useState(false);
-    const [results, setResults]   = useState(null);
-    const [error, setError]       = useState(null);
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [results, setResults] = useState(null);
+    const [error, setError] = useState(null);
     const [profileLoading, setProfileLoading] = useState(true);
 
     // Fetch the user's stored profile to check if resume exists
@@ -91,10 +91,80 @@ const ResumeAI = () => {
                 .rai-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); border-radius: 99px; font-size: 12px; font-weight: 600; color: var(--primary-light); margin-bottom: 18px; }
                 .rai-hero h1 { font-size: clamp(26px,5vw,40px); font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, var(--text-primary), #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
                 .rai-hero p  { font-size: 16px; color: var(--text-secondary); max-width: 560px; margin: 0 auto; line-height: 1.7; }
-                .rai-steps  { display: flex; justify-content: center; gap: 0; flex-wrap: wrap; margin-top: 32px; }
-                .rai-step   { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); padding: 0 16px; }
-                .rai-step-dot { width: 24px; height: 24px; border-radius: 50%; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--primary-light); flex-shrink: 0; }
-                .rai-step-arrow { font-size: 14px; color: var(--border); margin: 0 4px; }
+                .rai-steps { 
+                    display: grid; 
+                    grid-template-columns: repeat(6, 1fr); 
+                    gap: 12px; 
+                    margin-top: 40px; 
+                    padding: 0 20px;
+                    max-width: 1000px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                .rai-step { 
+                    display: flex; 
+                    flex-direction: column;
+                    align-items: center; 
+                    gap: 10px; 
+                    text-align: center;
+                    position: relative;
+                }
+                .rai-step-dot { 
+                    width: 36px; height: 36px; 
+                    border-radius: 12px; 
+                    background: white; 
+                    border: 1px solid var(--border); 
+                    display: flex; align-items: center; justify-content: center; 
+                    font-size: 14px; font-weight: 700; color: var(--primary-light); 
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+                    z-index: 2;
+                    transition: all 0.3s ease;
+                }
+                .rai-step:hover .rai-step-dot {
+                    border-color: var(--primary-light);
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 16px rgba(99,102,241,0.12);
+                }
+                .rai-step span {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                    line-height: 1.3;
+                }
+                .rai-step-connector {
+                    position: absolute;
+                    top: 18px;
+                    left: 50%;
+                    width: 100%;
+                    height: 2px;
+                    background: linear-gradient(90deg, var(--border) 0%, rgba(226, 232, 240, 0.4) 100%);
+                    z-index: 1;
+                }
+                @media(max-width:900px) {
+                    .rai-steps { grid-template-columns: repeat(3, 1fr); gap: 24px 12px; }
+                    .rai-step-connector { display: none; }
+                }
+                @media(max-width:500px) {
+                    .rai-steps { 
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 16px;
+                        max-width: 280px;
+                        margin-top: 32px;
+                    }
+                    .rai-step { 
+                        flex-direction: row; 
+                        text-align: left;
+                        width: 100%;
+                        background: var(--bg-card);
+                        padding: 10px 14px;
+                        border-radius: 12px;
+                        border: 1px solid var(--border);
+                    }
+                    .rai-step-dot { width: 30px; height: 30px; border-radius: 8px; font-size: 13px; flex-shrink: 0; }
+                    .rai-step span { font-size: 13px; }
+                }
                 .rai-card   { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: clamp(16px,4vw,32px); }
                 .rai-skill-chip { padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; background: rgba(99,102,241,0.1); color: var(--primary-light); border: 1px solid rgba(99,102,241,0.2); white-space: nowrap; }
                 .rai-job-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; transition: var(--transition); cursor: default; }
@@ -103,7 +173,6 @@ const ResumeAI = () => {
                 .rai-score-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
                 .rai-verify-ok  { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
                 .rai-verify-err { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 14px; padding: 16px 20px; }
-                @media(max-width:600px){ .rai-step-arrow{display:none;} .rai-step{border-bottom:1px solid var(--border);} }
             `}</style>
 
             {/* ── Hero ──────────────────────────────────────────────────────── */}
@@ -112,14 +181,21 @@ const ResumeAI = () => {
                 <h1>Smart Resume Matcher</h1>
                 <p>Upload your resume once. Our AI verifies your identity, parses your skills & experience, then matches you with the top 5 most relevant jobs from our database.</p>
                 <div className="rai-steps">
-                    {['Upload Resume', 'Identity Verify', 'AI Parsing', 'Skill Extraction', 'Job Matching', 'Recommendations'].map((s, i, arr) => (
-                        <React.Fragment key={s}>
-                            <div className="rai-step">
-                                <div className="rai-step-dot">{i + 1}</div>
-                                <span>{s}</span>
+                    {[
+                        { label: 'Upload Resume', icon: <Upload size={14} /> },
+                        { label: 'Identity Verify', icon: <Shield size={14} /> },
+                        { label: 'AI Parsing', icon: <FileText size={14} /> },
+                        { label: 'Skill Extraction', icon: <Code size={14} /> },
+                        { label: 'Job Matching', icon: <Briefcase size={14} /> },
+                        { label: 'Recommendations', icon: <Sparkles size={14} /> }
+                    ].map((step, i, arr) => (
+                        <div className="rai-step" key={step.label}>
+                            <div className="rai-step-dot">
+                                {step.icon}
                             </div>
-                            {i < arr.length - 1 && <span className="rai-step-arrow">→</span>}
-                        </React.Fragment>
+                            <span>{step.label}</span>
+                            {i < arr.length - 1 && <div className="rai-step-connector" />}
+                        </div>
                     ))}
                 </div>
             </div>
@@ -128,7 +204,7 @@ const ResumeAI = () => {
 
                 {/* ── Resume Status ─────────────────────────────────────────── */}
                 {!profileLoading && (
-                    <div className="rai-card" style={{ marginBottom: 24 }}>
+                    <div className="rai-card" style={{ marginBottom: 24, marginTop: 10 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                                 <div style={{ width: 52, height: 52, borderRadius: 14, background: hasResume ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', border: `1px solid ${hasResume ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -235,10 +311,10 @@ const ResumeAI = () => {
                             </h2>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
                                 {[
-                                    { label: 'Industry',       value: results.extractedProfile?.industry },
-                                    { label: 'Experience',     value: `${results.experience_years} yrs` },
-                                    { label: 'Level',          value: levelInfo.label },
-                                    { label: 'Education',      value: results.extractedProfile?.educationField },
+                                    { label: 'Industry', value: results.extractedProfile?.industry },
+                                    { label: 'Experience', value: `${results.experience_years} yrs` },
+                                    { label: 'Level', value: levelInfo.label },
+                                    { label: 'Education', value: results.extractedProfile?.educationField },
                                 ].map(({ label, value }) => value ? (
                                     <div key={label} style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '12px 14px' }}>
                                         <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{label}</div>
@@ -385,7 +461,7 @@ const ResumeAI = () => {
 
                 {/* ── Empty / Info state ────────────────────────────────────── */}
                 {!results && !error && !loading && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 16, marginBottom: 10 }}>
                         {[
                             { icon: <Shield size={20} />, color: '#10b981', title: 'Identity Verification', desc: 'We extract your Name, Email & Phone from the resume and match against your registered account.' },
                             { icon: <Code size={20} />, color: '#6366f1', title: 'Deep Skill Extraction', desc: 'NLP powered parsing detects all technical skills, frameworks, tools, certifications & total years of experience.' },
