@@ -94,6 +94,8 @@ const Messages = () => {
     const canvasRef = useRef(null);
 
     const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
+    const isAtBottomRef = useRef(true);
     const inputRef = useRef(null);
     const pollRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -199,23 +201,17 @@ const Messages = () => {
                 const page = document.querySelector('.messages-page');
                 if (page) {
                     page.style.height = `${height - offset}px`;
-                    // Ensure the viewport is centered - avoids upward creep
-                    if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
-                        window.scrollTo(0, 0);
-                    }
                 }
             }
         };
 
         window.visualViewport?.addEventListener('resize', handleResize);
-        window.visualViewport?.addEventListener('scroll', handleResize);
         handleResize();
 
         return () => {
             document.body.style.overflow = originalBodyStyle;
             document.documentElement.style.overflow = originalHtmlStyle;
             window.visualViewport?.removeEventListener('resize', handleResize);
-            window.visualViewport?.removeEventListener('scroll', handleResize);
         };
     }, [loadConversations]);
 
@@ -254,7 +250,16 @@ const Messages = () => {
         if (!silent) setMsgLoading(true);
         try {
             const res = await getMessages(convId);
-            setMessages(res.data.messages || []);
+            const data = res.data.messages || [];
+
+            setMessages(prev => {
+                // If same content, don't update to avoid triggering useEffect[messages]
+                if (prev.length === data.length && prev[prev.length - 1]?._id === data[data.length - 1]?._id) {
+                    return prev;
+                }
+                return data;
+            });
+
             // Update unread to 0 locally
             setConversations(prev =>
                 prev.map(c => c._id === convId ? { ...c, unreadCount: 0 } : c)
@@ -302,16 +307,29 @@ const Messages = () => {
 
     // ── Scroll to bottom when messages change ───────────────────────────
     useEffect(() => {
-        // Use auto behavior initially or if already at bottom to avoid triggering layout shifts
-        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+        if (isAtBottomRef.current) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+        }
     }, [messages]);
+
+    const handleChatScroll = () => {
+        if (!chatContainerRef.current) return;
+        const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+        // If within 150px of bottom, consider it "at bottom"
+        const isBottom = scrollTop + clientHeight >= scrollHeight - 150;
+        isAtBottomRef.current = isBottom;
+    };
 
     // ── Select conversation ─────────────────────────────────────────────
     const selectConversation = async (conv) => {
         setActiveConv(conv);
         setMobileShowConv(false);
         setShowOptions(false);
+        isAtBottomRef.current = true; // Force scroll to bottom on new selection
         await loadMessages(conv._id);
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+        }, 100);
         inputRef.current?.focus({ preventScroll: true });
     };
 
@@ -759,7 +777,12 @@ const Messages = () => {
                         )}
 
                         {/* Messages */}
-                        <div className="chat-messages" onClick={() => { setShowOptions(false); setGifPickerOpen(false); clearSelection(); }}>
+                        <div
+                            className="chat-messages"
+                            ref={chatContainerRef}
+                            onScroll={handleChatScroll}
+                            onClick={() => { setShowOptions(false); setGifPickerOpen(false); clearSelection(); }}
+                        >
                             {msgLoading && (
                                 <div className="chat-loading"><Loader size={22} className="spin" /></div>
                             )}

@@ -353,7 +353,7 @@ const PostCard = ({ post, currentUser, onDelete, onLike, onComment, onDeleteComm
 };
 
 // ── Create Post Box ────────────────────────────────────────────────────────────
-const CreatePost = ({ currentUser, onCreated }) => {
+const CreatePost = ({ currentUser, onCreated, defaultCategory = 'General' }) => {
     const [text, setText] = useState('');
     const [files, setFiles] = useState([]);
     const [previews, setPreviews] = useState([]);
@@ -378,6 +378,7 @@ const CreatePost = ({ currentUser, onCreated }) => {
         try {
             const fd = new FormData();
             if (text.trim()) fd.append('text', text.trim());
+            fd.append('category', defaultCategory);
             files.forEach(f => fd.append('media', f));
             const { data } = await createFeedPost(fd);
             if (data.success) {
@@ -466,10 +467,13 @@ const SocialFeed = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [activeFilter, setActiveFilter] = useState('All Roles');
 
-    const loadPosts = useCallback(async (p = 1) => {
+    const loadPosts = useCallback(async (p = 1, currentFilter = activeFilter) => {
         try {
-            const { data } = await getFeedPosts({ page: p, limit: 10 });
+            const params = { page: p, limit: 10 };
+            if (currentFilter !== 'All Roles') params.category = currentFilter;
+            const { data } = await getFeedPosts(params);
             if (p === 1) setPosts(data.posts);
             else setPosts(prev => [...prev, ...data.posts]);
             setHasMore(p < data.pages);
@@ -479,9 +483,9 @@ const SocialFeed = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [activeFilter]);
 
-    useEffect(() => { loadPosts(1); }, [loadPosts]);
+    useEffect(() => { loadPosts(1, activeFilter); }, [loadPosts, activeFilter]);
 
     const handleCreated = (newPost) => setPosts(prev => [newPost, ...prev]);
 
@@ -582,54 +586,110 @@ const SocialFeed = () => {
     };
 
     return (
-        <div className="social-feed">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 4, height: 28, background: 'var(--gradient-primary)', borderRadius: 4 }} />
-                <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Community Feed</h2>
+        <div className="social-feed-container" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 280px', gap: 24, alignItems: 'flex-start' }}>
+            <div className="social-feed-main">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                    <div style={{ width: 4, height: 28, background: 'var(--gradient-primary)', borderRadius: 4 }} />
+                    <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Community Feed</h2>
+                </div>
+
+                <CreatePost
+                    currentUser={user}
+                    onCreated={handleCreated}
+                    defaultCategory={activeFilter !== 'All Roles' ? activeFilter : 'General'}
+                />
+
+                {loading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+                        <div className="spinner" />
+                    </div>
+                ) : posts.length === 0 ? (
+                    <div className="post-card" style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--text-muted)' }}>
+                        <div style={{ fontSize: 48, marginBottom: 12 }}>📢</div>
+                        <h3 style={{ fontWeight: 700 }}>No posts yet</h3>
+                        <p style={{ fontSize: 14, marginTop: 4 }}>Be the first to share something with the community!</p>
+                    </div>
+                ) : (
+                    <>
+                        {posts.map(post => (
+                            <PostCard
+                                key={post._id}
+                                post={post}
+                                currentUser={user}
+                                onDelete={handleDelete}
+                                onLike={handleLike}
+                                onComment={handleComment}
+                                onDeleteComment={handleDeleteComment}
+                                onShare={handleShare}
+                                onConnect={handleConnect}
+                                onFollow={handleFollow}
+                            />
+                        ))}
+
+                        {hasMore && (
+                            <div style={{ textAlign: 'center', paddingTop: 8 }}>
+                                <button
+                                    className="btn btn-secondary"
+                                    onClick={() => loadPosts(page + 1)}
+                                    style={{ fontSize: 13 }}
+                                >
+                                    Load more
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
 
-            <CreatePost currentUser={user} onCreated={handleCreated} />
-
-            {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
-                    <div className="spinner" />
-                </div>
-            ) : posts.length === 0 ? (
-                <div className="post-card" style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--text-muted)' }}>
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>📢</div>
-                    <h3 style={{ fontWeight: 700 }}>No posts yet</h3>
-                    <p style={{ fontSize: 14, marginTop: 4 }}>Be the first to share something with the community!</p>
-                </div>
-            ) : (
-                <>
-                    {posts.map(post => (
-                        <PostCard
-                            key={post._id}
-                            post={post}
-                            currentUser={user}
-                            onDelete={handleDelete}
-                            onLike={handleLike}
-                            onComment={handleComment}
-                            onDeleteComment={handleDeleteComment}
-                            onShare={handleShare}
-                            onConnect={handleConnect}
-                            onFollow={handleFollow}
-                        />
-                    ))}
-
-                    {hasMore && (
-                        <div style={{ textAlign: 'center', paddingTop: 8 }}>
+            {/* Sidebar with Filters */}
+            <div className="social-feed-sidebar" style={{ position: 'sticky', top: 100 }}>
+                <div className="card" style={{ padding: 20, borderRadius: 24 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Clock size={16} /> Filter by Role
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {['All Roles', 'Technology'].map(filter => (
                             <button
-                                className="btn btn-secondary"
-                                onClick={() => loadPosts(page + 1)}
-                                style={{ fontSize: 13 }}
+                                key={filter}
+                                onClick={() => setActiveFilter(filter)}
+                                style={{
+                                    justifyContent: 'flex-start',
+                                    padding: '10px 16px',
+                                    borderRadius: 14,
+                                    fontSize: 14,
+                                    fontWeight: 700,
+                                    transition: 'var(--transition)',
+                                    background: activeFilter === filter ? 'var(--gradient-primary)' : 'var(--bg-secondary)',
+                                    color: activeFilter === filter ? 'white' : 'var(--text-primary)',
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 10,
+                                    cursor: 'pointer'
+                                }}
                             >
-                                Load more
+                                {filter === 'All Roles' ? '🌍' : '💻'} {filter}
                             </button>
+                        ))}
+                    </div>
+
+                    <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 12 }}>Trending Topics</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                            {['#hiring', '#jobs', '#coding', '#remote'].map(tag => (
+                                <span key={tag} style={{ fontSize: 12, padding: '4px 10px', background: 'var(--bg-secondary)', borderRadius: 20, color: 'var(--primary-light)', fontWeight: 700 }}>{tag}</span>
+                            ))}
                         </div>
-                    )}
-                </>
-            )}
+                    </div>
+                </div>
+            </div>
+
+            <style>{`
+                @media (max-width: 1000px) {
+                    .social-feed-container { grid-template-columns: 1fr !important; }
+                    .social-feed-sidebar { display: none !important; }
+                }
+            `}</style>
         </div>
     );
 };

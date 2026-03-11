@@ -6,17 +6,18 @@ const getBaseURL = () => {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
 
-    // Localhost: use CRA proxy (proxy target defined in package.json)
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
+    // Detect if we are in local development (localhost or LAN IP)
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+    const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
+
+    if (isLocalhost) {
         return '/api';
     }
 
-    // Check if hostname is an IP (local dev with mobile phone)
-    const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
     if (isIP) {
-        // Use the same port as the current window or default to 8000 if it feels like dev
-        const port = window.location.port || '8000';
-        return `${protocol}//${hostname}:${port}/api`;
+        // If we are on mobile accessing via IP, the API is likely on the same IP port 8000
+        // Webpack proxy might or might not handle it, so direct IP is safer
+        return `${protocol}//${hostname}:8000/api`;
     }
 
     // Production fallback
@@ -33,7 +34,7 @@ export const getUploadUrl = (filePath) => {
     let path = filePath;
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
-    const isProduction = !/localhost|127\.0\.0\.1|\[::1\]/.test(hostname) && !/^(?:[192|172|10]\..*|169\.254\..*)$/.test(hostname);
+    const isProduction = !/localhost|127\.0\.0\.1|\[::1\]/.test(hostname) && !/^(?:192\.168\.|172\.16\.|10\.|169\.254\.)/.test(hostname);
 
     // Get live backend URL from env
     const backendBaseFromEnv = process.env.REACT_APP_API_URL
@@ -48,8 +49,9 @@ export const getUploadUrl = (filePath) => {
             path = path.replace(/^http:\/\/(localhost|127\.0\.0\.1)(:[\d]+)?/, backendBaseFromEnv);
         } else if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
             // We are on Mobile IP: swap localhost with PC's IP (assume backend on port 8000)
-            path = path.replace(/localhost:[\d]+/, `${hostname}:8000`);
-            path = path.replace(/(localhost|127\.0\.0\.1)/, hostname);
+            const pcHost = hostname; // The current hostname is the IP of the PC serving the app
+            path = path.replace(/localhost:[\d]+/, `${pcHost}:8000`);
+            path = path.replace(/(localhost|127\.0\.0\.1)/, pcHost);
         }
     }
 
@@ -97,8 +99,7 @@ export const getUploadUrl = (filePath) => {
 
     // Check if we are likely on dev port 3000 but backend is on 8000
     let port = window.location.port;
-    if (port === '3000') port = '8000'; // Common dev setup
-    if (!port && (isIP || hostname === 'localhost')) port = '8000';
+    if (port === '3000' || isIP || hostname === 'localhost') port = '8000';
 
     const backendBase = port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
 

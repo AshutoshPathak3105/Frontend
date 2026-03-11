@@ -53,9 +53,7 @@ const STATUS_CONFIG = {
 };
 
 const AvatarCircle = ({ user, size = 44 }) => {
-    const src = user?.avatar
-        ? (user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000${user.avatar}`)
-        : null;
+    const src = user?.avatar ? getUploadUrl(user.avatar) : null;
     return (
         <div style={{
             width: size, height: size, borderRadius: '50%',

@@ -12,12 +12,17 @@ const CompanyDetail = () => {
     const navigate = useNavigate();
     const [company, setCompany] = useState(null);
     const [jobs, setJobs] = useState([]);
-    const [filteredJobs, setFilteredJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All Roles');
+    const [loading, setLoading] = useState(true);
     const [logoError, setLogoError] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
     const { user, isAuthenticated } = useAuth();
+
+    // Derived filtered jobs
+    const filteredJobs = React.useMemo(() => {
+        if (selectedCategory === 'All Roles') return jobs;
+        return jobs.filter(j => (j.category || 'Other') === selectedCategory);
+    }, [jobs, selectedCategory]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,7 +34,6 @@ const CompanyDetail = () => {
                 setCompany(companyRes.data.company);
                 const fetchedJobs = jobsRes.data.jobs || [];
                 setJobs(fetchedJobs);
-                setFilteredJobs(fetchedJobs);
                 if (user && companyRes.data.company.followers) {
                     setIsFollowing(companyRes.data.company.followers.includes(user._id));
                 }
@@ -50,11 +54,6 @@ const CompanyDetail = () => {
 
     const handleCategoryFilter = (category) => {
         setSelectedCategory(category);
-        if (category === 'All Roles') {
-            setFilteredJobs(jobs);
-        } else {
-            setFilteredJobs(jobs.filter(j => (j.category || 'Other') === category));
-        }
     };
 
     const handleFollow = async () => {
@@ -171,7 +170,9 @@ const CompanyDetail = () => {
                     margin: 12px 0 16px;
                     color: var(--text-primary);
                     letter-spacing: -1.5px;
-                    line-height: 1;
+                    line-height: 1.1;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
                 }
 
                 .full-width-stat-box {
@@ -282,13 +283,29 @@ const CompanyDetail = () => {
                 }
 
                 @media (max-width: 768px) {
-                    .company-hero { height: 180px; }
-                    .header-wrapper { margin-top: -60px; }
-                    .logo-container { width: 120px; height: 120px; border-radius: 20px; border-width: 4px; }
-                    .desktop-only-flex { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
-                    .company-name-h1 { font-size: 28px; }
-                    .stats-badge-container { width: 100%; justify-content: center; }
+                    .company-hero { height: 160px; }
+                    .header-wrapper { margin-top: -80px; }
+                    .profile-header-card { padding: 20px; gap: 20px; border-radius: 24px; }
+                    .header-main-content { gap: 16px; }
+                    .logo-container { width: 90px; height: 90px; border-radius: 18px; border-width: 3px; }
+                    .company-name-h1 { font-size: 24px; margin: 4px 0 8px; }
                     .content-card { padding: 24px; }
+                    .full-width-stat-box { padding: 14px; border-radius: 16px; }
+                    .stat-item-horizontal .val { font-size: 22px; }
+                    .stat-item-horizontal .lbl { font-size: 11px; }
+                }
+
+                @media (max-width: 640px) {
+                    .header-main-content { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+                    .company-info-box { align-items: center; text-align: center; }
+                    .logo-container { width: 110px; height: 110px; }
+                    .company-name-h1 { font-size: 26px; line-height: 1.2; }
+                }
+
+                @media (max-width: 400px) {
+                    .profile-header-card { padding: 16px; }
+                    .logo-container { width: 90px; height: 90px; }
+                    .company-name-h1 { font-size: 22px; }
                 }
             `}</style>
 
@@ -338,7 +355,7 @@ const CompanyDetail = () => {
                                 {company.isVerified && <span className="badge badge-success" style={{ gap: 4 }}><Verified size={12} /> Verified</span>}
                             </div>
                             <h1 className="company-name-h1">{company.name}</h1>
-                            <div style={{ display: 'flex', gap: 20, color: 'var(--text-secondary)', fontSize: 15, flexWrap: 'wrap', whiteSpace: 'nowrap' }}>
+                            <div style={{ display: 'flex', gap: 20, color: 'var(--text-secondary)', fontSize: 15, flexWrap: 'wrap' }}>
                                 {company.location && <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><MapPin size={18} /> {company.location}</span>}
                                 {company.website && (
                                     <a href={company.website} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--primary-light)', fontWeight: 700 }}>

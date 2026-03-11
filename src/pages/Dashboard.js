@@ -4,7 +4,7 @@ import {
     Briefcase, FileText, CheckCircle, Calendar,
     Plus, ArrowRight, Eye, Users, Zap,
     BookmarkCheck, Building2, TrendingUp, UserCheck,
-    Target, Layout, Bell, BarChart2, Send
+    Target, Layout, Bell, BarChart2, Send, Clock
 } from 'lucide-react';
 import { getDashboardStats, getEmployerDashboardStats, getMyApplications, getMyJobs, getUploadUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -43,7 +43,7 @@ const JobSeekerDashboard = () => {
                     getMyApplications()
                 ]);
                 setStats(statsRes.data.stats);
-                setApplications((appsRes.data.applications || []).slice(0, 6));
+                setApplications(appsRes.data.applications || []);
             } catch (err) { console.error(err); }
             finally { setLoading(false); }
         })();
@@ -129,6 +129,46 @@ const JobSeekerDashboard = () => {
                     ))}
                 </div>
 
+                {/* Interview Reminder Section — 30 min before */}
+                {(() => {
+                    const upcoming = applications.find(app =>
+                        app.status === 'interview' &&
+                        app.interviewDate &&
+                        new Date(app.interviewDate) > new Date() &&
+                        new Date(app.interviewDate) - new Date() < 30 * 60 * 1000
+                    );
+                    if (!upcoming) return null;
+                    return (
+                        <div style={{
+                            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                            borderRadius: 'var(--radius-xl)', padding: '20px 24px', marginBottom: 20,
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            boxShadow: '0 10px 30px rgba(79,70,229,0.3)', color: 'white',
+                            animation: 'pulse-notif 2s infinite ease-in-out'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.2)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Clock size={24} color="white" />
+                                </div>
+                                <div>
+                                    <h4 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Interview starting soon!</h4>
+                                    <p style={{ fontSize: 13, opacity: 0.9, margin: 2 }}>{upcoming.job?.title} @ {upcoming.company?.name} · {new Date(upcoming.interviewDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                </div>
+                            </div>
+                            <Link to="/applications" className="btn" style={{ background: 'white', color: '#4f46e5', fontWeight: 700, padding: '8px 20px', fontSize: 13 }}>
+                                Join Now / Details
+                            </Link>
+                            <style>{`
+                                @keyframes pulse-notif {
+                                    0% { transform: scale(1); box-shadow: 0 10px 30px rgba(79,70,229,0.3); }
+                                    50% { transform: scale(1.01); box-shadow: 0 10px 40px rgba(79,70,229,0.4); }
+                                    100% { transform: scale(1); box-shadow: 0 10px 30px rgba(79,70,229,0.3); }
+                                }
+                            `}</style>
+                        </div>
+                    );
+                })()}
+
                 {/* Application Pipeline */}
                 <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', padding: 'clamp(16px, 3vw, 24px)', marginBottom: 28 }}>
                     <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Your Application Pipeline</h2>
@@ -159,44 +199,53 @@ const JobSeekerDashboard = () => {
                                     View All <ArrowRight size={11} />
                                 </Link>
                             </div>
-                            {applications.length > 0 ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                    {applications.map((app, i) => (
-                                        <div key={i} className="dash-recent-item" style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', transition: 'var(--transition)' }}
-                                            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'}
-                                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-                                        >
-                                            <div style={{ width: 40, height: 40, background: 'var(--gradient-primary)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, overflow: 'hidden' }}>
-                                                {app.job?.company?.logo ? (
-                                                    <img
-                                                        src={getUploadUrl(app.job.company.logo)}
-                                                        alt=""
-                                                        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }}
-                                                    />
-                                                ) : null}
-                                                <span style={{ display: app.job?.company?.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>🏢</span>
+                            {(() => {
+                                // Filter out expired interviews (older than 1 hour)
+                                const activeApps = applications.filter(app => {
+                                    if (app.status === 'interview' && app.interviewDate) {
+                                        return new Date(app.interviewDate) > new Date(Date.now() - 60 * 60 * 1000);
+                                    }
+                                    return true;
+                                });
+
+                                if (activeApps.length === 0) return (
+                                    <div className="empty-state" style={{ padding: '28px 16px' }}>
+                                        <div className="empty-state-icon" style={{ fontSize: 36 }}>📋</div>
+                                        <h3 style={{ fontSize: 15 }}>No recent activity</h3>
+                                        <p style={{ fontSize: 13 }}>Browse jobs and start applying to track your progress</p>
+                                    </div>
+                                );
+
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                        {activeApps.slice(0, 6).map((app, i) => (
+                                            <div key={i} className="dash-recent-item" style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', transition: 'var(--transition)' }}
+                                                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)' }}
+                                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)' }}
+                                            >
+                                                <div style={{ width: 40, height: 40, background: 'var(--gradient-primary)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, overflow: 'hidden' }}>
+                                                    {app.job?.company?.logo ? (
+                                                        <img
+                                                            src={getUploadUrl(app.job.company.logo)}
+                                                            alt=""
+                                                            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }}
+                                                        />
+                                                    ) : null}
+                                                    <span style={{ display: app.job?.company?.logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>🏢</span>
+                                                </div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{app.job?.title || 'Unknown Role'}</div>
+                                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{app.job?.company?.name || '—'}</div>
+                                                </div>
+                                                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0, background: STATUS_CONFIG[app.status]?.bg || 'var(--bg-card)', color: STATUS_CONFIG[app.status]?.color || 'var(--text-secondary)' }}>
+                                                    {STATUS_CONFIG[app.status]?.label || app.status}
+                                                </span>
                                             </div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{app.job?.title || 'Unknown Role'}</div>
-                                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{app.job?.company?.name || '—'}</div>
-                                            </div>
-                                            <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0, background: STATUS_CONFIG[app.status]?.bg || 'var(--bg-card)', color: STATUS_CONFIG[app.status]?.color || 'var(--text-secondary)' }}>
-                                                {STATUS_CONFIG[app.status]?.label || app.status}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="empty-state" style={{ padding: '28px 16px' }}>
-                                    <div className="empty-state-icon" style={{ fontSize: 36 }}>📋</div>
-                                    <h3 style={{ fontSize: 15 }}>No applications yet</h3>
-                                    <p style={{ fontSize: 13 }}>Browse jobs and start applying to track your progress</p>
-                                    <Link to="/jobs" className="btn btn-primary btn-sm" style={{ marginTop: 12 }}>
-                                        <Briefcase size={13} /> Browse Jobs
-                                    </Link>
-                                </div>
-                            )}
+                                        ))}
+                                    </div>
+                                );
+                            })()}
                         </div>
                     </div>
 
