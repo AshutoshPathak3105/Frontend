@@ -189,6 +189,9 @@ const Footer = () => {
                         padding: 12px 16px;
                         border-radius: 0;
                     }
+                    footer {
+                        margin-top: 24px !important;
+                    }
                 }
             `}</style>
 
