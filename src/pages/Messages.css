@@ -1422,7 +1422,7 @@
         bottom: 0;
         margin-top: 0;
         /* Use CSS var set by JS when keyboard opens; fall back to 100% of remaining viewport */
-        height: var(--messages-page-height, calc(100vh - 66px));
+        height: var(--messages-page-height, calc(100dvh - 66px));
         overflow: hidden;
         overscroll-behavior: none;
     }

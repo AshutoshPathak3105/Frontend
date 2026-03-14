@@ -3,13 +3,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
     User, MapPin, Briefcase, GraduationCap, Calendar,
     MessageCircle, ThumbsUp, Tag, UserPlus,
-    MoreHorizontal, Users, UserCheck, X, Clock, Camera
+    MoreHorizontal, Users, UserCheck, X, Clock, Camera, Trash2, Upload
 } from 'lucide-react';
 import {
     getProfile, getOrCreateConversation, getFeedPosts,
     togglePostLike, sendConnectionRequest, uploadAvatar,
     addPostComment, toggleFollow, getMe, getUploadUrl, respondToConnectionRequest, removeConnection,
-    cancelConnectionRequest
+    cancelConnectionRequest, updateProfile
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -242,6 +242,7 @@ const PublicProfile = () => {
     const [msgLoading, setMsgLoading] = useState(false);
     const [friendSent, setFriendSent] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [showAvatarMenu, setShowAvatarMenu] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
 
@@ -274,6 +275,21 @@ const PublicProfile = () => {
             toast.success('Profile picture updated');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to update profile picture');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleRemoveAvatar = async () => {
+        if (!window.confirm('Are you sure you want to remove your profile picture?')) return;
+        setUploading(true);
+        try {
+            const res = await updateProfile({ removeAvatar: true });
+            if (updateUser) updateUser(res.data.user);
+            setProfile(prev => ({ ...prev, avatar: '' }));
+            toast.success('Profile picture removed!');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to remove picture');
         } finally {
             setUploading(false);
         }
@@ -483,7 +499,7 @@ const PublicProfile = () => {
                 gap: 8,
                 padding: isMobile ? '0 16px 24px' : 0,
                 width: isMobile ? '100%' : 'auto',
-                justifyContent: isMobile ? 'center' : 'flex-end',
+                justifyContent: isMobile ? 'flex-start' : 'flex-end',
                 zIndex: 10
             }}>
                 {/* Follow Button */}
@@ -614,37 +630,75 @@ const PublicProfile = () => {
                         textAlign: isMobile ? 'center' : 'left',
                         marginTop: isMobile ? 0 : 70
                     }}>
-                        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }} onMouseLeave={() => setShowAvatarMenu(false)}>
                             <div style={{ border: '4px solid var(--bg-card)', borderRadius: '50%', background: 'var(--bg-card)', boxShadow: '0 8px 20px rgba(0,0,0,0.12)', overflow: 'hidden' }}>
                                 <Avatar user={profile} size={isMobile ? 100 : 120} />
                             </div>
                             {isMe && (
-                                <label
-                                    htmlFor="public-profile-avatar-upload"
-                                    onClick={e => { if (uploading) e.preventDefault(); }}
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 5,
-                                        right: 5,
-                                        background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-                                        borderRadius: '50%',
-                                        width: 32,
-                                        height: 32,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: uploading ? 'not-allowed' : 'pointer',
-                                        boxShadow: '0 4px 10px rgba(99, 102, 241, 0.4)',
-                                        color: '#fff',
-                                        border: '3px solid var(--bg-card)',
-                                        transition: 'all 0.2s',
-                                        zIndex: 11
-                                    }}
-                                    title="Change Profile Picture"
-                                >
-                                    <input type="file" id="public-profile-avatar-upload" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" disabled={uploading} />
-                                    {uploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
-                                </label>
+                                <>
+                                    <div
+                                        onClick={e => {
+                                            if (uploading) return;
+                                            e.preventDefault();
+                                            setShowAvatarMenu(!showAvatarMenu);
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: 5,
+                                            right: 5,
+                                            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                                            borderRadius: '50%',
+                                            width: 32,
+                                            height: 32,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: uploading ? 'not-allowed' : 'pointer',
+                                            boxShadow: '0 4px 10px rgba(99, 102, 241, 0.4)',
+                                            color: '#fff',
+                                            border: '3px solid var(--bg-card)',
+                                            transition: 'all 0.2s',
+                                            zIndex: 11
+                                        }}
+                                        title="Change Profile Picture"
+                                    >
+                                        <input type="file" id="public-profile-avatar-upload" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" disabled={uploading} />
+                                        {uploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={14} />}
+                                    </div>
+                                    {showAvatarMenu && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '100%',
+                                            left: isMobile ? 0 : '50%',
+                                            transform: isMobile ? 'none' : 'translateX(-50%)',
+                                            marginTop: 8,
+                                            background: 'var(--bg-card)',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: 12,
+                                            padding: 6,
+                                            zIndex: 100,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            minWidth: 160,
+                                            boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                                        }}>
+                                            <button 
+                                                className="btn" 
+                                                onClick={() => { setShowAvatarMenu(false); document.getElementById('public-profile-avatar-upload').click(); }} 
+                                                style={{ padding: '8px 12px', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--text-primary)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}
+                                            >
+                                                <Upload size={14} /> Upload Photo
+                                            </button>
+                                                <button 
+                                                    className="btn" 
+                                                    onClick={() => { setShowAvatarMenu(false); handleRemoveAvatar(); }} 
+                                                    style={{ padding: '8px 12px', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--danger)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}
+                                                >
+                                                    <Trash2 size={14} /> Remove Photo
+                                                </button>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
 

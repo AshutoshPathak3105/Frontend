@@ -66,6 +66,24 @@ const JobDetail = () => {
         }
     };
 
+    const handleShare = async () => {
+        const url = window.location.href;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: job?.title,
+                    text: `Check out this job: ${job?.title} at ${job?.company?.name}`,
+                    url: url,
+                });
+            } catch (err) {
+                console.log('Error sharing', err);
+            }
+        } else {
+            navigator.clipboard.writeText(url);
+            toast.success('Link copied to clipboard!');
+        }
+    };
+
     const formatSalary = (min, max) => {
         if (!min && !max) return 'Salary not disclosed';
         const fmt = (n) => {
@@ -151,7 +169,22 @@ const JobDetail = () => {
                 @media (max-width: 768px) {
                     .job-hero { padding: 100px 0 40px; }
                     .content-box { padding: 24px; }
-                    .desktop-flex { flex-direction: column; align-items: flex-start !important; gap: 20px; }
+                    .desktop-flex { flex-direction: column; align-items: center !important; gap: 20px; text-align: center; }
+                    .mobile-center { justify-content: center !important; }
+                    .mobile-column-center { display: flex !important; flex-direction: column !important; align-items: center !important; }
+                }
+
+                .job-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+                    gap: 32px;
+                    align-items: start;
+                }
+
+                @media (max-width: 992px) {
+                    .job-grid {
+                        grid-template-columns: 1fr;
+                    }
                 }
 
                 @media (min-width: 1025px) {
@@ -209,14 +242,14 @@ const JobDetail = () => {
                             ) : job.company?.name?.[0]?.toUpperCase()}
                         </div>
 
-                        <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                        <div style={{ flex: 1 }} className="mobile-column-center">
+                            <div className="mobile-center" style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                                 {job.featured && <span className="badge badge-warning">Featured Role</span>}
                                 <span className="badge badge-primary">{job.type}</span>
                                 {isExpired && <span className="badge badge-danger">Closed</span>}
                             </div>
                             <h1 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{job.title}</h1>
-                            <div style={{ display: 'flex', gap: 16, marginTop: 12, color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+                            <div className="mobile-center" style={{ display: 'flex', gap: 16, marginTop: 12, color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
                                 <Link to={`/companies/${job.company?._id}`} style={{ color: 'var(--primary-light)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
                                     <Building2 size={16} /> {job.company?.name}
                                 </Link>
@@ -229,15 +262,15 @@ const JobDetail = () => {
                             <button onClick={handleSave} className="stat-card-mini" style={{ padding: '12px 20px', minWidth: 'auto', cursor: 'pointer' }}>
                                 {saved ? <BookmarkCheck size={20} className="text-primary" /> : <BookmarkPlus size={20} />}
                             </button>
-                            <button className="stat-card-mini" style={{ padding: '12px 20px', minWidth: 'auto', cursor: 'pointer' }}><Share2 size={20} /></button>
+                            <button onClick={handleShare} className="stat-card-mini" style={{ padding: '12px 20px', minWidth: 'auto', cursor: 'pointer' }}><Share2 size={20} /></button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div className="container" style={{ marginTop: 40 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 32, alignItems: 'start' }}>
-                    <div style={{ gridColumn: 'span 2' }}>
+                <div className="job-grid">
+                    <div className="main-column">
                         <div className="content-box">
                             <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>Overview</h2>
                             <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, fontSize: 16, whiteSpace: 'pre-wrap' }}>

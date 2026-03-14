@@ -15,6 +15,7 @@ const Profile = () => {
     const [saving, setSaving] = useState(false);
     const [avatarUploading, setAvatarUploading] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState(null);
+    const [showAvatarMenu, setShowAvatarMenu] = useState(false);
     const avatarInputRef = useRef(null);
     const [activeTab, setActiveTab] = useState('profile');
     const [skillInput, setSkillInput] = useState('');
@@ -109,6 +110,22 @@ const Profile = () => {
     };
 
     const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
+
+    const handleRemoveAvatar = async () => {
+        if (!window.confirm('Are you sure you want to remove your profile picture?')) return;
+        setAvatarUploading(true);
+        try {
+            const res = await updateProfile({ removeAvatar: true });
+            updateUser(res.data.user);
+            setAvatarPreview(null);
+            setProfile(prev => ({ ...prev, avatar: '' }));
+            toast.success('Profile picture removed!');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to remove picture');
+        } finally {
+            setAvatarUploading(false);
+        }
+    };
 
     const handleDeleteAccount = async () => {
         if (!deletePassword) { toast.error('Please enter your password'); return; }
@@ -400,7 +417,7 @@ const Profile = () => {
                             flex: 1,
                             width: '100%'
                         }}>
-                            <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
+                            <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }} onMouseLeave={() => setShowAvatarMenu(false)}>
                                 <label
                                     htmlFor="profile-avatar-upload"
                                     className="profile-hero-avatar"
@@ -422,9 +439,12 @@ const Profile = () => {
                                         </div>
                                     )}
                                 </label>
-                                <label
-                                    htmlFor="profile-avatar-upload"
-                                    onClick={e => { if (avatarUploading) e.preventDefault(); }}
+                                <div
+                                    onClick={e => {
+                                        if (avatarUploading) return;
+                                        e.preventDefault();
+                                        setShowAvatarMenu(!showAvatarMenu);
+                                    }}
                                     style={{
                                         position: 'absolute',
                                         bottom: 0,
@@ -446,7 +466,40 @@ const Profile = () => {
                                     title="Change Profile Picture"
                                 >
                                     {avatarUploading ? <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} /> : <Camera size={isMobile ? 14 : 18} />}
-                                </label>
+                                </div>
+                                {showAvatarMenu && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: isMobile ? 0 : '50%',
+                                        transform: isMobile ? 'none' : 'translateX(-50%)',
+                                        marginTop: 8,
+                                        background: 'var(--bg-card)',
+                                        border: '1px solid var(--border)',
+                                        borderRadius: 12,
+                                        padding: 6,
+                                        zIndex: 100,
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        minWidth: 160,
+                                        boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                                    }}>
+                                        <button 
+                                            className="btn" 
+                                            onClick={() => { setShowAvatarMenu(false); document.getElementById('profile-avatar-upload').click(); }} 
+                                            style={{ padding: '8px 12px', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--text-primary)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}
+                                        >
+                                            <Upload size={14} /> Upload Photo
+                                        </button>
+                                        <button 
+                                            className="btn" 
+                                            onClick={() => { setShowAvatarMenu(false); handleRemoveAvatar(); }} 
+                                            style={{ padding: '8px 12px', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--danger)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}
+                                        >
+                                            <Trash2 size={14} /> Remove Photo
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="profile-hero-info" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -478,21 +531,21 @@ const Profile = () => {
                         }}>
                             <div
                                 onClick={() => navigate('/network?tab=connections')}
-                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: '#f5f7ff', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(99,102,241,0.1)', whiteSpace: 'nowrap' }}
+                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: 'rgba(99, 102, 241, 0.08)', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(99,102,241,0.2)', whiteSpace: 'nowrap' }}
                             >
                                 <span style={{ fontWeight: 800 }}>{profile?.connections?.length || 0}</span>
                                 <span style={{ color: 'var(--text-secondary)' }}>Connections</span>
                             </div>
                             <div
                                 onClick={() => navigate('/network?tab=followers')}
-                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: '#f0fdf4', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(16,185,129,0.1)', whiteSpace: 'nowrap' }}
+                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: 'rgba(16, 185, 129, 0.08)', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(16,185,129,0.2)', whiteSpace: 'nowrap' }}
                             >
                                 <span style={{ fontWeight: 800 }}>{profile?.followers?.length || 0}</span>
                                 <span style={{ color: 'var(--text-secondary)' }}>Followers</span>
                             </div>
                             <div
                                 onClick={() => navigate('/network?tab=following')}
-                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: '#fffbeb', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(245,158,11,0.1)', whiteSpace: 'nowrap' }}
+                                style={{ cursor: 'pointer', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: isMobile ? 4 : 6, fontSize: isMobile ? 10 : 13, background: 'rgba(245, 158, 11, 0.08)', padding: isMobile ? '6px 4px' : '6px 14px', borderRadius: 10, color: 'var(--text-primary)', transition: 'all 0.2s', border: '1px solid rgba(245,158,11,0.2)', whiteSpace: 'nowrap' }}
                             >
                                 <span style={{ fontWeight: 800 }}>{profile?.following?.length || 0}</span>
                                 <span style={{ color: 'var(--text-secondary)' }}>Following</span>
@@ -593,7 +646,7 @@ const Profile = () => {
                                 </div>
                             </div>
 
-                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: isMobile ? 'center' : 'flex-end', width: '100%', marginBottom: 24, marginTop: 24 }}>
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: isMobile ? 'flex-start' : 'flex-end', width: '100%', marginBottom: isMobile ? -4 : 24, marginTop: isMobile ? -12 : 24 }}>
                                 <button onClick={handleProfileSave} disabled={saving} className="btn btn-primary" style={{ padding: '12px 32px' }}>
                                     {saving ? <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Saving...</> : <><Save size={16} /> Save Changes</>}
                                 </button>

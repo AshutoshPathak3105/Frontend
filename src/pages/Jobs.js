@@ -240,8 +240,8 @@ const Jobs = () => {
                                 onMouseEnter={e => e.currentTarget.style.background = 'var(--gradient-button-hover)'}
                                 onMouseLeave={e => e.currentTarget.style.background = 'var(--gradient-button)'}
                             >
+                                <span className="search-btn-text">Search</span>
                                 <Search size={16} />
-                                <span style={{ display: 'none' }} className="search-btn-text">Search</span>
                             </button>
                         </div>
                     </form>
@@ -466,7 +466,7 @@ const Jobs = () => {
                     </div>
                 ) : jobs.length > 0 ? (
                     <>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, marginTop: 12, flexWrap: 'wrap', gap: 12 }}>
                             <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
                                 Showing <strong style={{ color: 'var(--text-primary)' }}>{jobs.length}</strong> of{' '}
                                 <strong style={{ color: 'var(--primary)' }}>{totalJobs}</strong> jobs

@@ -201,7 +201,8 @@ const Messages = () => {
             if (!page) return;
             if (window.visualViewport) {
                 const vh = window.visualViewport.height;
-                page.style.setProperty('--messages-page-height', `${vh}px`);
+                // Subtract navbar height (66px) since the page is positioned at top: 66px
+                page.style.setProperty('--messages-page-height', `${vh - 66}px`);
                 // Scroll the input into view only if user was at bottom
                 if (isAtBottomRef.current && activeConv) {
                     requestAnimationFrame(() => {

@@ -145,6 +145,11 @@
     box-shadow: none;
 }
 
+[data-theme="light"] .tab-btn.active {
+    color: #059669;
+    border-bottom-color: #059669;
+}
+
 /* Scrollbar hidden */
 .network-tabs {
     scrollbar-width: none;
@@ -167,6 +172,10 @@
 .tab-btn.active .tab-badge {
     background: #6366f1;
     color: #fff;
+}
+
+[data-theme="light"] .tab-btn.active .tab-badge {
+    background: #059669;
 }
 
 /* .tab-badge.secondary removed as it was empty */
@@ -327,6 +336,7 @@
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }

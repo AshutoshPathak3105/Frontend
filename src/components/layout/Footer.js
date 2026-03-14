@@ -155,7 +155,12 @@ const Footer = () => {
                     gap: 16px; flex-wrap: wrap;
                 }
 
+                .footer-col-seekers { padding-left: 15px; }
+                .footer-col-employers { padding-left: 20px; }
+                .footer-col-contact { padding-left: 40px; }
+
                 @media (max-width: 1024px) {
+                    .footer-col-seekers, .footer-col-employers, .footer-col-contact { padding-left: 0; }
                     .footer-main-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
                     .footer-stats { grid-template-columns: repeat(2, 1fr); }
                     .footer-stat-item:nth-child(2) { border-right: none; }
@@ -286,7 +291,7 @@ const Footer = () => {
                     </div>
 
                     {/* For Job Seekers */}
-                    <div style={{ paddingLeft: '15px' }}>
+                    <div className="footer-col-seekers">
                         <h4 style={colHeadStyle}>Job Seekers</h4>
                         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {[
@@ -308,7 +313,7 @@ const Footer = () => {
                     </div>
 
                     {/* For Employers */}
-                    <div style={{ paddingLeft: '20px' }}>
+                    <div className="footer-col-employers">
                         <h4 style={colHeadStyle}>Employers</h4>
                         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {[
@@ -330,7 +335,7 @@ const Footer = () => {
                     </div>
 
                     {/* Contact */}
-                    <div style={{ paddingLeft: '40px' }}>
+                    <div className="footer-col-contact">
                         <h4 style={colHeadStyle}>Get In Touch</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
                             {[

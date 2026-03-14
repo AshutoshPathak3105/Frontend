@@ -18,7 +18,7 @@ const Contact = () => {
     };
 
     return (
-        <div style={{ paddingTop: 80, minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <div style={{ paddingTop: 80, paddingBottom: 40, minHeight: '100vh', background: 'var(--bg-primary)' }}>
             <div className="container" style={{ padding: '60px 24px' }}>
                 <div style={{ textAlign: 'center', marginBottom: 60 }}>
                     <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, marginBottom: 16 }}>

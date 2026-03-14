@@ -106,7 +106,7 @@ const JobCard = ({ job, onSaveToggle, isSaved: initialSaved = false }) => {
     const company = job.company;
 
     return (
-        <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', display: 'block' }}>
             <div className="job-card">
                 {/* Status Badges - Top Row */}
                 {(job.isFeatured || job.isUrgent) && (

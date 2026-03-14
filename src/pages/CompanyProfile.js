@@ -418,7 +418,7 @@ const CompanyProfile = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-end', width: '100%', marginBottom: 24, marginTop: 24 }}>
+                        <div style={{ display: 'flex', justifyContent: isMobile ? 'flex-start' : 'flex-end', width: '100%', marginBottom: 24, marginTop: 24 }}>
                             <button type="submit" disabled={saving} className="btn btn-primary" style={{ padding: '12px 36px' }}>
                                 {saving ? <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Saving...</> : <><Save size={16} /> {isNew ? 'Create Profile' : 'Save Changes'}</>}
                             </button>

@@ -83,6 +83,19 @@ const CompanyDetail = () => {
     const logoUrl = getUploadUrl(company.logo);
     const showLogo = logoUrl && !logoError;
 
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: company.name,
+                text: `Check out ${company.name} on JobSarthi!`,
+                url: window.location.href,
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            toast.success('Company link copied to clipboard!');
+        }
+    };
+
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingBottom: 60 }}>
             <style>{`
@@ -392,7 +405,13 @@ const CompanyDetail = () => {
                                 >
                                     {isFollowing ? 'Following' : 'Follow Company'}
                                 </button>
-                                <button className="btn btn-outline" style={{ width: 48, padding: 0, justifyContent: 'center' }}><Share2 size={18} /></button>
+                                <button 
+                                    className="btn btn-outline" 
+                                    style={{ width: 48, padding: 0, justifyContent: 'center' }} 
+                                    onClick={handleShare}
+                                >
+                                    <Share2 size={18} />
+                                </button>
                             </div>
                         </div>
 

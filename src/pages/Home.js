@@ -7,12 +7,8 @@ import LogoImage from '../components/common/Logo';
 import { useAuth } from '../context/AuthContext';
 import '../components/jobs/JobCard.css';
 
-const HERO_STATS = [
-    { value: '50K+', label: 'Active Jobs', icon: '💼' },
-    { value: '10K+', label: 'Companies', icon: '🏢' },
-    { value: '500K+', label: 'Job Seekers', icon: '👥' },
-    { value: '95%', label: 'Success Rate', icon: '🎯' },
-];
+// Will generate stats dynamically inside the component based on backend data
+
 
 const TESTIMONIALS = [];
 
@@ -23,7 +19,7 @@ const Home = () => {
     const [searchLocation, setSearchLocation] = useState('');
     const [featuredJobs, setFeaturedJobs] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [, setStats] = useState(null);
+    const [stats, setStats] = useState(null);
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -62,7 +58,7 @@ const Home = () => {
     return (
         <div>
             <style>{`
-            .home-stats-grid   { display:grid; grid-template-columns: repeat(4,1fr); gap:20px; max-width:920px; margin:64px auto 0; }
+            .home-stats-grid   { display:grid; grid-template-columns: repeat(4,1fr); gap:20px; max-width:920px; margin:64px auto 12px; }
             .home-cat-grid     { display:grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap:16px; }
             .home-cat-link     { display:block; height:100%; text-decoration:none; }
             .home-cat-card     {
@@ -337,9 +333,13 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* Stats */}
                     <div className="home-stats-grid">
-                        {HERO_STATS.map((stat, i) => (
+                        {[
+                            { value: stats?.totalJobs?.toLocaleString() || '0', label: 'Active Jobs', icon: '💼' },
+                            { value: stats?.totalCompanies?.toLocaleString() || '0', label: 'Companies', icon: '🏢' },
+                            { value: stats?.totalUsers?.toLocaleString() || '0', label: 'Job Seekers', icon: '👥' },
+                            { value: stats?.totalApplications?.toLocaleString() || '0', label: 'Applications', icon: '📝' },
+                        ].map((stat, i) => (
                             <div key={i} style={{
                                 background: 'var(--bg-glass)', backdropFilter: 'blur(20px)',
                                 border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)',

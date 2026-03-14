@@ -33,3 +33,9 @@
 .job-card:hover::before {
     opacity: 1;
 }
+
+@media (max-width: 768px) {
+    .job-card {
+        margin-bottom: 12px;
+    }
+}
